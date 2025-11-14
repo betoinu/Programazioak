@@ -1,2 +1,0 @@
-# Programazioak
-Programazioak hobetzeko tresna
