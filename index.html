@@ -163,7 +163,7 @@
          */
         async function loadCurriculumData() {
 			try {
-					const response = await fetch('./curriculumDB.json');  // 
+					const response = await fetch('./json/curriculumDB.json');  // 
 					if (!response.ok) {
 						throw new Error(`HTTP error! status: ${response.status}`);
 					}
@@ -557,4 +557,5 @@
 
     </script>
 </body>
+
 </html>
