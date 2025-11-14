@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="eu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curriculum Diseinurako Laguntzailea (ANECA/GJH)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .form-select, .form-textarea, .form-input {
+            @apply block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out;
+        }
+        .form-select:disabled, .form-textarea:disabled, .form-input:disabled {
+            @apply bg-gray-100 cursor-not-allowed opacity-70;
+        }
+        .btn-primary {
+            @apply inline-flex justify-center w-full px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out;
+        }
+        .btn-primary:disabled {
+            @apply bg-indigo-300 cursor-not-allowed;
+        }
+        .result-section {
+            @apply mt-6 bg-white p-5 rounded-lg shadow-sm border border-gray-200;
+        }
+        h2 {
+            @apply text-lg font-semibold text-gray-800 mb-3 border-b border-gray-200 pb-2;
+        }
+        .loader {
+            @apply w-5 h-5 border-t-2 border-b-2 border-white rounded-full animate-spin;
+        }
+        /* Para lectores de pantalla */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
+        <header class="mb-6">
+            <h1 class="text-3xl font-bold text-gray-900">Curriculum Diseinurako Laguntzailea</h1>
+            <p class="mt-1 text-sm text-gray-600">Graduetarako Ikaskuntza Emaitzak (IE) sortu eta fintzeko tresna (ANECA / AUDIT / GJH).</p>
+        </header>
+
+        <!-- Formulario Principal -->
+        <form id="course-form" class="bg-white p-6 rounded-lg shadow-md border border-gray-200 space-y-6">
+            
+            <!-- Mensaje de Error Global -->
+            <div id="error-message" class="hidden p-3 bg-red-100 text-red-700 border border-red-300 rounded-md"></div>
+
+            <!-- Sección 1: Datuak -->
+            <section>
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">1. Irakasgaiaren Datuak</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Espezialitatea / Gradua -->
+                    <div>
+                        <label for="specialty-select" class="block text-sm font-medium text-gray-700">Espezialitatea / Gradua</label>
+                        <select id="specialty-select" name="specialty" class="form-select mt-1" required>
+                            <option value="">Aukeratu bat...</option>
+                        </select>
+                    </div>
+
+                    <!-- Kurtsoa -->
+                    <div>
+                        <label for="course-select" class="block text-sm font-medium text-gray-700">Kurtsoa</label>
+                        <select id="course-select" name="course" class="form-select mt-1" disabled required>
+                            <option value="">Aukeratu gradu bat...</option>
+                        </select>
+                    </div>
+
+                    <!-- Irakasgaiaren Izena -->
+                    <div class="md:col-span-2">
+                        <label for="subject-select" class="block text-sm font-medium text-gray-700">Irakasgaiaren Izena</label>
+                        <select id="subject-select" name="subject" class="form-select mt-1" disabled aria-disabled="true" aria-describedby="subject-help">
+                            <option value="">Aukeratu kurtso bat lehenik...</option>
+                        </select>
+                        <p id="subject-help" class="sr-only">Irakasgai bat aukeratu arte ezin da hautatu.</p>
+                    </div>
+
+                    <!-- Datu Karga Automatikoa -->
+                    <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label for="area-input" class="block text-sm font-medium text-gray-700">Jakin-arloa</label>
+                            <input type="text" id="area-input" name="area" class="form-input mt-1" readonly disabled>
+                        </div>
+                        <div>
+                            <label for="credits-input" class="block text-sm font-medium text-gray-700">Kredituak (ECTS)</label>
+                            <input type="number" id="credits-input" name="credits" class="form-input mt-1" readonly disabled>
+                        </div>
+                        <div class="flex items-end">
+                            <div class="flex items-center mt-4 sm:mt-0 h-full">
+                                <input id="optional-checkbox" name="optional" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" readonly disabled>
+                                <label for="optional-checkbox" class="ml-2 block text-sm font-medium text-gray-700">Irakasgai hautazkoa da?</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección 2: Ikaskuntza Emaitzak -->
+            <section>
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">2. Ikaskuntza Emaitzak</h2>
+                
+                <!-- Aurrekariak -->
+                <div>
+                    <label for="prerequisitesRAs" class="block text-sm font-medium text-gray-700">Aurrekariak (Beste irakasgaietako IEak)</label>
+                    <textarea id="prerequisitesRAs" name="prerequisitesRAs" rows="4" class="form-textarea mt-1" placeholder="Adib: 'Proiektuak I'-tik: Oinarrizko espazio-konposizioa ulertzen du.&#10;Adib: 'Adierazpen Teknikoa I'-tik: Oinarrizko planoak irakurtzen ditu."></textarea>
+                    <p class="mt-1 text-xs text-gray-500">Idatzi hemen bertikalki lotuta dauden beste irakasgaietako IEak, IA-k progresioa uler dezan. Automatikoki kargatzen da posible denean.</p>
+                </div>
+
+                <!-- Egungo IEak -->
+                <div class="mt-4">
+                    <label for="draftRAs" class="block text-sm font-medium text-gray-700">Egungo IEak (Berrikusteko)</label>
+                    <textarea id="draftRAs" name="draftRAs" rows="10" class="form-textarea mt-1" placeholder="Idatzi hemen zure zirriborroa edo egungo IE ofizialak...&#10;Adib: Barne-diseinuko proiektuen oinarrizko alderdi funtzionalak eta formalak aztertzen ditu." required></textarea>
+                    <p class="mt-1 text-xs text-gray-500">Automatikoki kargatzen da datu-basetik. Berrikusi edo aldatu IA-ri bidali aurretik.</p>
+                </div>
+            </section>
+
+            <!-- Botoia -->
+            <div>
+                <button type
+                ="submit" id="generate-button" class="btn-primary w-full flex items-center justify-center">
+                    <span id="button-text">Iradokizunak Sortu</span>
+                    <div id="button-loader" class="loader hidden"></div>
+                </button>
+            </div>
+        </form>
+
+        <!-- Emaitzen Atala -->
+        <div id="results-container" class="mt-8 space-y-6 hidden">
+            <h2 class="text-2xl font-bold text-gray-900">IA-ren Iradokizunak</h2>
+            
+            <div id="result-ane-ie" class="result-section"></div>
+            <div id="result-ods" class="result-section"></div>
+            <div id="result-criteria" class="result-section"></div>
+            <div id="result-contents" class="result-section"></div>
+            <div id="result-practices" class="result-section"></div>
+            <div id="result-partners" class="result-section"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // --- Script bertsioa (cache-a garbitzeko) ---
+        console.log("Script kargatuta: v" + Date.now());
+
+        // --- "DATU-BASEA" (JSON kargatzailea) ---
+        let curriculumDB = {};
+
+        /**
+         * curriculumDB.json fitxategia kargatzen du eta 'curriculumDB' aldagaia betetzen du.
+         * Espezialitateen menua ere kargatzen du behin datuak jasota.
+         */
+        async function loadCurriculumData() {
+			try {
+					const response = await fetch('./curriculumDB.json');  // 
+					if (!response.ok) {
+						throw new Error(`HTTP error! status: ${response.status}`);
+					}
+					curriculumDB = await response.json();
+					console.log("Datu-basea kargatuta:", curriculumDB);
+					populateSpecialties();
+				} catch (error) {
+					console.error("Errorea datu-basea kargatzean:", error);
+					// ... errore kudeaketa
+				}
+			}
+
+        // --- DOM Elementuak ---
+        const specialtySelect = document.getElementById("specialty-select");
+        const courseSelect = document.getElementById("course-select");
+        const subjectSelect = document.getElementById("subject-select");
+        const areaInput = document.getElementById("area-input");
+        const creditsInput = document.getElementById("credits-input");
+        const optionalCheckbox = document.getElementById("optional-checkbox");
+        const prerequisitesRAs = document.getElementById("prerequisitesRAs");
+        const draftRAs = document.getElementById("draftRAs");
+        const form = document.getElementById("course-form");
+        const generateButton = document.getElementById("generate-button");
+        const buttonText = document.getElementById("button-text");
+        const buttonLoader = document.getElementById("button-loader");
+        const resultsContainer = document.getElementById("results-container");
+        const errorMessage = document.getElementById("error-message");
+
+        // --- Funtzio Logikoak ---
+
+        /**
+         * Espezialitateen menua kargatzen du DB-tik.
+         */
+        function populateSpecialties() {
+            if (!curriculumDB) return;
+            const specialties = Object.keys(curriculumDB);
+            specialtySelect.innerHTML = '<option value="">Aukeratu bat...</option>'; // Garbitu
+            specialties.forEach(spec => {
+                const option = document.createElement("option");
+                option.value = spec;
+                option.textContent = spec;
+                specialtySelect.appendChild(option);
+            });
+        }
+
+        /**
+         * Kurtsoen menua kargatzen du hautatutako espezialitatearen arabera.
+         */
+        function populateCourses(specialty) {
+            const courses = Object.keys(curriculumDB[specialty] || {});
+            courseSelect.innerHTML = '<option value="">Aukeratu bat...</option>'; // Garbitu
+            subjectSelect.innerHTML = '<option value="">Aukeratu kurtso bat...</option>'; // Garbitu
+            
+            if (courses.length > 0) {
+                courses.forEach(course => {
+                    const option = document.createElement("option");
+                    option.value = course;
+                    option.textContent = `${course}. Kurtsoa`;
+                    courseSelect.appendChild(option);
+                });
+                courseSelect.disabled = false;
+            } else {
+                courseSelect.disabled = true;
+            }
+            subjectSelect.disabled = true;
+            resetSubjectDetails();
+        }
+
+        /**
+         * Irakasgaien menua kargatzen du hautatutako kurtsoaren arabera.
+         */
+        function populateSubjects(specialty, course) {
+            const subjects = curriculumDB[specialty]?.[course] || [];
+            subjectSelect.innerHTML = '<option value="">Aukeratu bat...</option>'; // Garbitu
+            
+            if (subjects.length > 0) {
+                subjects.forEach((subject, index) => {
+                    const option = document.createElement("option");
+                    option.value = index; // Erabili index-a ID gisa
+                    option.textContent = subject.izena;
+                    subjectSelect.appendChild(option);
+                });
+                subjectSelect.disabled = false;
+            } else {
+                subjectSelect.disabled = true;
+            }
+            resetSubjectDetails();
+        }
+
+        /**
+         * Irakasgaiaren xehetasunak (kredituak, arloa...) kargatzen ditu.
+         */
+        function populateSubjectDetails(specialty, course, subjectIndex) {
+            const subject = curriculumDB[specialty]?.[course]?.[subjectIndex];
+            if (subject) {
+                areaInput.value = subject.arloa || "";
+                creditsInput.value = subject.kredituak || "";
+                optionalCheckbox.checked = subject.mota === "Hautazkoa";
+                
+                // Kargatu IE ofizialak (baldin badaude)
+                draftRAs.value = subject.currentOfficialRAs ? subject.currentOfficialRAs.join("\n") : "";
+                
+                // Kargatu aurrekariak (baldin badaude)
+                prerequisitesRAs.value = subject.prerequisiteRAs ? subject.prerequisiteRAs.join("\n") : "";
+            } else {
+                resetSubjectDetails();
+            }
+        }
+
+        /**
+         * Irakasgaiaren xehetasunen eremuak garbitzen ditu.
+         */
+        function resetSubjectDetails() {
+            areaInput.value = "";
+            creditsInput.value = "";
+            optionalCheckbox.checked = false;
+            draftRAs.value = "";
+            prerequisitesRAs.value = "";
+        }
+
+        // --- Gertaera-entzuleak (Event Listeners) ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Hasi datu-basea kargatzen
+            loadCurriculumData();
+
+            specialtySelect.addEventListener("change", (e) => {
+                populateCourses(e.target.value);
+            });
+
+            courseSelect.addEventListener("change", (e) => {
+                const specialty = specialtySelect.value;
+                populateSubjects(specialty, e.target.value);
+            });
+
+            subjectSelect.addEventListener("change", (e) => {
+                const specialty = specialtySelect.value;
+                const course = courseSelect.value;
+                populateSubjectDetails(specialty, course, e.target.value);
+            });
+
+            form.addEventListener("submit", (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+                
+                // Hautatutako testuak ere bidali
+                data.specialtyName = specialtySelect.options[specialtySelect.selectedIndex]?.text || data.specialty;
+                data.subjectName = subjectSelect.options[subjectSelect.selectedIndex]?.text || data.subject;
+                data.courseName = courseSelect.options[courseSelect.selectedIndex]?.text || data.course;
+                
+                generateSuggestions(data);
+            });
+        });
+
+
+        // --- API Deia (Gemini) ---
+
+        /**
+         * IA-ri eskaera egin eta emaitzak erakutsi.
+         */
+        async function generateSuggestions(data) {
+            setLoadingState(true);
+            resultsContainer.classList.add("hidden");
+            errorMessage.classList.add("hidden");
+
+            const prompt = buildPrompt(data);
+            
+            try {
+                // Gemini APIari deia
+                const result = await callGeminiAPI(prompt, true); // Google Search gaituta
+                
+                // Emaitzak bistaratu
+                displayResults(result);
+
+            } catch (error) {
+                console.error("Errorea IA-ri deitzean:", error);
+                errorMessage.textContent = `Errore bat gertatu da iradokizunak sortzean: ${error.message}`;
+                errorMessage.classList.remove("hidden");
+            } finally {
+                setLoadingState(false);
+            }
+        }
+
+        /**
+         * Gemini APIrako prompt-a eraikitzen du.
+         */
+        function buildPrompt(data) {
+            // Datuak testu formatura pasa
+            const optionalText = data.optional === "on" ? "Bai (Aipamen ibilbide baterako izan daiteke)" : "Ez";
+            const prerequisitesText = data.prerequisitesRAs ? `Aurrekari gisa, irakasgai honek honako IE hauek ditu oinarri (beste irakasgai batzuetakoak):\n${data.prerequisitesRAs}` : "Ez da aurrekaririk zehaztu.";
+            const draftText = data.draftRAs ? `Hau da irakasleak proposatutako IEen egungo bertsioa (berrikusteko):\n${data.draftRAs}` : "Ez da zirriborrorik eman.";
+
+            // Prompt-a eraiki
+            return `
+                **ROLA:** Espainiako unibertsitate-kalitatean (ANECA, AUDIT) eta irakaskuntza-metodologian aditu perfektua zara.
+
+                **HELBURUA:** Irakasgai baten datuak aztertu eta curriculum-diseinu osoa eta koherentea proposatzea, 6 ataletan banatuta.
+
+                **TESTUINGURUA:**
+                - **Gradua:** ${data.specialtyName}
+                - **Kurtsoa:** ${data.courseName}
+                - **Irakasgaia:** ${data.subjectName}
+                - **Jakin-arloa:** ${data.area}
+                - **Kredituak (ECTS):** ${data.credits}
+                - **Hautazkoa:** ${optionalText}
+
+                **SARRERAKO DATUAK (IRAKASLEAK EMANAK):**
+                1. **Aurrekariak (Lotura Bertikala):** ${prerequisitesText}
+                2. **Egungo IE Zirriborroa:** ${draftText}
+
+                **ZURE EGINKIZUNA (ATALKA):**
+                Mesedez, sortu 6 atal hauek Markdown formatuan. Ez erabili H1 (###) goiburuak, H2 (##) bakarrik erabil ditzakezu atal bakoitzaren izenerako.
+
+                ## 1. IE Berrikusiak (ANECA/AUDIT Arautara Egokituak)
+                Hartu irakaslearen IE zirriborroa eta aurrekariak. Berridatzi ANECA/AUDIT arauen arabera (ekintza-aditz behagarriak Bloom-en taxonomiari jarraituz). IE tekniko eta zeharkako (transbertsalak) nahastu. Kopurua kredituen araberakoa izan behar da (${data.credits} ECTS = gutxi gorabehera ${Math.round(data.credits / 1.5)}-${Math.round(data.credits)} IE).
+                *Oharra: Aurrekariak aipatu badira, ziurtatu IE hauek aurrekoen mailakatze (scaffolding) logiko bat direla (konplexutasun handiagoa).*
+
+                ## 2. Garapen Jasangarrirako Helburuen (GJH/ODS) Integrazioa
+                Proposatu nola integra daitezkeen GJHak (ODS) berrikusitako IE horietan. Aipatu 2-3 GJH zehatz (adibidez, GJH 11: Hiri eta Komunitate Jasangarriak) eta azaldu nola landu daitezkeen irakasgaian.
+
+                ## 3. Ebaluazio Irizpideen Iradokizunak
+                Zerrendatu proposatutako IE bakoitza ebaluatzeko irizpide zehatzak. (Adib: IE 1.1 ebaluatzeko: "Aurkeztutako planoek araudia betetzen dute %100ean").
+
+                ## 4. Edukien Iradokizun Zehatzak
+                IE horiek lortzeko landu beharko liratekeen eduki-bloke zehatzak iradoki (gai-zerrenda).
+
+                ## 5. Ebaluaziorako Praktika Iradokizunak
+                Proposatu 2-3 praktika, proiektu edo jarduera zehatz (adib: "Erronkatan Oinarritutako Ikaskuntza (EOI) proiektu bat non...") ikasleek IE horiek garatu eta ebaluatuak izan daitezen.
+
+                ## 6. Erakunde Kolaboratzaileak (Google Search Erabiliz)
+                **Erabili Google Search** Euskadiko, Espainiako eta Europako 3-5 erakunde, enpresa edo estudio zehatz aurkitzeko, irakasgai honen jakin-arloarekin (${data.area} eta ${data.subjectName}) lotuta daudenak, kolaborazioak (hitzaldiak, praktikak, proiektuak) egiteko.
+            `;
+        }
+
+        /**
+         * Gemini APIari deia egiten dio.
+         */
+        async function callGeminiAPI(prompt, useGoogleSearch = false) {
+            const apiKey = ""; // API gakoa Canvas inguruneak kudeatuko du
+            const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: {
+                    parts: [{ text: "Erantzun beti euskaraz. Zure rola Espainiako unibertsitate-kalitatean aditua da. Egituratu erantzuna Markdown formatuan, eskatutako 6 ataletan." }]
+                },
+                tools: []
+            };
+
+            if (useGoogleSearch) {
+                payload.tools.push({ "google_search": {} });
+            }
+
+            // Deia egin eta erantzuna prozesatu (exponential backoff logikarekin)
+            let response;
+            let retries = 0;
+            const maxRetries = 5;
+            let delay = 1000;
+
+            while (retries < maxRetries) {
+                try {
+                    response = await fetch(geminiApiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.status === 429 || response.status >= 500) {
+                        // Throttling edo zerbitzari errorea, saiatu berriro
+                        throw new Error(`Server error or throttling: ${response.status}`);
+                    }
+
+                    if (!response.ok) {
+                        // Bestelako erroreak (adib. 400 Bad Request)
+                        const errorData = await response.json();
+                        throw new Error(`API Error: ${response.status} - ${errorData.error?.message || response.statusText}`);
+                    }
+
+                    // Erantzun zuzena
+                    const result = await response.json();
+                    
+                    const candidate = result.candidates?.[0];
+                    if (candidate && candidate.content?.parts?.[0]?.text) {
+                        return candidate.content.parts[0].text;
+                    } else {
+                        throw new Error("APIaren erantzunak ez du baliozko testurik.");
+                    }
+
+                } catch (error) {
+                    console.warn(`Saiakera ${retries + 1} huts egin du: ${error.message}`);
+                    retries++;
+                    if (retries < maxRetries) {
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2; // Handitu atzerapena
+                    } else {
+                        throw error; // Saiakera maximoa gaindituta
+                    }
+                }
+            }
+        }
+
+        /**
+         * Emaitzak HTML-n bistaratzen ditu.
+         */
+        function displayResults(markdownText) {
+            // Funtzio honek Markdown sinplea HTML bihurtzen du
+            const htmlText = simpleMarkdownToHTML(markdownText);
+            
+            // Atalak banatu '<h2>' etiketen arabera
+            const sections = htmlText.split('<h2>');
+            
+            if (sections.length > 1) {
+                sections.shift(); // Kendu lehen elementu hutsa
+                
+                const sectionMap = {
+                    "1. IE Berrikusiak": "result-ane-ie",
+                    "2. Garapen Jasangarrirako Helburuen": "result-ods",
+                    "3. Ebaluazio Irizpideen Iradokizunak": "result-criteria",
+                    "4. Edukien Iradokizun Zehatzak": "result-contents",
+                    "5. Ebaluaziorako Praktika Iradokizunak": "result-practices",
+                    "6. Erakunde Kolaboratzaileak": "result-partners"
+                };
+
+                // Garbitu aurreko emaitzak
+                Object.values(sectionMap).forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.innerHTML = '';
+                });
+
+                sections.forEach(section => {
+                    const titleEndIndex = section.indexOf('</h2>');
+                    if (titleEndIndex === -1) return;
+                    
+                    const title = section.substring(0, titleEndIndex).trim();
+                    const content = section.substring(titleEndIndex + 5).trim(); // 5 = '</h2>'.length
+
+                    // Bilatu atalari dagokion IDa
+                    const matchingKey = Object.keys(sectionMap).find(key => title.includes(key));
+                    if (matchingKey) {
+                        const targetElement = document.getElementById(sectionMap[matchingKey]);
+                        if (targetElement) {
+                            // Gehitu titulua eta edukia
+                            targetElement.innerHTML = `<h2>${title}</h2>${content}`;
+                        }
+                    }
+                });
+
+            } else {
+                // Ezin izan da ataletan banatu, erakutsi dena batera
+                const fallbackElement = document.getElementById("result-ane-ie");
+                if (fallbackElement) {
+                    fallbackElement.innerHTML = htmlText;
+                }
+            }
+
+            resultsContainer.classList.remove("hidden");
+            // Scroll egin emaitzetara
+            resultsContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        /**
+         * Markdown sinplea HTML bihurtzen du.
+         */
+        function simpleMarkdownToHTML(text) {
+            if (!text) return "";
+            return text
+                .replace(/## (.*)/g, '<h2>$1</h2>') // H2
+                .replace(/\* \*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+                .replace(/\*(.*?)\*/g, '<em>$1</em>') // Italic
+                .replace(/^- (.*)/gm, '<ul><li>$1</li></ul>') // Unordered list (sinplea)
+                .replace(/- (.*)/gm, '<ul><li>$1</li></ul>') // Unordered list (alternatiboa)
+                .replace(/<\/ul>\s*<ul>/g, '') // Konpondu listak
+                .replace(/\n/g, '<br>'); // Lerro-jauziak
+        }
+
+        /**
+         * Botoiaren karga-egoera kudeatzen du.
+         */
+        function setLoadingState(isLoading) {
+            if (isLoading) {
+                generateButton.disabled = true;
+                buttonText.classList.add("hidden");
+                buttonLoader.classList.remove("hidden");
+            } else {
+                generateButton.disabled = false;
+                buttonText.classList.remove("hidden");
+                buttonLoader.classList.add("hidden");
+            }
+        }
+
+    </script>
+</body>
+</html>
