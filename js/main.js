@@ -51,9 +51,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function initializeGlobalAnalysis() {
     try {
         // Kargatu moduluak dinamikoki
-        const competenceModule = await import('./analysis/competence-analyzer.js');
-        const curriculumModule = await import('./data/curriculum-loader.js');
-        const displayModule = await import('./visualization/analysis-display.js');
+        const competenceModule = await import('../analysis/competence-analyzer.js');
+        const curriculumModule = await import('../data/curriculum-loader.js');
+        const displayModule = await import('../visualization/analysis-display.js');
         
         // ✅ Ahora estas variables son locales a la función
         const CompetenceAnalyzer = competenceModule.CompetenceAnalyzer;
@@ -206,6 +206,7 @@ function setLoadingState(isLoading) {
 window.showError = showError;
 window.hideError = hideError;
 window.setLoadingState = setLoadingState;
+
 
 
 
