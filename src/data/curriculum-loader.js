@@ -4,7 +4,7 @@ export class CurriculumLoader {
             console.log('📥 Cargando datos del curriculum BD...');
             
             // Cargar el JSON existente
-            const response = await fetch('./curriculumBD.json');
+            const response = await fetch('./public/json/curriculumBD.json');
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -85,4 +85,5 @@ export class CurriculumLoader {
             }
         ];
     }
+
 }
