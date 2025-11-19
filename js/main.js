@@ -1,27 +1,27 @@
 // Configuración
-import { APP_CONFIG } from './config/app-config.js';
+import { APP_CONFIG } from '../config/app-config.js';
 
 // Servicios
-import { GroqAPIService } from './services/api-service.js';
-import { CurriculumDataService } from './services/data-service.js';
+import { GroqAPIService } from '../services/api-service.js';
+import { CurriculumDataService } from '../services/data-service.js';
 
 // Utils
-import { PromptBuilder } from './utils/prompt-builder.js';
+import { PromptBuilder } from '../utils/prompt-builder.js';
 
 // Components
-import { ResultsDisplay } from './components/results-display.js';
-import { initializeApp } from './components/app-initializer.js';
-import { setupEventListeners } from './components/event-manager.js';
-import { APIKeyManager } from './components/api-key-manager.js';
+import { ResultsDisplay } from '../components/results-display.js';
+import { initializeApp } from '../components/app-initializer.js';
+import { setupEventListeners } from '../components/event-manager.js';
+import { APIKeyManager } from '../components/api-key-manager.js';
 
 // Analysis - NOMBRE CORRECTO
-import { CompetenceAnalyzer } from './analysis/competence-analyzer.js';
+import { CompetenceAnalyzer } from '../analysis/competence-analyzer.js';
 
 // Data - SI LO NECESITAS
-import { CurriculumLoader } from './data/curriculum-loader.js';
+import { CurriculumLoader } from '../data/curriculum-loader.js';
 
 // Visualization - SI LO NECESITAS  
-import { AnalysisDisplay } from './visualization/analysis-display.js';
+import { AnalysisDisplay } from '../visualization/analysis-display.js';
 
 // ===== APLIKAZIOA HASIERATU =====
 document.addEventListener('DOMContentLoaded', async () => {
@@ -207,5 +207,6 @@ function setLoadingState(isLoading) {
 window.showError = showError;
 window.hideError = hideError;
 window.setLoadingState = setLoadingState;
+
 
 
