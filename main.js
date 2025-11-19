@@ -1,11 +1,11 @@
-import { APP_CONFIG } from './config/app-config.js';
-import { GroqAPIService } from './services/api-service.js';
-import { CurriculumDataService } from './services/data-service.js';
-import { PromptBuilder } from './utils/prompt-builder.js';
-import { ResultsDisplay } from './components/results-display.js';
-import { initializeApp } from './components/app-initializer.js';
-import { setupEventListeners } from './components/event-manager.js';
-import { APIKeyManager } from './components/api-key-manager.js';
+import { APP_CONFIG } from 'config/app-config.js';
+import { GroqAPIService } from 'services/api-service.js';
+import { CurriculumDataService } from 'services/data-service.js';
+import { PromptBuilder } from 'utils/prompt-builder.js';
+import { ResultsDisplay } from 'components/results-display.js';
+import { initializeApp } from 'components/app-initializer.js';
+import { setupEventListeners } from 'components/event-manager.js';
+import { APIKeyManager } from 'components/api-key-manager.js';
 
 // ===== APLIKAZIOA HASIERATU =====
 document.addEventListener('DOMContentLoaded', async () => {
@@ -191,3 +191,4 @@ function setLoadingState(isLoading) {
 window.showError = showError;
 window.hideError = hideError;
 window.setLoadingState = setLoadingState;
+
