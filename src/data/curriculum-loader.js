@@ -1,10 +1,12 @@
 export class CurriculumLoader {
+    export class CurriculumLoader {
     static async loadCompleteCurriculumData() {
         try {
             console.log('📥 Cargando datos del curriculum BD...');
             
-            // Cargar el JSON existente
+            // ✅ USA ESTA RUTA QUE SÍ FUNCIONA
             const response = await fetch('./public/json/curriculumBD.json');
+            
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -16,7 +18,6 @@ export class CurriculumLoader {
             
         } catch (error) {
             console.error('❌ Error cargando curriculum:', error);
-            console.log('🔄 Usando datos de ejemplo para prueba...');
             return this.getSampleData();
         }
     }
@@ -26,7 +27,7 @@ export class CurriculumLoader {
         const gradoPrincipal = "Barne Diseinuko Goi Mailako Arte Irakaskuntzetako Gradua";
         
         if (!rawData[gradoPrincipal]) {
-            console.warn('⚠️ No se encuentra el grado principal en los datos');
+            console.warn('⚠️ No se encuentra el grado principal');
             return this.getSampleData();
         }
         
@@ -50,7 +51,7 @@ export class CurriculumLoader {
             }
         }
         
-        console.log(`✅ Curriculum estructurado: ${structuredData.length} asignaturas en ${new Set(structuredData.map(s => s.area)).size} áreas`);
+        console.log(`✅ Curriculum estructurado: ${structuredData.length} asignaturas`);
         return structuredData;
     }
 
@@ -87,3 +88,4 @@ export class CurriculumLoader {
     }
 
 }
+
