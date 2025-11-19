@@ -1,5 +1,5 @@
 export class CurriculumLoader {
-    export class CurriculumLoader {
+    
     static async loadCompleteCurriculumData() {
         try {
             console.log('📥 Cargando datos del curriculum BD...');
@@ -88,4 +88,5 @@ export class CurriculumLoader {
     }
 
 }
+
 
