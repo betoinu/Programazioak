@@ -8,6 +8,7 @@ import { initializeApp } from './components/app-initializer.js';
 import { setupEventListeners } from './components/event-manager.js';
 import { APIKeyManager } from './components/api-key-manager.js';
 import { CompetenceAnalyzer } from './src/analysis/competence-analyzer.js';
+import { CurriculumLoader } from './src/data/curriculum-loader.js';
 
 // ===== APLIKAZIOA HASIERATU =====
 document.addEventListener('DOMContentLoaded', async () => {
@@ -30,19 +31,67 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // Función para lanzar el análisis global
+// Función mejorada para lanzar análisis global
 async function launchGlobalAnalysis() {
+    const button = document.getElementById('global-analysis-btn');
+    const buttonText = document.getElementById('global-analysis-text');
+    const loader = document.getElementById('global-analysis-loader');
+    const resultsContainer = document.getElementById('global-analysis-results');
+    
     try {
-        // Cargar todos los datos del curriculum
-        const allCurriculumData = await loadCompleteCurriculumData();
+        // Estado de carga
+        button.disabled = true;
+        buttonText.textContent = 'Analizatzen...';
+        loader.classList.remove('hidden');
+        resultsContainer.classList.add('hidden');
         
-        const results = await CompetenceAnalyzer.performGlobalAnalysis(allCurriculumData);
+        console.log('🚀 Analisi Globala abiarazten...');
+        
+        // Ejecutar análisis completo
+        const results = await CompetenceAnalyzer.performGlobalAnalysis();
         
         // Mostrar resultados
         displayCompetenceAnalysis(results);
         
+        // Éxito
+        buttonText.textContent = 'Analisia Osatuta!';
+        setTimeout(() => {
+            buttonText.textContent = 'Berriro Hasi Analisia';
+            button.disabled = false;
+            loader.classList.add('hidden');
+        }, 2000);
+        
     } catch (error) {
-        console.error('❌ Errorea analisi globala egiten:', error);
+        console.error('❌ Errorea analisi globalean:', error);
+        
+        // Error state
+        buttonText.textContent = 'Errorea - Saiatu Berriro';
+        button.disabled = false;
+        loader.classList.add('hidden');
+        
+        // Mostrar error
+        showError(`Analisi globalean errorea: ${error.message}`);
     }
+}
+
+function displayCompetenceAnalysis(results) {
+    const resultsContainer = document.getElementById('global-analysis-results');
+    const summaryContent = document.getElementById('summary-content');
+    const areaContent = doc
+        ument.getElementById('area-content');
+    const recommendationsContent = document.getElementById('recommendations-content');
+    
+    // Mostrar contenedor
+    resultsContainer.classList.remove('hidden');
+    
+    // 1. Resumen ejecutivo
+    summaryContent.innerHTML = this.buildSummaryHTML(results);
+    
+    // 2. Análisis por áreas
+    areaContent.innerHTML = this.buildAreaAnalysisHTML(results.areaAnalyses);
+    
+    // 3. Recomendaciones
+    recommendationsContent.innerHTML = this.buildRecommendationsHTML(results);
 }
 
 // Botón para lanzar el análisis (añadir al HTML)
@@ -90,4 +139,5 @@ export function hideError() {
     }
 
 }
+
 
