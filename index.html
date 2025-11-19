@@ -7,96 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Curriculum Diseinurako Laguntzailea</title>
     
-    <!-- 🎯 TAILWIND + BACKUP -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- ✅ TAILWIND DESKARGATUA -->
+    <link href="./css/tailwind.css" rel="stylesheet">
+    
+    <!-- ✅ GOOGLE FONTS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* 🔧 STYLE BACKUP (Tailwind errore baten kasuan) */
-        /* Layout */
-        .hidden { display: none !important; }
-        .block { display: block !important; }
-        .flex { display: flex !important; }
-        .w-full { width: 100% !important; }
-        
-        /* Spacing */
-        .p-6 { padding: 1.5rem !important; }
-        .px-3 { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
-        .py-2 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
-        .mt-1 { margin-top: 0.25rem !important; }
-        .mb-4 { margin-bottom: 1rem !important; }
-        
-        /* Colors */
-        .bg-white { background-color: white !important; }
-        .bg-indigo-600 { background-color: #4f46e5 !important; }
-        .bg-gray-50 { background-color: #f9fafb !important; }
-        .text-white { color: white !important; }
-        .text-gray-800 { color: #1f2937 !important; }
-        
-        /* Borders */
-        .border { border-width: 1px !important; }
-        .border-gray-200 { border-color: #e5e7eb !important; }
-        .border-gray-300 { border-color: #d1d5db !important; }
-        .rounded-lg { border-radius: 0.5rem !important; }
-        .rounded-md { border-radius: 0.375rem !important; }
-        
-        /* Shadows */
-        .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important; }
-        .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important; }
-        
-        /* 🔧 ZURE ESTILO PERTSONALIZATUAK */
-        .form-select, .form-textarea, .form-input {
-            display: block;
-            width: 100%;
-            padding: 0.5rem 0.75rem;
-            background-color: white;
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            transition: all 0.15s ease-in-out;
-        }
-        .form-select:focus, .form-textarea:focus, .form-input:focus {
-            outline: none;
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-        
-        .btn-primary {
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            padding: 0.5rem 1rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: white;
-            background-color: #4f46e5;
-            border: 1px solid transparent;
-            border-radius: 0.375rem;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            transition: all 0.15s ease-in-out;
-            cursor: pointer;
-        }
-        .btn-primary:hover {
-            background-color: #4338ca;
-        }
-        .btn-primary:disabled {
-            background-color: #a5b4fc;
-            cursor: not-allowed;
-        }
-        
-        .loader {
-            width: 1.25rem;
-            height: 1.25rem;
-            border: 2px solid transparent;
-            border-top: 2px solid white;
-            border-bottom: 2px solid white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        body {
+            font-family: 'Inter', sans-serif;
         }
     </style>
 </head>
@@ -213,3 +132,4 @@
 </body>
 
 </html>
+
