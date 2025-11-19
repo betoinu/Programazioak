@@ -1,69 +1,66 @@
-Curriculum Diseinurako Laguntzailea 🎓
+# Curriculum Diseinurako Laguntzailea 🎓
+
 Euskal curriculum diseinurako tresna adimenduna, ANECA/AUDIT/GJH arauekin bateragarria.
 
-🚀 Ezaugarriak
-Ikaskuntza Emaitzen Diseinua ANECA/AUDIT arauetara egokituak
+## 🚀 Ezaugarriak
 
-GJH Integrazioa (Garapen Jasangarrirako Helburuak)
+- **Ikaskuntza Emaitzen Diseinua** ANECA/AUDIT arauetara egokituak
+- **GJH Integrazioa** (Garapen Jasangarrirako Helburuak)
+- **Groq AI** bidezko iradokizun automatikoak
+- **Interfaze erraza** euskaraz
 
-Groq AI bidezko iradokizun automatikoak
+## 🛠️ Instalazioa
 
-Interfaze erraza euskaraz
-
-🛠️ Instalazioa
-Deskargatu kodea:
-
-bash
+1. **Deskargatu kodea:**
+```bash
 git clone https://github.com/zure-izena/curriculum-diseinu-laguntzailea.git
 cd curriculum-diseinu-laguntzailea
-API Gakoa Konfiguratu:
+```
 
-bash
+2. **API Gakoa Konfiguratu:**
+```bash
 # 1. Kopiatu template fitxategia
 cp src/config/app-config-template.js src/config/app-config.js
 
 # 2. Editatu app-config.js eta jarri zure API gakoa
 nano src/config/app-config.js
-API Gakoa Lortu:
+```
 
-Joan: https://console.groq.com
+3. **API Gakoa Lortu:**
+   - Joan: [https://console.groq.com](https://console.groq.com)
+   - Erregistratu (doakoa da)
+   - Sortu API gako berria
+   - Kopiatu gakoa
 
-Erregistratu (doakoa da)
-
-Sortu API gako berria
-
-Kopiatu gakoa
-
-Abiarazi aplikazioa:
-
-bash
+4. **Abiarazi aplikazioa:**
+```bash
 python -m http.server 8000
 # edo
 npx http-server
 # edo
 php -S localhost:8000
-Bisitatu: http://localhost:8000
+```
 
-📋 Erabilera
-Aukeratu gradua, kurtsoa eta irakasgaia
+5. **Bisitatu:** `http://localhost:8000`
 
-Ikusi automatikoki kargatzen diren datuak
+## 📋 Erabilera
 
-Egin klik "Iradokizunak Sortu" botoian
+1. Aukeratu gradua, kurtsoa eta irakasgaia
+2. Ikusi automatikoki kargatzen diren datuak
+3. Egin klik "Iradokizunak Sortu" botoian
+4. Ikusi 6 ataletako curriculum proposamena
 
-Ikusi 6 ataletako curriculum proposamena
+## 🏗️ Egitura Teknikoa
 
-🏗️ Egitura Teknikoa
-Frontend: HTML5, Tailwind CSS, JavaScript ES6+
+- **Frontend**: HTML5, Tailwind CSS, JavaScript ES6+
+- **AI API**: Groq Cloud
+- **Datuak**: JSON formatuan
+- **Hizkuntza**: Euskara
 
-AI API: Groq Cloud
+## ⚠️ Oharra
 
-Datuak: JSON formatuan
+API gakoa konfiguratu behar da `src/config/app-config.js` fitxategian.
 
-Hizkuntza: Euskara
+## 📄 Lizentzia
 
-⚠️ Oharra
-API gakoa konfiguratu behar da src/config/app-config.js fitxategian.
-
-📄 Lizentzia
-MIT Lizentzia - LICENSE fitxategia ikusi
+MIT Lizentzia - [LICENSE](LICENSE) fitxategia ikusi
