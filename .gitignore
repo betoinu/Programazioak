@@ -3,7 +3,7 @@
 # =================================
 
 # API gakoak eta konfigurazio pribatuak
-src/config/app-config.js
+config/app-config.js
 .env
 .env.local
 .env.production
@@ -151,4 +151,5 @@ yarn.lock
 *.DS_Store?
 
 # Ez igo app-config.js (zure API gakoa duena)
-src/config/app-config.js
+config/app-config.js
+
