@@ -404,8 +404,8 @@
 						"currentOfficialRAs": [
 							"Ikasgaiari dagozkion ezagutza teorikoak eskuratzea.",
 							"Lanaren lege-esparrua aztertzea eta interpretatzea, eta lan-harremanetatik eratortzen diren eskubideak eta betebeharrak ezagutzea.",
-							"Enpresa txiki edo ertain bat antolatzeko eta kudeatzeko lege-eskakizunak ezagutzea, produkzio-faktoreak, faktore juridikoak, merkataritzakoakta gizarte- et6a lan-arlokoak kontuan hartuta.",
-							"Lan-merkatuan eta etengabeko prestakuntzan sartzeko bideak identifikatzea, eta helburu horietara bideratutako erakunde instituzional, nazional  eeta komunitarioak ezagutzea.",
+							"Enpresa txiki edo ertain bat antolatzeko eta kudeatzeko lege-eskakizunak ezagutzea, produkzio-faktoreak, faktore juridikoak, merkataritzakoakta gizarte- eta lan-arlokoak kontuan hartuta.",
+							"Lan-merkatuan eta etengabeko prestakuntzan sartzeko bideak identifikatzea, eta helburu horietara bideratutako erakunde instituzional, nazional  eta komunitarioak ezagutzea.",
 							"Laneko segurtasunari eta higieneari buruzko arauak ulertzea eta aplikatzea, eta ingurumenarekiko babesarekiko sentikortasuna garatzea, bizi-kalitatearen faktore erabakigarri gisa."
 						]
                     },
@@ -493,7 +493,7 @@
                         "kredituak": 5,
                         "arloa": "ERAIKUNTZA ETA TEKNOLOGIA",
                         "currentOfficialRAs": [
-                            "Eraikin bateko eraikuntza-elementuak bereiztea eta zertarako diren eta bana-banaka zein beste elementu batzuekiko erlazioan nola erantzuten duten jakitea."
+                            "Eraikin bateko eraikuntza-elementuak bereiztea eta zertarako diren eta bana-banaka zein beste elementu batzuekiko erlazioan nola erantzuten duten jakitea.",
 							"Eraikin baten egituraren funtzionamenduaren oinarrizko alderdiak zein diren jakitea.",
 							"Egiturazko elementu txikiak kalkulatzea.",
 							"Eraikuntza-arloko terminologia jakitea.",
@@ -518,10 +518,10 @@
 							"Eraikuntza-prozesuetarako aukerak alderatzea eta egokiena hautatzea.",
 							"Eraikuntzaren esparruan oinarri teorikoa eta praktikoa lortzea, lanbide-jardunean erabiltzeko.",
 							"Eraikuntza-arazoak eta -xehetasunak indarreko araudiaren arabera konpontzeko oinarrizko ezagutzak bereganatzea.",
-							"Eraikuntza-materialen eta -elementuen erabilerari eta aplikazioari lotutako ingurumen alderdiak zein diren	jakitea.",
+							"Eraikuntza-materialen eta elementuen erabilerari eta aplikazioari lotutako ingurumen alderdiak zein diren jakitea.",
 							"Eskura dauden informazio-bideak erabiltzea, merkatuan dauden eraikuntza-materialez ikertzeko."
-                    }
-                ],
+                    	]
+                },
                     {
                         "izena": "Akustika eta argiztapena",
                         "mota": "Hautazkoa",
@@ -583,8 +583,7 @@
 							"Proiektuen alderdi konplexuak sinplifikatu eta argitu eskuz irudikatzeko eta irudikapen digitaleko baliabideak	erabiliz.",
 							"Konposizio-irudi eta estilo pertsonalizatua eta bereizgarria sortu."
                         ]
-                    }
-					},
+                    },
 					{
                         "izena": "Home Staging",
                         "mota": "Hautazkoa",
@@ -800,5 +799,8 @@
                 "3": [],
                 "4": []
             }
+        }
     }
+
+
 
