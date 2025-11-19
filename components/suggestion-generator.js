@@ -1,7 +1,7 @@
 import { GroqAPIService } from '../services/api-service.js';
 import { PromptBuilder } from '../utils/prompt-builder.js';
 import { ResultsDisplay } from './results-display.js';
-import { setLoadingState, showError, hideError } from '../js/main.js';
+import { setLoadingState, showError, hideError } from '../utils/ui-helpers.js';
 
 export async function generateSuggestions(data) {
     setLoadingState(true);
@@ -27,3 +27,4 @@ export async function generateSuggestions(data) {
     }
 
 }
+
