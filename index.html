@@ -170,6 +170,48 @@
                     🔑 API Gakoa Konfiguratu
                 </button>
             </div>
+
+            <!-- Botón de Análisis Global -->
+            <div class="mt-8 p-6 bg-white rounded-lg shadow-md border border-gray-200 text-center">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">🔍 Analisi Kompetentzial Globala</h3>
+                <p class="text-sm text-gray-600 mb-4">Gradu osoaren ikuspegitik analizatu konpetentziak eta haien garapena</p>
+                
+                <button 
+                    id="global-analysis-btn" 
+                    class="btn-primary inline-flex items-center justify-center px-6 py-3"
+                    onclick="launchGlobalAnalysis()"
+                >
+                    <span id="global-analysis-text">Hasi Analisi Globala</span>
+                    <div id="global-analysis-loader" class="loader hidden ml-2"></div>
+                </button>
+                
+                <p class="text-xs text-gray-500 mt-3">
+                    Analisiak gradu osoaren datuak erabiliko ditu konpetentzia mapa osatu bat sortzeko
+                </p>
+            </div>
+            
+            <!-- Nuevo contenedor para resultados del análisis global -->
+            <div id="global-analysis-results" class="mt-8 space-y-6 hidden">
+                <h2 class="text-2xl font-bold text-gray-900">🏛️ Analisi Kompetentzial Globala - Emaitzak</h2>
+                
+                <!-- Resumen ejecutivo -->
+                <div id="analysis-summary" class="result-section">
+                    <h3 class="text-xl font-semibold mb-4">📊 Laburpen Exekutiboa</h3>
+                    <div id="summary-content"></div>
+                </div>
+                
+                <!-- Análisis por áreas -->
+                <div id="area-analyses" class="result-section">
+                    <h3 class="text-xl font-semibold mb-4">🎯 Analisiak Arloen Arabera</h3>
+                    <div id="area-content" class="space-y-4"></div>
+                </div>
+                
+                <!-- Recomendaciones -->
+                <div id="analysis-recommendations" class="result-section">
+                    <h3 class="text-xl font-semibold mb-4">💡 Gomendioak eta Hobespenak</h3>
+                    <div id="recommendations-content"></div>
+                </div>
+            </div>
             
             <script>
             function showAPIKeyPrompt() {
@@ -178,7 +220,7 @@
                     localStorage.setItem('groq_api_key', apiKey);
                     alert('API gakoa gordeta!');
                 }
-            }
+            }         
             </script>
             
             <!-- Emaitzen Atala -->
@@ -199,6 +241,7 @@
     <script type="module" src="src/main.js"></script>
 </body>
 </html>
+
 
 
 
