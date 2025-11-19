@@ -218,9 +218,9 @@
                         "arloa": "DISEINUAREN IKUS-ADIERAZPENA",
                         "currentOfficialRAs": [
                             "Lantaldean bolumen sinpleak eta konposatuak grafikoki irudikatzeko irudikapen teknikoko sistemarik egokiena aukeratu izana argudiatzea.",
-							"Irudikapen teknikoko sistema zuzen	eta zehatz aplikatzea, lan-dokumentuetan bolumen sinpleak eta konposatuak grafikoki irudikatzeko.",
+							"Irudikapen teknikoko sistema zuzen eta zehatz aplikatzea, lan-dokumentuetan bolumen sinpleak eta konposatuak grafikoki irudikatzeko.",
 							"Bolumenak eta espazioak irudikatzeko lanetan lantaldearen irudikapen teknikoko sistemak behar bezala erabiltzen direla berrikustea.",
-							"Barne-diseinuko proiektuen	diseinuan eta eraikuntza-xehetasunetan bolumenen eta espazioen benetako	magnitudea zehaztasunez	definitzea.",
+							"Barne diseinuko proiektuen diseinuan eta eraikuntza-xehetasunetan bolumenen eta espazioen benetako magnitudea zehaztasunez definitzea.",
 							"Maketa bat eraikitzeko garaian lantaldeak egindako irudikapen-sistemen bidez egindako irudikapenak dituzten planoak deskodetzeko.",
 							"Bolumen konposatuak diseinatzeko pentsamendu dibergentea erabiliz, formak eta espazioak buruz irudikatzea.",
 							"Irudikapen-sistemak proiektu- eta eraikuntza-planoen marrazketarekin lotzea, dokumentu teknikoen produkzioa ulertzeko eta erabiltzeko.",
@@ -802,6 +802,7 @@
             }
         }
     
+
 
 
 
