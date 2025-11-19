@@ -1,4 +1,5 @@
 // ===== INPORTATU MODULU GUZTIAK =====
+// ✅ AHORA (consistente - TODOS relativos a main.js en src/):
 import { APP_CONFIG } from './config/app-config.js';
 import { GroqAPIService } from './services/api-service.js';
 import { CurriculumDataService } from './services/data-service.js';
@@ -7,9 +8,11 @@ import { ResultsDisplay } from './components/results-display.js';
 import { initializeApp } from './components/app-initializer.js';
 import { setupEventListeners } from './components/event-manager.js';
 import { APIKeyManager } from './components/api-key-manager.js';
-import { CompetenceAnalyzer } from './src/analysis/competence-analyzer.js';
-import { CurriculumLoader } from './src/data/curriculum-loader.js';
-import { AnalysisDisplay } from './src/visualization/analysis-display.js';
+
+// ✅ NUEVOS MÓDULOS - Rutas consistentes
+import { CompetenceAnalyzer } from './analysis/competence-analyzer.js';
+import { CurriculumLoader } from './data/curriculum-loader.js';
+import { AnalysisDisplay } from './visualization/analysis-display.js';
 
 // ===== APLIKAZIOA HASIERATU =====
 document.addEventListener('DOMContentLoaded', async () => {
@@ -148,6 +151,7 @@ export function hideError() {
     }
 
 }
+
 
 
 
