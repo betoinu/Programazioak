@@ -3,10 +3,9 @@ export class CurriculumDataService {
 
     static async loadData() {
         try {
-            const response = await fetch('./public/json/curriculumBD.json');
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+            const response = await fetch('./json/curriculumBD.json');
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            
             this.curriculumData = await response.json();
             console.log('📊 Curriculum datuak kargatuta');
             return this.curriculumData;
@@ -26,5 +25,14 @@ export class CurriculumDataService {
 
     static getSubjects(specialty, course) {
         return this.curriculumData[specialty]?.[course] || [];
+    }
+
+    // ✅ GEHITU FUNTZIO HAU!
+    static getSubjectDetails(specialty, course, subjectIndex) {
+        const subjects = this.curriculumData[specialty]?.[course];
+        if (subjects && subjects[subjectIndex]) {
+            return subjects[subjectIndex];
+        }
+        return null;
     }
 }
