@@ -1,5 +1,5 @@
 // ===== INPORTATU MODULU GUZTIAK =====
-import { APP_CONFIG } from '../config/app-config.js';
+import { APP_CONFIG } from './config/app-config.js';
 import { GroqAPIService } from './services/api-service.js';
 import { CurriculumDataService } from './services/data-service.js';
 import { PromptBuilder } from './utils/prompt-builder.js';
@@ -61,4 +61,5 @@ export function hideError() {
     if (errorMessage) {
         errorMessage.classList.add("hidden");
     }
+
 }
