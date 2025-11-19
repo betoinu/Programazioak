@@ -163,7 +163,24 @@
                     </button>
                 </div>
             </form>
-
+            
+            <!-- index.html-en, formularioaren ondoren gehitu -->
+            <div class="mt-4 text-center">
+                <button onclick="showAPIKeyPrompt()" class="text-sm text-indigo-600 hover:text-indigo-800">
+                    🔑 API Gakoa Konfiguratu
+                </button>
+            </div>
+            
+            <script>
+            function showAPIKeyPrompt() {
+                const apiKey = prompt("Sartu zure Groq API gakoa:");
+                if (apiKey) {
+                    localStorage.setItem('groq_api_key', apiKey);
+                    alert('API gakoa gordeta!');
+                }
+            }
+            </script>
+            
             <!-- Emaitzen Atala -->
             <div id="results-container" class="mt-8 space-y-6 hidden">
                 <h2 class="text-2xl font-bold text-gray-900">IA-ren Iradokizunak</h2>
@@ -182,6 +199,7 @@
     <script type="module" src="src/main.js"></script>
 </body>
 </html>
+
 
 
 
