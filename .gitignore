@@ -147,4 +147,8 @@ yarn.lock
 .history/
 
 # MacOS
+
 *.DS_Store?
+
+# Ez igo app-config.js (zure API gakoa duena)
+src/config/app-config.js
