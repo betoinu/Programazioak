@@ -9,6 +9,7 @@ import { setupEventListeners } from './components/event-manager.js';
 import { APIKeyManager } from './components/api-key-manager.js';
 import { CompetenceAnalyzer } from './src/analysis/competence-analyzer.js';
 import { CurriculumLoader } from './src/data/curriculum-loader.js';
+import { AnalysisDisplay } from './src/visualization/analysis-display.js';
 
 // ===== APLIKAZIOA HASIERATU =====
 document.addEventListener('DOMContentLoaded', async () => {
@@ -77,22 +78,30 @@ async function launchGlobalAnalysis() {
 function displayCompetenceAnalysis(results) {
     const resultsContainer = document.getElementById('global-analysis-results');
     const summaryContent = document.getElementById('summary-content');
-    const areaContent = doc
-        ument.getElementById('area-content');
+    const areaContent = document.getElementById('area-content');
     const recommendationsContent = document.getElementById('recommendations-content');
     
     // Mostrar contenedor
     resultsContainer.classList.remove('hidden');
     
-    // 1. Resumen ejecutivo
-    summaryContent.innerHTML = this.buildSummaryHTML(results);
-    
-    // 2. Análisis por áreas
-    areaContent.innerHTML = this.buildAreaAnalysisHTML(results.areaAnalyses);
-    
-    // 3. Recomendaciones
-    recommendationsContent.innerHTML = this.buildRecommendationsHTML(results);
+    // Usar el display helper
+    summaryContent.innerHTML = AnalysisDisplay.buildSummaryHTML(results);
+    areaContent.innerHTML = AnalysisDisplay.buildAreaAnalysisHTML(results.areaAnalyses);
+    recommendationsContent.innerHTML = AnalysisDisplay.buildRecommendationsHTML(results);
 }
+
+// Inicializar cuando se cargue la página
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('✅ Analisi Globala modulua prest!');
+    
+    // Verificar que el botón existe
+    const analysisButton = document.getElementById('global-analysis-btn');
+    if (analysisButton) {
+        console.log('🔍 Analisi botoia aurkitu da');
+    } else {
+        console.warn('⚠️ Analisi botoia ez da aurkitu');
+    }
+});
 
 // Botón para lanzar el análisis (añadir al HTML)
 function addGlobalAnalysisButton() {
@@ -139,5 +148,6 @@ export function hideError() {
     }
 
 }
+
 
 
