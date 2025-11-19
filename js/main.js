@@ -48,8 +48,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ===== ANALISI GLOBALA =====
-let CompetenceAnalyzer, CurriculumLoader, AnalysisDisplay;
-
 async function initializeGlobalAnalysis() {
     try {
         // Kargatu moduluak dinamikoki
@@ -207,6 +205,7 @@ function setLoadingState(isLoading) {
 window.showError = showError;
 window.hideError = hideError;
 window.setLoadingState = setLoadingState;
+
 
 
 
