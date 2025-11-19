@@ -3,7 +3,7 @@ export class CurriculumDataService {
 
     static async loadData() {
         try {
-            const response = await fetch('./public/json/curriculumBD.json');
+            const response = await fetch('./data/curriculumBD.json');
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             
             this.curriculumData = await response.json();
@@ -36,4 +36,5 @@ export class CurriculumDataService {
         return null;
     }
 }
+
 
