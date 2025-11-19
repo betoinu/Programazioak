@@ -96,10 +96,32 @@ export class APIKeyManager {
     }
 
     static getAPIKey() {
-        return APP_CONFIG.API.GROQ_API_KEY;
+    // 1. Leer SIEMPRE del localStorage primero (fuente de verdad)
+    const storedKey = localStorage.getItem('groq_api_key');
+    
+    console.log('🔑 Debug getAPIKey:', {
+        storedInLocalStorage: !!storedKey,
+        storedValue: storedKey ? storedKey.substring(0, 8) + '...' : 'none',
+        inAppConfig: APP_CONFIG.API.GROQ_API_KEY !== "erabiltzaileak-konfiguratuko-du"
+    });
+    
+    // 2. Si hay clave válida en localStorage, usarla y sincronizar APP_CONFIG
+    if (storedKey && storedKey.trim() && storedKey !== "erabiltzaileak-konfiguratuko-du") {
+        // Sincronizar con APP_CONFIG
+        if (APP_CONFIG.API.GROQ_API_KEY !== storedKey) {
+            APP_CONFIG.API.GROQ_API_KEY = storedKey;
+            console.log('🔄 APP_CONFIG actualizado con clave localStorage');
+        }
+        return storedKey;
     }
+    
+    // 3. Si no, usar APP_CONFIG (fallback)
+    console.log('⚠️ Usando APP_CONFIG como fallback');
+    return APP_CONFIG.API.GROQ_API_KEY;
+}
 
     static validateAPIKey(apiKey) {
         return apiKey && apiKey.startsWith('gsk_') && apiKey.length > 20;
     }
 }
+
