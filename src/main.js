@@ -7,6 +7,7 @@ import { ResultsDisplay } from './components/results-display.js';
 import { initializeApp } from './components/app-initializer.js';
 import { setupEventListeners } from './components/event-manager.js';
 import { APIKeyManager } from './components/api-key-manager.js';
+import { CompetenceAnalyzer } from './src/analysis/competence-analyzer.js';
 
 // ===== APLIKAZIOA HASIERATU =====
 document.addEventListener('DOMContentLoaded', async () => {
@@ -27,6 +28,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('❌ Errorea aplikazioa hasieratzean:', error);
     }
 });
+
+// Función para lanzar el análisis global
+async function launchGlobalAnalysis() {
+    try {
+        // Cargar todos los datos del curriculum
+        const allCurriculumData = await loadCompleteCurriculumData();
+        
+        const results = await CompetenceAnalyzer.performGlobalAnalysis(allCurriculumData);
+        
+        // Mostrar resultados
+        displayCompetenceAnalysis(results);
+        
+    } catch (error) {
+        console.error('❌ Errorea analisi globala egiten:', error);
+    }
+}
+
+// Botón para lanzar el análisis (añadir al HTML)
+function addGlobalAnalysisButton() {
+    const button = document.createElement('button');
+    button.textContent = '🔍 Analisi Kompetentzial Globala';
+    button.className = 'btn-primary mt-4';
+    button.onclick = launchGlobalAnalysis;
+    
+    document.querySelector('header').appendChild(button);
+}
 
 // ===== FUNTZIO GLOBALAK (beharrezkoak baldin badaude) =====
 export function setLoadingState(isLoading) {
@@ -63,3 +90,4 @@ export function hideError() {
     }
 
 }
+
