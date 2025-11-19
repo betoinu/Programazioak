@@ -55,9 +55,10 @@ async function initializeGlobalAnalysis() {
         const curriculumModule = await import('./data/curriculum-loader.js');
         const displayModule = await import('./visualization/analysis-display.js');
         
-        CompetenceAnalyzer = competenceModule.CompetenceAnalyzer;
-        CurriculumLoader = curriculumModule.CurriculumLoader;
-        AnalysisDisplay = displayModule.AnalysisDisplay;
+        // ✅ Ahora estas variables son locales a la función
+        const CompetenceAnalyzer = competenceModule.CompetenceAnalyzer;
+        const CurriculumLoader = curriculumModule.CurriculumLoader; 
+        const AnalysisDisplay = displayModule.AnalysisDisplay;
         
         console.log('✅ Analisi Globala moduluak kargatuta');
         
@@ -205,6 +206,7 @@ function setLoadingState(isLoading) {
 window.showError = showError;
 window.hideError = hideError;
 window.setLoadingState = setLoadingState;
+
 
 
 
