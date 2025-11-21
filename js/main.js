@@ -26,6 +26,9 @@ import { ANECA_STANDARDS } from '../data/aneca-standards.js';
 import { CurriculumCoverage } from '../analysis/curriculum-coverage.js';
 import { HorizontalCoherence } from '../analysis/horizontal-coherence.js';
 import { AnecaValidator } from '../analysis/aneca-validator.js';
+import { ContentAlignment } from '../analysis/content-alignment.js';
+import { MatrixDisplay } from '../visualization/matrix-display.js';
+import { GapAnalyzer } from '../visualization/gap-analyzer.js';
 
 // ===== APLIKAZIOA HASIERATU =====
 document.addEventListener('DOMContentLoaded', async () => {
@@ -69,31 +72,55 @@ async function initializeGlobalAnalysis() {
         const ambitosProfesionales = globalAnalyzer.identificarAmbitosProfesionales();
         const progresionCompetencial = globalAnalyzer.analizarProgresionCompetencial();
         
-        // 2. MATRICES ANECA
+        // 2. MATRICES ANECA COMPLETAS
         const matrizCompetenciasRA = CompetenceMapper.generarMatrizCompetenciasRA(curriculumData);
         const matrizRAsignaturas = CurriculumCoverage.generarMatrizRAsignaturas(curriculumData);
         const matrizCompetenciasAsignaturas = HorizontalCoherence.generarMatrizCompetenciasAsignaturas(curriculumData);
+        const matrizContenidosRA = ContentAlignment.generarMatrizContenidosRA(curriculumData);
         
         // 3. VALIDACIÓN ANECA
         const validacionANECA = AnecaValidator.validarCumplimientoCompleto(curriculumData);
         
+        // 4. DETECCIÓN DE HUECOS
+        const analisisHuecos = GapAnalyzer.analizarHuecosCurriculares(curriculumData, {
+            competenciasRA: matrizCompetenciasRA,
+            RAsignaturas: matrizRAsignaturas
+        });
+        
         console.log('✅ Análisis ANECA completado');
         
-        // Mostrar resultados
-        this.mostrarDashboardANECA({
+        // 5. MOSTRAR DASHBOARD COMPLETO
+        MatrixDisplay.mostrarDashboardANECA({
             ambitosProfesionales,
             progresionCompetencial,
             matrices: {
                 competenciasRA: matrizCompetenciasRA,
                 RAsignaturas: matrizRAsignaturas,
-                competenciasAsignaturas: matrizCompetenciasAsignaturas
+                competenciasAsignaturas: matrizCompetenciasAsignaturas,
+                contenidosRA: matrizContenidosRA
             },
-            validacionANECA
+            validacionANECA,
+            analisisHuecos
         });
         
     } catch (error) {
         console.error('❌ Error en Análisis Global ANECA:', error);
+        showError(`Error en análisis ANECA: ${error.message}`);
     }
+}
+
+// ===== SISTEMA BIDIRECCIONAL =====
+function setupBidirectionalSystem() {
+    // Conectar eventos entre análisis global y específico
+    document.addEventListener('globalAnalysisComplete', (event) => {
+        const { issues, recomendaciones } = event.detail;
+        this.derivarMejorasEspecificas(issues, recomendaciones);
+    });
+    
+    document.addEventListener('specificImprovementApplied', (event) => {
+        const { asignatura, cambios } = event.detail;
+        this.actualizarAnalisisGlobal(asignatura, cambios);
+    });
 }
 
 function setupAnalysisButton() {
@@ -231,6 +258,7 @@ function setLoadingState(isLoading) {
 window.showError = showError;
 window.hideError = hideError;
 window.setLoadingState = setLoadingState;
+
 
 
 
