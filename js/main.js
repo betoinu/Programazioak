@@ -67,10 +67,16 @@ async function initializeGlobalAnalysis() {
         const validacionANECA = AnecaValidator.validarCumplimientoCompleto(curriculumData);
         
         // 4. DETECCIÓN DE HUECOS
-        const analisisHuecos = GapAnalyzer.analizarHuecosCurriculares(curriculumData, {
-            competenciasRA: matrizCompetenciasRA,
-            RAsignaturas: matrizRAsignaturas
-        });
+        // ✅ CORREGIDO:
+        console.log("🔍 Preparando matrices para GapAnalyzer...");
+        const matricesANECA = {
+            RAsignaturas: matrizRAsignaturas,
+            competenciasRA: matrizCompetenciasRA
+        };
+        console.log("📊 matricesANECA:", matricesANECA);
+        
+        const analisisHuecos = GapAnalyzer.analizarHuecosCurriculares(curriculumData, matricesANECA);
+        console.log("✅ Huecos detectados:", analisisHuecos);
         
         console.log('✅ Análisis ANECA completado');
         
@@ -137,6 +143,7 @@ window.initializeGlobalAnalysis = initializeGlobalAnalysis;
 window.setupBidirectionalSystem = setupBidirectionalSystem;
 
 console.log('✅ Todos los módulos ANECA exportados al objeto global');
+
 
 
 
