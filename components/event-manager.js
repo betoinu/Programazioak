@@ -1,6 +1,5 @@
 import { CurriculumDataService } from '../services/data-service.js';
 import { populateCourses, populateSubjects, populateSubjectDetails } from './app-initializer.js';
-import { generateSuggestions } from './suggestion-generator.js';
 
 export function setupEventListeners() {
     const specialtySelect = document.getElementById("specialty-select");
@@ -53,4 +52,5 @@ function handleFormSubmit(e) {
     data.courseName = courseSelect.options[courseSelect.selectedIndex]?.text || data.course;
     
     generateSuggestions(data);
+
 }
