@@ -1,4 +1,4 @@
-export class CurriculumDataService {
+class CurriculumDataService {
     static curriculumData = {};
 
     static async loadData() {
@@ -36,6 +36,7 @@ export class CurriculumDataService {
         return null;
     }
 }
+
 
 
 
