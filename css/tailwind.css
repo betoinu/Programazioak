@@ -203,4 +203,62 @@
     clip: rect(0, 0, 0, 0) !important;
     white-space: nowrap !important;
     border-width: 0 !important;
+
+}
+
+/* Estilos ANECA Dashboard */
+.aneca-dashboard {
+    @apply p-6 bg-white rounded-lg shadow-lg;
+}
+
+.matrix-table {
+    @apply overflow-x-auto border rounded-lg;
+}
+
+.matrix-table table {
+    @apply w-full text-sm;
+}
+
+.matrix-table th {
+    @apply bg-gray-50 p-3 text-left font-semibold border-b;
+}
+
+.matrix-table td {
+    @apply p-3 border-b;
+}
+
+.compliance-badge {
+    @apply inline-block px-3 py-1 rounded-full text-white font-semibold;
+}
+
+.compliance-badge.compliant {
+    @apply bg-green-500;
+}
+
+.compliance-badge.non-compliant {
+    @apply bg-red-500;
+}
+
+.status.compliant {
+    @apply text-green-600;
+}
+
+.status.non-compliant {
+    @apply text-red-600;
+}
+
+.alertas-section {
+    @apply mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded;
+}
+
+.checklist-item {
+    @apply flex items-start p-3 border rounded mb-2;
+}
+
+.checklist-item.checked {
+    @apply bg-green-50 border-green-200;
+}
+
+.checklist-item.unchecked {
+    @apply bg-red-50 border-red-200;
 }
