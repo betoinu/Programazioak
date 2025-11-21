@@ -113,6 +113,30 @@ window.showError = showError;
 window.hideError = hideError;
 window.setLoadingState = setLoadingState;
 
+// ===== EXPORTAR MÓDULOS AL OBJETO GLOBAL =====
+
+// Servicios y componentes base
+window.CurriculumDataService = CurriculumDataService;
+window.GroqAPIService = GroqAPIService;
+window.APIKeyManager = APIKeyManager;
+window.ResultsDisplay = ResultsDisplay;
+
+// Sistema ANECA completo
+window.GlobalAnalyzer = GlobalAnalyzer;
+window.CompetenceMapper = CompetenceMapper;
+window.CurriculumCoverage = CurriculumCoverage;
+window.HorizontalCoherence = HorizontalCoherence;
+window.ContentAlignment = ContentAlignment;
+window.AnecaValidator = AnecaValidator;
+window.MatrixDisplay = MatrixDisplay;
+window.GapAnalyzer = GapAnalyzer;
+window.ANECA_STANDARDS = ANECA_STANDARDS;
+
+// Funciones principales
+window.initializeGlobalAnalysis = initializeGlobalAnalysis;
+window.setupBidirectionalSystem = setupBidirectionalSystem;
+
+console.log('✅ Todos los módulos ANECA exportados al objeto global');
 
 
 
