@@ -83,7 +83,55 @@ export class AnecaValidator {
             }
         ];
     }
+    static evaluarClaridadCompetencias(competencias) {
+    let score = 0;
+    competencias.forEach(comp => {
+        if (comp.descripcion && comp.descripcion.length > 20) score += 1;
+        if (comp.codigo) score += 1;
+        if (comp.descripcion?.includes('ser capaz de')) score += 1;
+    });
+    return score / (competencias.length * 3);
+}
+
+    static evaluarMedibilidadRAs(RAs) {
+        let score = 0;
+        const verbosMedibles = ['analizar', 'diseñar', 'evaluar', 'crear', 'resolver', 'implementar'];
+        
+        RAs.forEach(ra => {
+            const texto = ra.descripcion?.toLowerCase() || ra.toLowerCase();
+            if (verbosMedibles.some(verbo => texto.includes(verbo))) score += 1;
+        });
+        
+        return score / RAs.length;
+    }
+    
+    static evaluarAlineacion(competencias, RAs) {
+        const competenciasText = competencias.map(c => c.descripcion?.toLowerCase() || c.toLowerCase()).join(' ');
+        const RAsText = RAs.map(ra => ra.descripcion?.toLowerCase() || ra.toLowerCase()).join(' ');
+        
+        const palabrasComunes = competenciasText.split(' ')
+            .filter(palabra => RAsText.includes(palabra) && palabra.length > 4);
+        
+        return palabrasComunes.length / Math.max(competencias.length, RAs.length);
+    }
+    
+    static recopilarEvidenciasPerfilEgreso(curriculumData) {
+        return [
+            'Documento de plan de estudios',
+            'Matriz de competencias', 
+            'Resultados de aprendizaje definidos'
+        ];
+    }
+    
+    static calcularPuntuacionPerfil(competencias, RAs) {
+        const claridad = this.evaluarClaridadCompetencias(competencias);
+        const medibilidad = this.evaluarMedibilidadRAs(RAs);
+        const alineacion = this.evaluarAlineacion(competencias, RAs);
+        
+        return (claridad + medibilidad + alineacion) / 3;
+    }
   }
+
 
 
 
