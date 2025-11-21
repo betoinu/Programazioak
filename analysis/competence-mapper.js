@@ -42,6 +42,19 @@ static async generarMatrizCompetenciasRA(curriculumData) {
     }
 }
 
+// ✅ AÑADIR ESTE MÉTODO FALTANTE:
+static calcularDistribucionCursos(competencias) {
+    const distribucion = {};
+    competencias.forEach(comp => {
+        if (comp.cursos && Array.isArray(comp.cursos)) {
+            comp.cursos.forEach(curso => {
+                distribucion[curso] = (distribucion[curso] || 0) + 1;
+            });
+        }
+    });
+    return distribucion;
+}
+    
 // NUEVOS MÉTODOS PARA LA NUEVA ESTRUCTURA
 static calcularMetricasCompetencias(competencias) {
     return {
@@ -151,6 +164,47 @@ static analizarProgresionCurricular(competencias) {
         });
         return evidencias;
     }
+
+    // ✅ AÑADIR MÉTODOS AUXILIARES FALTANTES:
+    static analizarDistribucionBloom(competencias) {
+        const distribucion = {};
+        competencias.forEach(comp => {
+            const nivel = comp.nivelBloom?.nivel || comp.nivelBloom || 'RECORDAR';
+            distribucion[nivel] = (distribucion[nivel] || 0) + 1;
+        });
+        return distribucion;
+    }
+    
+    static analizarProgresionCurricular(competencias) {
+        const progresion = { cursos: {} };
+        
+        competencias.forEach(comp => {
+            if (comp.cursos && Array.isArray(comp.cursos)) {
+                comp.cursos.forEach(curso => {
+                    if (!progresion.cursos[curso]) {
+                        progresion.cursos[curso] = { competencias: 0, creditos: 0 };
+                    }
+                    progresion.cursos[curso].competencias++;
+                    progresion.cursos[curso].creditos += (comp.creditosTotales || 0) / comp.cursos.length;
+                });
+            }
+        });
+        
+        return progresion;
+    }
+    
+    static agruparPorAmbitos(competencias) {
+        const ambitos = {};
+        competencias.forEach(comp => {
+            if (comp.ambito) {
+                if (!ambitos[comp.ambito]) {
+                    ambitos[comp.ambito] = [];
+                }
+                ambitos[comp.ambito].push(comp);
+            }
+        });
+        return ambitos;
+    }
     
     static estructuraVacia() {
         return {
@@ -171,6 +225,7 @@ static analizarProgresionCurricular(competencias) {
         };
     }
 }
+
 
 
 
