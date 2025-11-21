@@ -34,4 +34,22 @@ export class CompetenceMapper {
             coberturaHorizontal: this.evaluarCobertura(matriz)
         };
     }
+        // En competence-mapper.js, agrega:
+        evaluarClaridad(competencias) {
+            let score = 0;
+            competencias.forEach(comp => {
+                if (comp.descripcion && comp.descripcion.length > 10) score += 1;
+                if (comp.codigo) score += 1;
+            });
+            return score / (competencias.length * 2);
+        },
+        
+        evaluarMedibilidad(RAs) {
+            let score = 0;
+            RAs.forEach(ra => {
+                const texto = ra.descripcion?.toLowerCase() || ra.toLowerCase();
+                if (texto.includes('analizar') || texto.includes('diseñar') || texto.includes('evaluar')) score += 1;
+            });
+            return score / RAs.length;
+        }
 }
