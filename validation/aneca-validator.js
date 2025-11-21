@@ -123,6 +123,18 @@ export class AnecaValidator {
         ];
     }
     
+    static validarSecuenciaProgresion(curriculumData) {
+    // Validación básica de secuencia
+    const cursos = [1, 2, 3, 4];
+    let secuenciaValida = true;
+    
+    cursos.forEach(curso => {
+        const asignaturasCurso = curriculumData.asignaturas?.filter(a => a.curso === curso) || [];
+        if (asignaturasCurso.length === 0) secuenciaValida = false;
+    });
+    
+    return secuenciaValida;
+}
     static calcularPuntuacionPerfil(competencias, RAs) {
         const claridad = this.evaluarClaridadCompetencias(competencias);
         const medibilidad = this.evaluarMedibilidadRAs(RAs);
@@ -131,6 +143,7 @@ export class AnecaValidator {
         return (claridad + medibilidad + alineacion) / 3;
     }
   }
+
 
 
 
