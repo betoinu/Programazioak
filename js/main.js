@@ -50,10 +50,10 @@ async function initializeGlobalAnalysis() {
         const progresionCompetencial = globalAnalyzer.analizarProgresionCompetencial();
         
         // 2. MATRICES ANECA COMPLETAS
-        const matrizCompetenciasRA = CompetenceMapper.generarMatrizCompetenciasRA(curriculumData);
-        const matrizRAsignaturas = CurriculumCoverage.generarMatrizRAsignaturas(curriculumData);
-        const matrizCompetenciasAsignaturas = HorizontalCoherence.generarMatrizCompetenciasAsignaturas(curriculumData);
-        const matrizContenidosRA = ContentAlignment.generarMatrizContenidosRA(curriculumData);
+        const matrizCompetenciasRA = await CompetenceMapper.generarMatrizCompetenciasRA(curriculumData);
+        const matrizRAsignaturas = await CurriculumCoverage.generarMatrizRAsignaturas(curriculumData);
+        const matrizCompetenciasAsignaturas = await HorizontalCoherence.generarMatrizCompetenciasAsignaturas(curriculumData);
+        const matrizContenidosRA = await ContentAlignment.generarMatrizContenidosRA(curriculumData);
         
         // 3. VALIDACIÓN ANECA
         const validacionANECA = AnecaValidator.validarCumplimientoCompleto(curriculumData);
@@ -135,6 +135,7 @@ window.initializeGlobalAnalysis = initializeGlobalAnalysis;
 window.setupBidirectionalSystem = setupBidirectionalSystem;
 
 console.log('✅ Todos los módulos ANECA exportados al objeto global');
+
 
 
 
