@@ -12,26 +12,23 @@ static async generarMatrizCompetenciasRA(curriculumData) {
         
         // ✅ AÑADIR dentro del método existente:
         const matrizCompetenciasRA = todasCompetencias.map(comp => ({
-            // Campos existentes que ya tienes:
-            id: comp.id,
-            nombre: comp.nombre,
-            descripcion: comp.descripcion,
-            ambito: comp.ambito,
-            nivelBloom: comp.nivelBloom,
-            cursos: comp.cursos,
-            asignaturas: comp.asignaturasRelacionadas,
-            rasConstituyentes: (comp.rasConstituyentes && comp.rasConstituyentes.length) || 0,
-            creditos: comp.creditosTotales,
-            progresion: comp.progresion,
-            instrumentosEvaluacion: comp.instrumentosEvaluacion,
-            
-            // ✅ NUEVOS CAMPOS PARA MATRIZ ANECA:
-            codigo: comp.codigo || this.generarCodigoCompetencia(comp), // NUEVO
-            resultadosAprendizaje: this.extraerResultadosAprendizaje(comp), // NUEVO
-            nivel: this.determinarNivelANECA(comp.nivelBloom), // NUEVO
-            evidenciasLogro: this.generarEvidenciasLogro(comp), // NUEVO
-            instrumentosEvaluacionEstandar: this.mapearInstrumentosEvaluacion(comp.instrumentosEvaluacion) // NUEVO
-        }));
+                id: comp.id,
+                nombre: comp.nombre,
+                descripcion: comp.descripcion,
+                ambito: comp.ambito,
+                nivelBloom: comp.nivelBloom,
+                // ✅ CORREGIDO:
+                codigo: comp.codigo || CompetenceMapper.generarCodigoCompetencia(comp),
+                resultadosAprendizaje: CompetenceMapper.extraerResultadosAprendizaje(comp),
+                nivel: CompetenceMapper.determinarNivelANECA(comp.nivelBloom),
+                evidenciasLogro: CompetenceMapper.generarEvidenciasLogro(comp),
+                instrumentosEvaluacion: CompetenceMapper.mapearInstrumentosEvaluacion(comp.instrumentosEvaluacion),
+                cursos: comp.cursos,
+                asignaturas: comp.asignaturasRelacionadas,
+                rasConstituyentes: (comp.rasConstituyentes && comp.rasConstituyentes.length) || 0,
+                creditos: comp.creditosTotales,
+                progresion: comp.progresion
+            }));
         
         const matriz = {
             competencias: matrizCompetenciasRA, // ✅ Esto reemplaza tu estructura actual
@@ -300,6 +297,97 @@ static analizarProgresionCurricular(competencias) {
         });
         return ambitos;
     }
+
+    // === AÑADIR ESTOS MÉTODOS FALTANTES AL FINAL DEL ARCHIVO ===
+
+// ✅ NUEVO: Generar código de competencia
+static generarCodigoCompetencia(competencia) {
+    const prefix = 'C';
+    const ambitoCode = competencia.ambito ? 
+        competencia.ambito.substring(0, 3).toUpperCase() : 'GEN';
+    const numero = competencia.id ? competencia.id.toString().padStart(2, '0') : '01';
+    return `${prefix}${ambitoCode}${numero}`;
+}
+
+// ✅ NUEVO: Extraer resultados de aprendizaje
+static extraerResultadosAprendizaje(competencia) {
+    if (!competencia.rasConstituyentes || !Array.isArray(competencia.rasConstituyentes)) {
+        return [{
+            codigo: `RA${this.generarCodigoCompetencia(competencia)}_1`,
+            descripcion: 'Por definir - competencia sin RA específico',
+            verbosAccion: [],
+            condiciones: 'Por determinar',
+            criterios: 'Por determinar'
+        }];
+    }
+    
+    return competencia.rasConstituyentes.map((ra, index) => ({
+        codigo: ra.codigo || `RA${this.generarCodigoCompetencia(competencia)}_${index + 1}`,
+        descripcion: ra.descripcion || 'Descripción no disponible',
+        verbosAccion: this.extraerVerbosAccion(ra.descripcion),
+        condiciones: ra.condiciones || 'Contexto académico/profesional',
+        criterios: ra.criterios || 'Cumplimiento de objetivos de aprendizaje'
+    }));
+}
+
+// ✅ NUEVO: Generar evidencias de logro
+static generarEvidenciasLogro(competencia) {
+    if (competencia.instrumentosEvaluacion) {
+        return competencia.instrumentosEvaluacion.map(instr => 
+            `${instr} sobre ${competencia.nombre}`
+        );
+    }
+    
+    const nivel = this.determinarNivelANECA(competencia.nivelBloom);
+    switch(nivel) {
+        case 'Introductorio': return ['Ejercicios básicos', 'Cuestionarios', 'Participación en clase'];
+        case 'Medio': return ['Casos prácticos', 'Simulaciones', 'Informes analíticos'];
+        case 'Avanzado': return ['Proyectos complejos', 'Investigaciones', 'Defensas orales'];
+        default: return ['Portafolio de evidencias', 'Proyectos aplicados'];
+    }
+}
+
+// ✅ NUEVO: Mapear instrumentos de evaluación
+static mapearInstrumentosEvaluacion(instrumentos) {
+    if (!instrumentos || !Array.isArray(instrumentos)) {
+        return ['Rúbrica analítica', 'Lista de cotejo'];
+    }
+    
+    const instrumentosEstandar = {
+        'examen': 'Examen escrito',
+        'proyecto': 'Rúbrica de proyecto',
+        'presentacion': 'Rúbrica de presentación oral',
+        'practica': 'Informe de prácticas'
+    };
+    
+    return instrumentos.map(instr => 
+        instrumentosEstandar[instr.toLowerCase()] || instr
+    );
+}
+
+// ✅ NUEVO: Analizar coherencia vertical
+static analizarCoherenciaVertical(competencias) {
+    const competenciasConRA = competencias.filter(comp => 
+        comp.rasConstituyentes && comp.rasConstituyentes.length > 0
+    ).length;
+    
+    return {
+        porcentajeCoherencia: (competenciasConRA / competencias.length * 100).toFixed(1),
+        competenciasConRA: competenciasConRA,
+        competenciasSinRA: competencias.length - competenciasConRA,
+        estado: competenciasConRA === competencias.length ? 'ÓPTIMA' : 
+               competenciasConRA >= competencias.length * 0.8 ? 'ACEPTABLE' : 'DEFICIENTE'
+    };
+}
+
+// ✅ NUEVO: Extraer verbos de acción (necesario para extraerResultadosAprendizaje)
+static extraerVerbosAccion(descripcion) {
+    if (!descripcion) return [];
+    const verbos = ['analizar', 'aplicar', 'calcular', 'clasificar', 'comparar', 'crear', 'demostrar'];
+    return descripcion.toLowerCase().split(' ')
+        .filter(palabra => verbos.includes(palabra))
+        .filter((v, i, a) => a.indexOf(v) === i);
+}
     
     static estructuraVacia() {
         return {
@@ -320,6 +408,7 @@ static analizarProgresionCurricular(competencias) {
         };
     }
 }
+
 
 
 
