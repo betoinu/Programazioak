@@ -61,22 +61,42 @@ export class GapAnalyzer {
     }
     
     static detectarHuecosEvaluacion(matrizCompetenciasRA) {
-        const huecos = [];
-        
-        matrizCompetenciasRA.competencias.forEach(comp => {
-            if (comp.instrumentosEvaluacion.length === 0) {
-                huecos.push({
-                    tipo: 'EVALUACION',
-                    descripcion: `Competencia "${comp.competencia}" carece de instrumentos de evaluación definidos`,
-                    accionRecomendada: 'Definir rúbricas o instrumentos de evaluación',
-                    impactoANECA: 'ALTO',
-                    urgencia: 'INMEDIATA'
-                });
-            }
-        });
-        
-        return huecos;
+    console.log("🔍 detectarHuecosEvaluacion - matrizCompetenciasRA:", matrizCompetenciasRA);
+    
+    // VERIFICACIÓN DE SEGURIDAD
+    if (!matrizCompetenciasRA) {
+        console.warn("⚠️ matrizCompetenciasRA es undefined");
+        return [];
     }
+    
+    const competencias = matrizCompetenciasRA.competencias || matrizCompetenciasRA.data || [];
+    console.log("📊 Competencias para evaluación:", competencias);
+    
+    if (!Array.isArray(competencias)) {
+        console.warn("⚠️ competencias no es un array:", competencias);
+        return [];
+    }
+    
+    const huecos = [];
+    
+    competencias.forEach((comp, index) => {
+        console.log(`🔍 Competencia ${index}:`, comp);
+        
+        const instrumentos = comp.instrumentosEvaluacion || comp.evaluationInstruments || [];
+        if (instrumentos.length === 0) {
+            huecos.push({
+                tipo: 'EVALUACION',
+                descripcion: `Competencia "${comp.competencia || comp.nombre || 'Sin nombre'}" carece de instrumentos de evaluación`,
+                accionRecomendada: 'Definir rúbricas o instrumentos de evaluación',
+                impactoANECA: 'ALTO',
+                urgencia: 'INMEDIATA'
+            });
+        }
+    });
+    
+    console.log("✅ Huecos de evaluación detectados:", huecos);
+    return huecos;
+}
     
     static detectarHuecosIntegracion(curriculumData) {
         // Detectar asignaturas aisladas sin conexión con otras
@@ -204,4 +224,5 @@ export class GapAnalyzer {
         return asignaturas.length > 0 ? asignaturas : ['Por determinar'];
     }
 }
+
 
