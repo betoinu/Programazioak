@@ -20,6 +20,10 @@ import { CurriculumLoader } from '../data/curriculum-loader.js';
 // Visualization - SI LO NECESITAS  
 import { AnalysisDisplay } from '../visualization/analysis-display.js';
 
+import { GlobalAnalyzer } from '../analysis/global-analyzer.js';
+import { CompetenceMapper } from '../analysis/competence-mapper.js';
+import { ANECA_STANDARDS } from '../data/aneca-standards.js';
+
 // ===== APLIKAZIOA HASIERATU =====
 document.addEventListener('DOMContentLoaded', async () => {
     try {
@@ -45,30 +49,35 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ===== ANALISI GLOBALA - VERSIÓN TEMPORAL =====
+// ===== NUEVOS IMPORTS ANECA =====
+import { GlobalAnalyzer } from '../analysis/global-analyzer.js';
+import { CompetenceMapper } from '../analysis/competence-mapper.js';
+import { ANECA_STANDARDS } from '../data/aneca-standards.js';
+
+// ===== ANALISIS GLOBAL ACTUALIZADO =====
 async function initializeGlobalAnalysis() {
     try {
-        console.log('🔧 Análisis Global - EN RECONSTRUCCIÓN para ANECA');
-        console.log('📌 Próximamente: Matrices competencias-RA, detección huecos curriculares, validación ANECA');
+        console.log('🚀 Iniciando Análisis Global ANECA');
         
-        // TODO: IMPLEMENTAR NUEVOS MÓDULOS ANECA:
-        // 1. GlobalAnalyzer - Análisis macro de titulación
-        // 2. CompetenceMapper - Matriz competencias-RA 
-        // 3. AnecaValidator - Validador estándares
-        // 4. GapAnalyzer - Detector huecos curriculares
+        // Cargar datos del curriculum
+        const curriculumData = await CurriculumDataService.loadCompleteCurriculumData();
         
-        // ⚠️ TEMPORALMENTE: Mostrar mensaje al usuario
-        const analysisButton = document.getElementById('globalAnalysisBtn');
-        if (analysisButton) {
-            analysisButton.innerHTML = '🔧 Análisis Global - En Construcción';
-            analysisButton.style.opacity = '0.6';
-            analysisButton.title = 'Próximamente: Análisis completo ANECA con matrices profesionales';
-        }
+        // 1. Análisis macro de ámbitos profesionales
+        const globalAnalyzer = new GlobalAnalyzer(curriculumData);
+        const ambitosProfesionales = globalAnalyzer.identificarAmbitosProfesionales();
+        const progresionCompetencial = globalAnalyzer.analizarProgresionCompetencial();
         
-        console.log('✅ Análisis Global preparado para nueva implementación ANECA');
+        // 2. Matriz Competencias-RA (ANECA 1)
+        const matrizCompetenciasRA = CompetenceMapper.generarMatrizCompetenciasRA(curriculumData);
+        
+        // 3. Validación estándares ANECA
+        const cumplimientoANECA = this.validarEstadaresANECA(matrizCompetenciasRA);
+        
+        console.log('✅ Análisis Global ANECA completado');
+        this.mostrarResultadosANECA(ambitosProfesionales, matrizCompetenciasRA, cumplimientoANECA);
         
     } catch (error) {
-        console.log('⚠️ Análisis Global en transición:', error.message);
-        // No mostrar error al usuario durante la reconstrucción
+        console.error('❌ Error en Análisis Global ANECA:', error);
     }
 }
 
@@ -207,6 +216,7 @@ function setLoadingState(isLoading) {
 window.showError = showError;
 window.hideError = hideError;
 window.setLoadingState = setLoadingState;
+
 
 
 
