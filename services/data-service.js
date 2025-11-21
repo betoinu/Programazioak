@@ -1,4 +1,4 @@
-class CurriculumDataService {
+export class CurriculumDataService {
     static curriculumData = {};
 
     static async loadData() {
@@ -36,10 +36,7 @@ class CurriculumDataService {
         return null;
     }
 }
-export { CurriculumDataService };
-if (typeof window !== 'undefined') {
-    window.CurriculumDataService = CurriculumDataService;
-}
+
 
 
 
