@@ -1,4 +1,4 @@
-class MatrixDisplay {
+export class MatrixDisplay {
     static mostrarMatrizCompetenciasRA(matriz, containerId = 'results-container') {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -266,3 +266,4 @@ class MatrixDisplay {
     }
 
 }
+
