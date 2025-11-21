@@ -1,5 +1,5 @@
 // 📁 analysis/competence-mapper.js - ACTUALIZADO
-class CompetenceMapper {
+export class CompetenceMapper {
     static async generarMatrizCompetenciasRA(curriculumData) {
         console.log("🔄 Generando matriz de competencias desde API...");
         
@@ -138,3 +138,4 @@ class CompetenceMapper {
         };
     }
 }
+
