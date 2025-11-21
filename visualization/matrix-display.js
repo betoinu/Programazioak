@@ -620,7 +620,6 @@ export class MatrixDisplay {
         html += '</div>';
         return html;
     }
-}
 
     static formatAmbitoName(ambito) {
         const names = {
@@ -651,5 +650,6 @@ export class MatrixDisplay {
     }
 
 }
+
 
 
