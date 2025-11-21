@@ -145,7 +145,104 @@ export class AnecaValidator {
     static calcularPuntuacionCobertura(matrizCobertura) {
     return matrizCobertura.cumplimientoANECA || 75;
 }
+    static validarSistemaEvaluacion(curriculumData) {
+    return {
+        criterio: "Sistema de evaluación basado en evidencias",
+        cumplimiento: {
+            rubricasExisten: this.verificarExistenciaRubricas(curriculumData),
+            evidenciasDefinidas: this.verificarEvidenciasEvaluacion(curriculumData),
+            portafoliosUtilizados: this.verificarPortafolios(curriculumData)
+        },
+        evidencias: this.recopilarEvidenciasEvaluacion(curriculumData),
+        puntuacion: this.verificarExistenciaRubricas(curriculumData) ? 0.7 : 0.3
+    };
+}
+
+static validarMejoraContinua(curriculumData) {
+    return {
+        criterio: "Sistema de mejora continua documentado",
+        cumplimiento: {
+            planMejoraExiste: curriculumData.planMejora !== undefined,
+            participacionStakeholders: curriculumData.stakeholders !== undefined,
+            usoResultadosEvaluacion: curriculumData.resultadosEvaluacion !== undefined
+        },
+        evidencias: curriculumData.planMejora ? ['Plan de mejora documentado'] : ['Plan de mejora pendiente'],
+        puntuacion: curriculumData.planMejora ? 0.6 : 0.2
+    };
+}
+
+static calcularPuntuacionGlobal(validaciones) {
+    const puntuaciones = Object.values(validaciones).map(v => v.puntuacion || 0);
+    return (puntuaciones.reduce((a, b) => a + b, 0) / puntuaciones.length) * 100;
+}
+
+static calcularPorcentajeCumplimiento(validaciones) {
+    const cumplimientos = Object.values(validaciones).flatMap(v => 
+        Object.values(v.cumplimiento || {})
+    );
+    const cumplidos = cumplimientos.filter(c => c === true).length;
+    return (cumplidos / cumplimientos.length) * 100;
+}
+
+static generarResumenEjecutivo(validaciones) {
+    const puntuacionGlobal = this.calcularPuntuacionGlobal(validaciones);
+    const porcentajeCumplimiento = this.calcularPorcentajeCumplimiento(validaciones);
+    
+    return `RESUMEN EJECUTIVO ANECA
+• Puntuación Global: ${puntuacionGlobal.toFixed(1)}/100
+• Cumplimiento: ${porcentajeCumplimiento.toFixed(1)}%
+• Perfil de Egreso: ${(validaciones.perfilEgreso?.puntuacion * 100 || 0).toFixed(1)}%
+• Cobertura Curricular: ${(validaciones.coberturaCurricular?.puntuacion * 100 || 0).toFixed(1)}%
+• Sistema Evaluación: ${(validaciones.sistemaEvaluacion?.puntuacion * 100 || 0).toFixed(1)}%`;
+}
+
+static identificarPuntosFuertes(validaciones) {
+    const puntos = [];
+    if (validaciones.perfilEgreso?.puntuacion > 0.7) puntos.push('Perfil de egreso bien definido');
+    if (validaciones.coberturaCurricular?.puntuacion > 0.7) puntos.push('Cobertura curricular adecuada');
+    if (validaciones.sistemaEvaluacion?.puntuacion > 0.6) puntos.push('Sistema de evaluación implementado');
+    return puntos.length > 0 ? puntos : ['Estructura básica establecida'];
+}
+
+static identificarAreasMejora(validaciones) {
+    const areas = [];
+    if (!validaciones.sistemaEvaluacion?.cumplimiento?.rubricasExisten) areas.push('Implementar rúbricas de evaluación');
+    if (!validaciones.mejoraContinua?.cumplimiento?.planMejoraExiste) areas.push('Desarrollar plan de mejora continua');
+    if (validaciones.perfilEgreso?.puntuacion < 0.6) areas.push('Mejorar definición del perfil de egreso');
+    return areas;
+}
+
+static generarRecomendacionesPrioritarias(validaciones) {
+    return [
+        'Completar sistema de evaluación con rúbricas detalladas',
+        'Documentar procedimientos de mejora continua',
+        'Fortalecer la participación de stakeholders en la evaluación',
+        'Revisar la secuenciación de competencias complejas'
+    ];
+}
+
+// MÉTODOS AUXILIARES
+static verificarExistenciaRubricas(curriculumData) {
+    return curriculumData.rubricas !== undefined && curriculumData.rubricas.length > 0;
+}
+
+static verificarEvidenciasEvaluacion(curriculumData) {
+    return curriculumData.evidenciasEvaluacion !== undefined;
+}
+
+static verificarPortafolios(curriculumData) {
+    return curriculumData.portafolios !== undefined;
+}
+
+static recopilarEvidenciasEvaluacion(curriculumData) {
+    const evidencias = [];
+    if (this.verificarExistenciaRubricas(curriculumData)) evidencias.push('Rúbricas de evaluación');
+    if (this.verificarPortafolios(curriculumData)) evidencias.push('Portafolios estudiantiles');
+    if (curriculumData.evidenciasEvaluacion) evidencias.push('Evidencias de evaluación documentadas');
+    return evidencias.length > 0 ? evidencias : ['Sistema de evaluación en desarrollo'];
+}
   }
+
 
 
 
