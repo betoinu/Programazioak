@@ -36,10 +36,9 @@ class CurriculumDataService {
         return null;
     }
 }
-// ✅ AÑADIR ESTO AL FINAL - EXPORTACIÓN GLOBAL
-if (typeof window !== 'undefined') {
-    window.CurriculumDataService = CurriculumDataService;
-}
+// ✅ AÑADIR export
+export { CurriculumDataService };
+
 
 
 
