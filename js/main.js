@@ -23,6 +23,9 @@ import { AnalysisDisplay } from '../visualization/analysis-display.js';
 import { GlobalAnalyzer } from '../analysis/global-analyzer.js';
 import { CompetenceMapper } from '../analysis/competence-mapper.js';
 import { ANECA_STANDARDS } from '../data/aneca-standards.js';
+import { CurriculumCoverage } from '../analysis/curriculum-coverage.js';
+import { HorizontalCoherence } from '../analysis/horizontal-coherence.js';
+import { AnecaValidator } from '../analysis/aneca-validator.js';
 
 // ===== APLIKAZIOA HASIERATU =====
 document.addEventListener('DOMContentLoaded', async () => {
@@ -57,24 +60,36 @@ import { ANECA_STANDARDS } from '../data/aneca-standards.js';
 // ===== ANALISIS GLOBAL ACTUALIZADO =====
 async function initializeGlobalAnalysis() {
     try {
-        console.log('🚀 Iniciando Análisis Global ANECA');
+        console.log('🚀 Iniciando Análisis Global ANECA Completo');
         
-        // Cargar datos del curriculum
         const curriculumData = await CurriculumDataService.loadCompleteCurriculumData();
         
-        // 1. Análisis macro de ámbitos profesionales
+        // 1. ANÁLISIS MACRO
         const globalAnalyzer = new GlobalAnalyzer(curriculumData);
         const ambitosProfesionales = globalAnalyzer.identificarAmbitosProfesionales();
         const progresionCompetencial = globalAnalyzer.analizarProgresionCompetencial();
         
-        // 2. Matriz Competencias-RA (ANECA 1)
+        // 2. MATRICES ANECA
         const matrizCompetenciasRA = CompetenceMapper.generarMatrizCompetenciasRA(curriculumData);
+        const matrizRAsignaturas = CurriculumCoverage.generarMatrizRAsignaturas(curriculumData);
+        const matrizCompetenciasAsignaturas = HorizontalCoherence.generarMatrizCompetenciasAsignaturas(curriculumData);
         
-        // 3. Validación estándares ANECA
-        const cumplimientoANECA = this.validarEstadaresANECA(matrizCompetenciasRA);
+        // 3. VALIDACIÓN ANECA
+        const validacionANECA = AnecaValidator.validarCumplimientoCompleto(curriculumData);
         
-        console.log('✅ Análisis Global ANECA completado');
-        this.mostrarResultadosANECA(ambitosProfesionales, matrizCompetenciasRA, cumplimientoANECA);
+        console.log('✅ Análisis ANECA completado');
+        
+        // Mostrar resultados
+        this.mostrarDashboardANECA({
+            ambitosProfesionales,
+            progresionCompetencial,
+            matrices: {
+                competenciasRA: matrizCompetenciasRA,
+                RAsignaturas: matrizRAsignaturas,
+                competenciasAsignaturas: matrizCompetenciasAsignaturas
+            },
+            validacionANECA
+        });
         
     } catch (error) {
         console.error('❌ Error en Análisis Global ANECA:', error);
@@ -216,6 +231,7 @@ function setLoadingState(isLoading) {
 window.showError = showError;
 window.hideError = hideError;
 window.setLoadingState = setLoadingState;
+
 
 
 
