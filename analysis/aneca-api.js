@@ -14,53 +14,53 @@ export class AnecaAPI {
         return competenciasAgrupadas;
     }
     
-    static async generarCompetenciasDesdeRAs(curriculumData) {
-    console.log("🔍 Analizando RAs para agrupar en competencias coherentes...");
+static async generarCompetenciasDesdeRAs(curriculumData) {
+    console.log("🔍 Agrupando RAs relacionados en competencias coherentes...");
     
-    // 1. EXTRAER TODOS LOS RAs POR ÁREA
-    const rasPorArea = this.agruparRAsPorArea(curriculumData);
+    // 1. Extraer todos los RAs del curriculum
+    const todosLosRAs = this.extraerTodosLosRAs(curriculumData);
+    console.log(`📊 Total de RAs encontrados: ${todosLosRAs.length}`);
     
-    // 2. IDENTIFICAR COMPETENCIAS POR ÁREA (agrupando RAs relacionados)
+    // 2. Agrupar RAs por temas relacionados
+    const gruposTematicos = this.agruparRAsPorTema(todosLosRAs);
+    console.log(`🎯 Grupos temáticos identificados: ${Object.keys(gruposTematicos).length}`);
+    
+    // 3. Crear competencias desde grupos temáticos
     const competencias = [];
+    let idCounter = 1;
     
-    Object.entries(rasPorArea).forEach(([area, rasArea]) => {
-        console.log(`📊 Procesando área ${area} con ${rasArea.length} RAs`);
-        
-        // Agrupar RAs similares dentro de la misma área
-        const gruposCompetencias = this.agruparRAsSimilares(rasArea, area);
-        
-        gruposCompetencias.forEach((grupo, index) => {
-            if (grupo.ras.length > 0) {
-                const competencia = this.crearCompetenciaDesdeGrupoRAs(grupo, area, index + 1);
-                competencias.push(competencia);
-            }
-        });
+    Object.entries(gruposTematicos).forEach(([tema, grupo]) => {
+        if (grupo.ras.length >= 1) { // Mínimo 1 RA por competencia
+            const competencia = this.crearCompetenciaDesdeGrupo(
+                tema, 
+                grupo, 
+                idCounter++
+            );
+            competencias.push(competencia);
+        }
     });
     
-    console.log(`✅ Generadas ${competencias.length} competencias desde ${this.contarRAsTotal(curriculumData)} RAs`);
+    console.log(`✅ Generadas ${competencias.length} competencias agrupadas`);
     return competencias;
 }
 
-static agruparRAsPorArea(curriculumData) {
-    const rasPorArea = {};
+// ========== MÉTODOS NUEVOS ==========
+
+static extraerTodosLosRAs(curriculumData) {
+    const todosLosRAs = [];
     
     Object.values(curriculumData).forEach(grado => {
         Object.entries(grado).forEach(([cursoKey, asignaturasCurso]) => {
             asignaturasCurso.forEach(asignatura => {
                 if (asignatura.currentOfficialRAs) {
-                    const area = asignatura.arloa || 'Orokorra';
-                    
-                    if (!rasPorArea[area]) {
-                        rasPorArea[area] = [];
-                    }
-                    
                     asignatura.currentOfficialRAs.forEach(ra => {
-                        rasPorArea[area].push({
+                        todosLosRAs.push({
                             texto: ra,
                             curso: parseInt(cursoKey),
                             asignatura: asignatura.izena,
-                            area: area,
-                            creditos: asignatura.kredituak || 6
+                            area: asignatura.arloa || 'General',
+                            creditos: asignatura.kredituak || 6,
+                            tipo: asignatura.mota || 'Obligatoria'
                         });
                     });
                 }
@@ -68,208 +68,109 @@ static agruparRAsPorArea(curriculumData) {
         });
     });
     
-    return rasPorArea;
+    return todosLosRAs;
 }
 
-static agruparRAsSimilares(rasArea, area) {
-    const grupos = [];
-    const rasProcesados = new Set();
+static agruparRAsPorTema(todosLosRAs) {
+    const grupos = {};
     
-    rasArea.forEach((ra, index) => {
-        if (rasProcesados.has(index)) return;
+    todosLosRAs.forEach(ra => {
+        const tema = this.identificarTemaPrincipal(ra.texto, ra.area);
+        const temaKey = tema.replace(/\s+/g, '_').toLowerCase();
         
-        const grupo = {
-            ras: [ra],
-            palabrasClave: this.extraerPalabrasClave(ra.texto),
-            cursos: new Set([ra.curso]),
-            asignaturas: new Set([ra.asignatura])
-        };
+        if (!grupos[temaKey]) {
+            grupos[temaKey] = {
+                tema: tema,
+                ras: [],
+                cursos: new Set(),
+                asignaturas: new Set(),
+                areas: new Set()
+            };
+        }
         
-        // Buscar RAs similares en el mismo área
-        rasArea.forEach((otroRa, otroIndex) => {
-            if (index !== otroIndex && !rasProcesados.has(otroIndex)) {
-                const similitud = this.calcularSimilitudRAs(ra.texto, otroRa.texto);
-                if (similitud > 0.6) { // Umbral de similitud
-                    grupo.ras.push(otroRa);
-                    grupo.cursos.add(otroRa.curso);
-                    grupo.asignaturas.add(otroRa.asignatura);
-                    rasProcesados.add(otroIndex);
-                }
-            }
-        });
-        
-        grupos.push(grupo);
-        rasProcesados.add(index);
+        grupos[temaKey].ras.push(ra);
+        grupos[temaKey].cursos.add(ra.curso);
+        grupos[temaKey].asignaturas.add(ra.asignatura);
+        grupos[temaKey].areas.add(ra.area);
     });
     
     return grupos;
 }
 
-static crearCompetenciaDesdeGrupoRAs(grupo, area, id) {
+static identificarTemaPrincipal(textoRA, area) {
+    // Identificar el tema principal del RA
+    const texto = textoRA.toLowerCase();
+    
+    // Temas comunes en diseño
+    if (texto.includes('diseinu') || texto.includes('diseño') || texto.includes('proiektu')) {
+        if (texto.includes('espazio') || texto.includes('espacio')) return 'Diseño Espacial';
+        if (texto.includes('produktu') || texto.includes('producto')) return 'Diseño de Producto';
+        if (texto.includes('grafik') || texto.includes('gráfico')) return 'Diseño Gráfico';
+        return 'Diseño General';
+    }
+    
+    if (texto.includes('teknolog') || texto.includes('tecnolog')) {
+        return 'Tecnología Digital';
+    }
+    
+    if (texto.includes('komunikazio') || texto.includes('comunicación')) {
+        return 'Comunicación Visual';
+    }
+    
+    if (texto.includes('kudeaketa') || texto.includes('gestión')) {
+        return 'Gestión de Proyectos';
+    }
+    
+    return area || 'Competencia Transversal';
+}
+
+static crearCompetenciaDesdeGrupo(tema, grupo, id) {
     const ras = grupo.ras;
     const cursos = Array.from(grupo.cursos).sort();
     const asignaturas = Array.from(grupo.asignaturas);
-    
-    // Determinar nombre de la competencia basado en los RAs
-    const nombreCompetencia = this.generarNombreCompetencia(ras, area);
-    
-    // Determinar nivel Bloom más alto del grupo
-    const nivelBloom = ras.reduce((maxNivel, ra) => {
-        const nivelActual = this.analizarNivelBloom(ra.texto);
-        return this.compararNivelesBloom(nivelActual, maxNivel) > 0 ? nivelActual : maxNivel;
-    }, 'RECORDAR');
+    const areas = Array.from(grupo.areas);
     
     return {
-        id: `COMP-${area.substring(0, 3).toUpperCase()}-${id}`,
-        nombre: nombreCompetencia,
-        descripcion: `Competencia en ${area} desarrollada a través de ${ras.length} resultados de aprendizaje relacionados`,
-        ambito: this.mapearAreaAAmbito(area),
-        nivelBloom: nivelBloom,
-        instrumentosEvaluacion: this.generarInstrumentosCompetencia(ras, area),
+        id: `COMP-${id}`,
+        nombre: tema,
+        descripcion: `Competencia desarrollada a través de ${ras.length} resultados de aprendizaje en ${areas.join(', ')}`,
+        ambito: this.mapearAreaAAmbito(areas[0]),
+        nivelBloom: this.analizarNivelBloomGrupo(ras),
+        instrumentosEvaluacion: this.generarInstrumentosGrupo(ras),
         cursos: cursos,
         asignaturasRelacionadas: asignaturas,
-        areaConocimiento: area,
-        rasConstituyentes: ras.map(ra => ({
-            texto: ra.texto,
-            curso: ra.curso,
-            asignatura: ra.asignatura
-        })),
-        progresion: this.definirProgresionCompetencia(cursos, ras.length),
-        creditosTotales: ras.reduce((sum, ra) => sum + (ra.creditos || 0), 0)
-    };
-}
-
-static generarNombreCompetencia(ras, area) {
-    // Analizar verbos y conceptos comunes en los RAs
-    const verbosComunes = this.extraerVerbosComunes(ras);
-    const conceptosComunes = this.extraerConceptosComunes(ras);
-    
-    const verboPrincipal = verbosComunes[0] || 'Desarrollar';
-    const conceptoPrincipal = conceptosComunes[0] || `competencias en ${area}`;
-    
-    return `${verboPrincipal} ${conceptoPrincipal}`;
-}
-
-static extraerVerbosComunes(ras) {
-    const verbos = {};
-    ras.forEach(ra => {
-        const verbo = this.extraerVerboPrincipal(ra.texto);
-        if (verbo) {
-            verbos[verbo] = (verbos[verbo] || 0) + 1;
+        areasConocimiento: areas,
+        rasConstituyentes: ras,
+        creditosTotales: ras.reduce((sum, ra) => sum + ra.creditos, 0),
+        progresion: {
+            cursoInicio: Math.min(...cursos),
+            cursoConsolidacion: Math.max(...cursos),
+            complejidad: cursos.length > 1 ? 'Progresiva' : 'Puntual'
         }
-    });
-    
-    return Object.entries(verbos)
-        .sort(([,a], [,b]) => b - a)
-        .map(([verbo]) => verbo);
-}
-
-static extraerConceptosComunes(ras) {
-    const conceptos = {};
-    ras.forEach(ra => {
-        const palabras = ra.texto.toLowerCase().split(' ');
-        palabras.forEach(palabra => {
-            if (palabra.length > 5 && !this.esPalabraFuncional(palabra)) {
-                conceptos[palabra] = (conceptos[palabra] || 0) + 1;
-            }
-        });
-    });
-    
-    return Object.entries(conceptos)
-        .sort(([,a], [,b]) => b - a)
-        .map(([concepto]) => concepto);
-}
-
-static extraerVerboPrincipal(textoRA) {
-    const verbos = {
-        'diseinatzea': 'Diseñar', 'sortzea': 'Crear', 'garatzea': 'Desarrollar',
-        'ebaluatzea': 'Evaluar', 'aztertzea': 'Analizar', 'aplikatzea': 'Aplicar',
-        'ulertzea': 'Comprender', 'ezagutzea': 'Conocer', 'erabiltzea': 'Utilizar'
-    };
-    
-    for (const [verboEus, verboCast] of Object.entries(verbos)) {
-        if (textoRA.toLowerCase().includes(verboEus)) {
-            return verboCast;
-        }
-    }
-    
-    return 'Desarrollar';
-}
-
-static extraerPalabrasClave(texto) {
-    return texto.toLowerCase()
-        .split(' ')
-        .filter(palabra => palabra.length > 4 && !this.esPalabraFuncional(palabra))
-        .slice(0, 5);
-}
-
-static esPalabraFuncional(palabra) {
-    const funcionales = ['diseinu', 'proiektu', 'elementu', 'oinarri', 'teknika', 'metodo', 'kontzeptu'];
-    return funcionales.some(func => palabra.includes(func));
-}
-
-static calcularSimilitudRAs(ra1, ra2) {
-    const palabras1 = new Set(ra1.toLowerCase().split(' '));
-    const palabras2 = new Set(ra2.toLowerCase().split(' '));
-    
-    const interseccion = [...palabras1].filter(p => palabras2.has(p)).length;
-    const union = new Set([...palabras1, ...palabras2]).size;
-    
-    return union > 0 ? interseccion / union : 0;
-}
-
-static compararNivelesBloom(nivel1, nivel2) {
-    const orden = ['RECORDAR', 'COMPRENDER', 'APLICAR', 'ANALIZAR', 'EVALUAR', 'CREAR'];
-    return orden.indexOf(nivel1) - orden.indexOf(nivel2);
-}
-
-static definirProgresionCompetencia(cursos, totalRAs) {
-    return {
-        inicio: Math.min(...cursos),
-        consolidacion: Math.max(...cursos),
-        complejidad: cursos.length > 1 ? 'progresiva' : 'puntual',
-        rasPorCurso: totalRAs / cursos.length
     };
 }
 
-static generarInstrumentosCompetencia(ras, area) {
+static analizarNivelBloomGrupo(ras) {
+    const niveles = ras.map(ra => this.analizarNivelBloom(ra.texto));
+    if (niveles.includes('CREAR')) return 'CREAR';
+    if (niveles.includes('EVALUAR')) return 'EVALUAR';
+    if (niveles.includes('ANALIZAR')) return 'ANALIZAR';
+    if (niveles.includes('APLICAR')) return 'APLICAR';
+    if (niveles.includes('COMPRENDER')) return 'COMPRENDER';
+    return 'RECORDAR';
+}
+
+static generarInstrumentosGrupo(ras) {
     const instrumentos = new Set();
     
     ras.forEach(ra => {
-        const inst = this.generarInstrumentosDesdeRA(ra.texto, area);
+        const inst = this.generarInstrumentosDesdeRA(ra.texto, ra.area);
         inst.forEach(i => instrumentos.add(i));
     });
     
     return Array.from(instrumentos);
 }
-    
-    static procesarRAsAsignatura(asignatura, curso, idCounter) {
-        const competencias = [];
-        const area = asignatura.arloa || 'Orokorra';
-        
-        asignatura.currentOfficialRAs.forEach((ra, index) => {
-            // Crear competencia desde cada RA
-            const competencia = {
-                id: `C${idCounter + index}`,
-                nombre: this.extraerNombreCompetencia(ra, asignatura.izena),
-                descripcion: ra,
-                ambito: this.mapearAreaAAmbito(area),
-                nivelBloom: this.analizarNivelBloom(ra),
-                instrumentosEvaluacion: this.generarInstrumentosDesdeRA(ra, area),
-                cursoRecomendado: curso,
-                asignaturasRelacionadas: [asignatura.izena],
-                areaConocimiento: area,
-                creditos: asignatura.kredituak || 6,
-                raOrigen: ra,
-                tipoAsignatura: asignatura.mota
-            };
-            
-            competencias.push(competencia);
-        });
-        
-        return competencias;
-    }
-    
+     
     static extraerNombreCompetencia(ra, nombreAsignatura) {
         // Extraer verbo acción del RA (en euskera)
         const verbosAccion = {
@@ -384,6 +285,7 @@ static generarInstrumentosCompetencia(ras, area) {
 if (typeof window !== 'undefined') {
     window.AnecaAPI = AnecaAPI;
 }
+
 
 
 
