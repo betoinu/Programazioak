@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Curriculum Diseinurako Laguntzailea</title>
+    <title>Curriculum Diseinurako Laguntzailea - ANECA Analisi Globala</title>
 
     <!-- ✅ FAVICON REFERENCES -->
     <link rel="icon" type="image/x-icon" href="img/favicon.ico">
@@ -48,6 +48,19 @@
         .btn-primary:hover {
             background-color: #4338ca;
         }
+
+        .btn-secondary {
+            background-color: #6b7280;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
         
         .loader {
             border: 2px solid #f3f3f3;
@@ -71,17 +84,115 @@
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
             margin-bottom: 1.5rem;
         }
+
+        .competence-card {
+            border-left: 4px solid #4f46e5;
+            background-color: #f8fafc;
+        }
+
+        .hueco-alto { border-left-color: #ef4444; background-color: #fef2f2; }
+        .hueco-medio { border-left-color: #f59e0b; background-color: #fffbeb; }
+        .hueco-bajo { border-left-color: #10b981; background-color: #f0fdf4; }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: #f3f4f6;
+            cursor: pointer;
+            border-radius: 0.375rem 0.375rem 0 0;
+        }
+
+        .tab-button.active {
+            background: #4f46e5;
+            color: white;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
     <div id="app">
-        <div class="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
+        <div class="container mx-auto max-w-6xl p-4 sm:p-6 lg:p-8">
             <header class="mb-6">
                 <h1 class="text-3xl font-bold text-gray-900">Curriculum Diseinurako Laguntzailea</h1>
                 <p class="mt-1 text-sm text-gray-600">Graduetarako Ikaskuntza Emaitzak (IE) sortu eta fintzeko tresna (ANECA / AUDIT / GJH).</p>
             </header>
 
-            <!-- Formulario Principal -->
+            <!-- ANALISIS GLOBAL ANECA SECTION -->
+            <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">🎯 ANECA Analisi Globala</h2>
+                <p class="text-gray-600 mb-4">Planaren analisi osoa: konpetentziak, estaldura, progresioa eta hobespenak.</p>
+                
+                <div class="flex gap-4 mb-4">
+                    <button id="global-analysis-btn" class="btn-primary flex items-center">
+                        <span id="global-analysis-text">🔍 Analisi Globala Abiarazi</span>
+                        <div id="global-analysis-loader" class="loader hidden"></div>
+                    </button>
+                    
+                    <button onclick="showAPIKeyPrompt()" class="btn-secondary">
+                        🔑 API Gakoa Konfiguratu
+                    </button>
+                </div>
+
+                <!-- Pestañas de Resultados -->
+                <div class="border-b border-gray-200 mb-4">
+                    <div class="flex space-x-1" role="tablist">
+                        <button class="tab-button active" data-tab="resumen">📊 Laburpena</button>
+                        <button class="tab-button" data-tab="competencias">🎯 Konpetentziak</button>
+                        <button class="tab-button" data-tab="huecos">⚠️ Hobespenak</button>
+                        <button class="tab-button" data-tab="matrices">📈 Matrizeak</button>
+                    </div>
+                </div>
+
+                <!-- Contenido de Pestañas -->
+                <div id="tab-content">
+                    <!-- Pestaña Resumen -->
+                    <div id="tab-resumen" class="tab-panel active">
+                        <div id="analysis-summary" class="result-section">
+                            <h3 class="text-xl font-semibold mb-4">📊 Laburpen Exekutiboa</h3>
+                            <div id="summary-content" class="text-gray-700">
+                                <p>Analisia abiarazi ezazu planaren diagnostiko osoa ikusteko.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pestaña Competencias -->
+                    <div id="tab-competencias" class="tab-panel hidden">
+                        <div id="competence-analysis" class="result-section">
+                            <h3 class="text-xl font-semibold mb-4">🎯 Konpetentziak eta Arloak</h3>
+                            <div id="competence-content">
+                                <p>Konpetentziak analisi globalaren ondoren agertuko dira hemen.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pestaña Huecos -->
+                    <div id="tab-huecos" class="tab-panel hidden">
+                        <div id="gap-analysis" class="result-section">
+                            <h3 class="text-xl font-semibold mb-4">⚠️ Hobespenak Detektatuak</h3>
+                            <div id="gap-content">
+                                <p>Hobespenen analisia ikusteko, abiarazi analisi globala.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pestaña Matrices -->
+                    <div id="tab-matrices" class="tab-panel hidden">
+                        <div id="matrix-analysis" class="result-section">
+                            <h3 class="text-xl font-semibold mb-4">📈 ANECA Matrizeak</h3>
+                            <div id="matrix-content">
+                                <p>Matrize analisiak hemen bistaratuko dira.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario Principal (Original) -->
             <form id="course-form" class="bg-white p-6 rounded-lg shadow-md border border-gray-200 space-y-6">
                 
                 <!-- Mensaje de Error Global -->
@@ -163,43 +274,8 @@
                     </button>
                 </div>
             </form>
-            
-            <!-- index.html-en, formularioaren ondoren gehitu -->
-            <div class="mt-4 text-center">
-                <button onclick="showAPIKeyPrompt()" class="text-sm text-indigo-600 hover:text-indigo-800">
-                    🔑 API Gakoa Konfiguratu
-                </button>
-            </div>              
-                <!-- Resumen ejecutivo -->
-                <div id="analysis-summary" class="result-section">
-                    <h3 class="text-xl font-semibold mb-4">📊 Laburpen Exekutiboa</h3>
-                    <div id="summary-content"></div>
-                </div>
-                
-                <!-- Análisis por áreas -->
-                <div id="area-analyses" class="result-section">
-                    <h3 class="text-xl font-semibold mb-4">🎯 Analisiak Arloen Arabera</h3>
-                    <div id="area-content" class="space-y-4"></div>
-                </div>
-                
-                <!-- Recomendaciones -->
-                <div id="analysis-recommendations" class="result-section">
-                    <h3 class="text-xl font-semibold mb-4">💡 Gomendioak eta Hobespenak</h3>
-                    <div id="recommendations-content"></div>
-                </div>
-            </div>
-            
-            <script>
-            function showAPIKeyPrompt() {
-                const apiKey = prompt("Sartu zure Groq API gakoa:");
-                if (apiKey) {
-                    localStorage.setItem('groq_api_key', apiKey);
-                    alert('API gakoa gordeta!');
-                }
-            }         
-            </script>
-            
-            <!-- Emaitzen Atala -->
+
+            <!-- Emaitzen Atala (Original) -->
             <div id="results-container" class="mt-8 space-y-6 hidden">
                 <h2 class="text-2xl font-bold text-gray-900">IA-ren Iradokizunak</h2>
                 
@@ -213,64 +289,190 @@
         </div>
     </div>
 
-    <!-- Moduluak kargatu -->
+    <!-- Módulos ANECA -->
+    <script src="analysis/aneca-api.js"></script>
+    <script src="analysis/competence-mapper.js"></script>
+    <script src="visualization/gap-analyzer.js"></script>
+    <script src="analysis/curriculum-coverage.js"></script>
+    <script src="analysis/horizontal-coherence.js"></script>
+    <script src="analysis/content-alignment.js"></script>
+    <script src="validation/aneca-validator.js"></script>
+    <script src="visualization/matrix-display.js"></script>
+    <script src="analysis/global-analyzer.js"></script>
+
+    <!-- Módulos principales -->
     <script type="module" src="js/main.js"></script>
+    <script src="js/data-service.js"></script>
+    <script src="js/ui-helpers.js"></script>
    
     <script>
     // Estados del análisis global
     let isGlobalAnalysisRunning = false;
     
-    
-    // Función temporal para cargar datos (necesita implementación real)
-    async function loadCompleteCurriculumData() {
-        console.log('📥 Curriculum datuak kargatzen...');
-        
-        // TODO: Implementar carga real de datos
-        // Por ahora devolvemos datos de ejemplo
-        return [
-            {
-                izena: "Diseinuaren Oinarriak",
-                area: "Diseinua",
-                kredituak: 6,
-                gradua: "Diseinu Grafikoa",
-                kurtsoa: "1",
-                ieak: [
-                    "Diseinuaren oinarrizko printzipioak ezagutzen ditu",
-                    "Kolorearen teoria aplikatzen du",
-                    "Forma eta espazioaren harremana ulertzen du"
-                ]
-            },
-            {
-                izena: "Proiektuen Kudeaketa",
-                area: "Diseinua", 
-                kredituak: 6,
-                gradua: "Diseinu Grafikoa",
-                kurtsoa: "2",
-                ieak: [
-                    "Diseinu proiektuen planifikazioa egiten du",
-                    "Denbara kudeaketa teknikak aplikatzen ditu",
-                    "Proiektuen ebaluazio irizpideak ezartzen ditu"
-                ]
-            }
-            // ... más asignaturas
-        ];
-    }
-    
-    // Inicializar cuando se cargue la página
+    // Sistema de pestañas
     document.addEventListener('DOMContentLoaded', function() {
         console.log('✅ Analisi Globala modulua prest!');
+        
+        // Configurar pestañas
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabPanels = document.querySelectorAll('.tab-panel');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetTab = button.getAttribute('data-tab');
+                
+                // Actualizar botones
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                // Actualizar paneles
+                tabPanels.forEach(panel => panel.classList.add('hidden'));
+                document.getElementById(`tab-${targetTab}`).classList.remove('hidden');
+            });
+        });
+        
+        // Botón de análisis global
+        const globalAnalysisBtn = document.getElementById('global-analysis-btn');
+        const globalAnalysisText = document.getElementById('global-analysis-text');
+        const globalAnalysisLoader = document.getElementById('global-analysis-loader');
+        
+        globalAnalysisBtn.addEventListener('click', async function() {
+            if (isGlobalAnalysisRunning) return;
+            
+            isGlobalAnalysisRunning = true;
+            globalAnalysisText.textContent = 'Analisian...';
+            globalAnalysisLoader.classList.remove('hidden');
+            globalAnalysisBtn.disabled = true;
+            
+            try {
+                await initializeGlobalAnalysis();
+            } catch (error) {
+                console.error('❌ Error en análisis global:', error);
+                showGlobalError('Errorea analisi globalean: ' + error.message);
+            } finally {
+                isGlobalAnalysisRunning = false;
+                globalAnalysisText.textContent = '🔍 Analisi Globala Abiarazi';
+                globalAnalysisLoader.classList.add('hidden');
+                globalAnalysisBtn.disabled = false;
+            }
+        });
     });
+    
+    function showGlobalError(message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'p-3 bg-red-100 text-red-700 border border-red-300 rounded-md mb-4';
+        errorDiv.textContent = message;
+        
+        const tabResumen = document.getElementById('tab-resumen');
+        tabResumen.insertBefore(errorDiv, tabResumen.firstChild);
+    }
+    
+    function showAPIKeyPrompt() {
+        const apiKey = prompt("Sartu zure Groq API gakoa:");
+        if (apiKey) {
+            localStorage.setItem('groq_api_key', apiKey);
+            alert('API gakoa gordeta!');
+        }
+    }
+
+    // Función principal de análisis global (se conectará con main.js)
+    async function initializeGlobalAnalysis() {
+        console.log('🚀 ANECA Analisi Globala abiarazten...');
+        
+        try {
+            // Esta función se implementará en main.js
+            if (typeof window.initializeGlobalAnalysis === 'function') {
+                await window.initializeGlobalAnalysis();
+            } else {
+                throw new Error('Analisi globalaren funtzioa ez dago eskuragarri');
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Función para mostrar resultados del análisis global
+    window.mostrarResultadosAnalisisGlobal = function(resultados) {
+        console.log('📊 Analisi globalaren emaitzak bistaratzen:', resultados);
+        
+        // Actualizar pestaña de resumen
+        const summaryContent = document.getElementById('summary-content');
+        if (resultados.ambitosProfesionales) {
+            summaryContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-blue-800">🎓 Arlo Profesionalak</h4>
+                        <p class="text-2xl font-bold text-blue-600">${Object.keys(resultados.ambitosProfesionales).length}</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-green-800">📈 Konpetentziak</h4>
+                        <p class="text-2xl font-bold text-green-600">${resultados.matrices?.competenciasRA?.metricas?.totalCompetencias || 0}</p>
+                    </div>
+                    <div class="bg-orange-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-orange-800">⚠️ Hobespenak</h4>
+                        <p class="text-2xl font-bold text-orange-600">${resultados.analisisHuecos?.huecos ? Object.values(resultados.analisisHuecos.huecos).flat().length : 0}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Actualizar pestaña de competencias
+        const competenceContent = document.getElementById('competence-content');
+        if (resultados.matrices?.competenciasRA?.matriz?.ambitos) {
+            let competenciasHTML = '';
+            Object.entries(resultados.matrices.competenciasRA.matriz.ambitos).forEach(([ambito, competencias]) => {
+                competenciasHTML += `
+                    <div class="mb-6">
+                        <h4 class="font-semibold text-lg mb-2">${ambito}</h4>
+                        <div class="space-y-2">
+                            ${competencias.slice(0, 5).map(comp => `
+                                <div class="competence-card p-3 rounded">
+                                    <div class="font-medium">${comp.nombre}</div>
+                                    <div class="text-sm text-gray-600">${comp.descripcion.substring(0, 100)}...</div>
+                                    <div class="text-xs text-gray-500 mt-1">${comp.nivelBloom} • ${comp.instrumentosEvaluacion.length} ebaluazio-instrumentu</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            competenceContent.innerHTML = competenciasHTML;
+        }
+
+        // Actualizar pestaña de huecos
+        const gapContent = document.getElementById('gap-content');
+        if (resultados.analisisHuecos?.huecos) {
+            const todosHuecos = Object.values(resultados.analisisHuecos.huecos).flat();
+            gapContent.innerHTML = todosHuecos.map(hueco => `
+                <div class="hueco-${hueco.urgencia.toLowerCase()} p-4 rounded-lg mb-3">
+                    <div class="font-semibold">${hueco.tipo} - ${hueco.urgencia}</div>
+                    <div class="text-sm mt-1">${hueco.descripcion}</div>
+                    <div class="text-xs text-gray-600 mt-2">${hueco.accionRecomendada}</div>
+                </div>
+            `).join('');
+        }
+
+        // Actualizar pestaña de matrices
+        const matrixContent = document.getElementById('matrix-content');
+        if (resultados.matrices) {
+            matrixContent.innerHTML = `
+                <div class="matrix-grid">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h4 class="font-semibold">📊 Konpetentzien Matrizea</h4>
+                        <p class="text-sm text-gray-600">${resultados.matrices.competenciasRA?.metricas?.totalCompetencias || 0} konpetentzia</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h4 class="font-semibold">🎯 IE-Asignatura Matrizea</h4>
+                        <p class="text-sm text-gray-600">Estaldura analisia</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h4 class="font-semibold">🔗 Koherentzia Horizontala</h4>
+                        <p class="text-sm text-gray-600">Asignatura arteko loturak</p>
+                    </div>
+                </div>
+            `;
+        }
+    };
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
