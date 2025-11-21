@@ -1,4 +1,4 @@
-import { CurriculumDataService } from '../services/data-service.js';
+const CurriculumDataService = window.CurriculumDataService;
 
 export async function initializeApp() {
     try {
@@ -114,4 +114,5 @@ function resetSubjectDetails() {
     if (optionalCheckbox) optionalCheckbox.checked = false;
     if (draftRAs) draftRAs.value = "";
     if (prerequisitesRAs) prerequisitesRAs.value = "";
+
 }
