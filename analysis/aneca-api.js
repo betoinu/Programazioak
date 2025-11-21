@@ -1,5 +1,5 @@
 // 📁 analysis/aneca-api.js
-export class AnecaAPI {
+class AnecaAPI {
     static async interpretarCompetencias(curriculumData) {
         console.log("🧠 API: Interpretando competencias desde RAs reales en euskera...");
         
@@ -180,4 +180,5 @@ if (typeof window !== 'undefined') {
     window.AnecaAPI = AnecaAPI;
 }
 }
+
 
