@@ -97,7 +97,7 @@ const resultados =
         // ✅ USAR LA FUNCIÓN CORRECTA
         ResultsDisplay.displayAnecaResults(resultados);
         console.log("✅ Dashboard mostrado en interfaz");
-        
+        initializeMatrixVisualization(resultados);
     } catch (error) {  // ← MANTENER el catch
         console.error('❌ Error en Análisis Global ANECA:', error);
         showError(`Error en análisis ANECA: ${error.message}`);
@@ -116,9 +116,7 @@ function setupBidirectionalSystem() {
         const { asignatura, cambios } = event.detail;
         this.actualizarAnalisisGlobal(asignatura, cambios);
     });
-}
-
-initializeMatrixVisualization(resultados);
+} // ✅ LLAVE CERRADA
 
 // ===== ✅ NUEVA FUNCIÓN: VISUALIZACIÓN DE MATRICES ANECA =====
 function initializeMatrixVisualization(resultados) {
@@ -167,6 +165,7 @@ window.initializeGlobalAnalysis = initializeGlobalAnalysis;
 window.setupBidirectionalSystem = setupBidirectionalSystem;
 
 console.log('✅ Todos los módulos ANECA exportados al objeto global');
+
 
 
 
