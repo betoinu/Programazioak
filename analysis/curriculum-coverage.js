@@ -163,5 +163,32 @@ export class CurriculumCoverage {
             textoAsignaturaLower.includes(palabra)
         );
     }
+
+    static extraerEvidenciasContribucion(asignatura, ra) {
+    const evidencias = [];
+    
+    // Buscar evidencias en contenidos, objetivos, actividades
+    const textoCombinado = [
+        ...(asignatura.contenidos || []),
+        ...(asignatura.objetivos || []),
+        ...(asignatura.actividades || [])
+    ].join(' ').toLowerCase();
+    
+    const textoRA = ra.descripcion?.toLowerCase() || ra.toLowerCase();
+    
+    // Coincidencias básicas
+    if (textoCombinado.includes('proyecto') && textoRA.includes('proyecto')) {
+        evidencias.push('Proyecto aplicado');
+    }
+    if (textoCombinado.includes('ejercicio') && textoRA.includes('aplicar')) {
+        evidencias.push('Ejercicios prácticos');
+    }
+    if (textoCombinado.includes('caso') && textoRA.includes('analizar')) {
+        evidencias.push('Estudios de caso');
+    }
+    
+    return evidencias.length > 0 ? evidencias : ['Actividades de aprendizaje'];
+}
     
 }
+
