@@ -124,3 +124,41 @@ export class GlobalAnalyzer {
     }
 }
 
+calcularDensidadCompetencial(progresion) {
+    const densidad = {};
+    const totalCompetencias = new Set();
+    
+    // Calcular densidad por curso
+    Object.entries(progresion).forEach(([curso, competencias]) => {
+        const competenciasCurso = Object.keys(competencias);
+        densidad[curso] = {
+            total: competenciasCurso.length,
+            densidad: competenciasCurso.length / 10, // Asumiendo 10 como máximo esperado
+            competencias: competenciasCurso
+        };
+        
+        competenciasCurso.forEach(comp => totalCompetencias.add(comp));
+    });
+    
+    return {
+        porCurso: densidad,
+        totalCompetencias: totalCompetencias.size,
+        distribucion: this.analizarDistribucionCompetencias(progresion)
+    };
+},
+
+analizarDistribucionCompetencias(progresion) {
+    const distribucion = {};
+    
+    // Contar en cuántos cursos aparece cada competencia
+    Object.values(progresion).forEach(competenciasCurso => {
+        Object.keys(competenciasCurso).forEach(competencia => {
+            if (!distribucion[competencia]) {
+                distribucion[competencia] = 0;
+            }
+            distribucion[competencia]++;
+        });
+    });
+    
+    return distribucion;
+}
