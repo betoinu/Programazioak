@@ -41,22 +41,19 @@
         </div>
     </div>
 
-    <!-- ✅ CORREGIR: CARGAR MÓDULOS COMO SCRIPTS NORMALES, NO MÓDULOS -->
-    
-    <!-- Módulos ANECA - Verificar que existen en estas rutas -->
-    <script src="analysis/aneca-api.js"></script>
-    <script src="analysis/competence-mapper.js"></script>
-    <script src="visualization/gap-analyzer.js"></script>
-    <script src="analysis/curriculum-coverage.js"></script>
-    <script src="analysis/horizontal-coherence.js"></script>
-    <script src="analysis/content-alignment.js"></script>
-    <script src="validation/aneca-validator.js"></script>
-    <script src="visualization/matrix-display.js"></script>
-    <script src="analysis/global-analyzer.js"></script>
+   <script type="module" src="analysis/aneca-api.js"></script>
+    <script type="module" src="analysis/competence-mapper.js"></script>
+    <script type="module" src="visualization/gap-analyzer.js"></script>
+    <script type="module" src="analysis/curriculum-coverage.js"></script>
+    <script type="module" src="analysis/horizontal-coherence.js"></script>
+    <script type="module" src="analysis/content-alignment.js"></script>
+    <script type="module" src="validation/aneca-validator.js"></script>
+    <script type="module" src="visualization/matrix-display.js"></script>
+    <script type="module" src="analysis/global-analyzer.js"></script>
 
-    <!-- ✅ MÓDULOS PRINCIPALES (scripts normales) -->
-    <script src="services/data-service.js"></script>
-    <script src="utils/ui-helpers.js"></script>
+    <!-- ✅ MÓDULOS PRINCIPALES - como módulos ES6 -->
+    <script type="module" src="services/data-service.js"></script>
+    <script type="module" src="utils/ui-helpers.js"></script>
 
     <!-- ✅ MAIN.JS como módulo ES6 -->
     <script type="module" src="js/main.js"></script>
@@ -303,5 +300,6 @@
     </script>
 </body>
 </html>
+
 
 
