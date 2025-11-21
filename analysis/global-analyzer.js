@@ -30,6 +30,57 @@ export class GlobalAnalyzer {
         
         return this.depurarYAnalizarAmbitos(ambitos);
     }
+
+    // EN global-analyzer.js, DESPUÉS de identificarAmbitosProfesionales(), AGREGA:
+    
+    depurarYAnalizarAmbitos(ambitos) {
+        // Eliminar ámbitos vacíos y analizar
+        const ambitosDepurados = {};
+        
+        Object.entries(ambitos).forEach(([nombre, datos]) => {
+            if (datos.RAs.length > 0 || datos.asignaturas.length > 0) {
+                ambitosDepurados[nombre] = {
+                    ...datos,
+                    totalRAs: datos.RAs.length,
+                    totalAsignaturas: datos.asignaturas.length,
+                    totalCompetencias: new Set(datos.competencias).size,
+                    fortaleza: this.calcularFortalezaAmbito(datos)
+                };
+            }
+        });
+        
+        return ambitosDepurados;
+    },
+    
+    calcularFortalezaAmbito(datosAmbito) {
+        const puntuacion = 
+            (datosAmbito.RAs.length * 0.4) + 
+            (datosAmbito.asignaturas.length * 0.3) + 
+            (new Set(datosAmbito.competencias).size * 0.3);
+        
+        if (puntuacion > 2) return 'ALTA';
+        if (puntuacion > 1) return 'MEDIA';
+        return 'BAJA';
+    },
+    
+    extraerCompetenciasDeRA(ra) {
+        // Extraer competencias básicas del texto del RA
+        const competencias = [];
+        const textoRA = ra.descripcion?.toLowerCase() || ra.toLowerCase();
+        
+        const palabrasCompetencia = [
+            'diseñar', 'planificar', 'gestionar', 'analizar', 'evaluar',
+            'comunicar', 'colaborar', 'innovar', 'resolver', 'crear'
+        ];
+        
+        palabrasCompetencia.forEach(palabra => {
+            if (textoRA.includes(palabra)) {
+                competencias.push(palabra);
+            }
+        });
+        
+        return competencias.length > 0 ? competencias : ['competencia_genérica'];
+    }
     
     clasificarRAenAmbito(ra) {
         const keywords = {
