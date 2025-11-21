@@ -189,33 +189,6 @@ function displayCompetenceAnalysis(results) {
     recommendationsContent.innerHTML = AnalysisDisplay.buildRecommendationsHTML(results);
 }
 
-// ===== ERROR HANDLER =====
-function showError(message) {
-    console.error('❌ Errorea:', message);
-    
-    // Erabili zure errore-sistema existentea
-    const errorDiv = document.getElementById('error-message');
-    if (errorDiv) {
-        errorDiv.textContent = message;
-        errorDiv.classList.remove('hidden');
-        
-        // Automatikoki ezkutatu 5 segundoaren ondoren
-        setTimeout(() => {
-            errorDiv.classList.add('hidden');
-        }, 5000);
-    } else {
-        // Fallback: alert sinplea
-        alert(`Errorea: ${message}`);
-    }
-}
-
-function hideError() {
-    const errorDiv = document.getElementById('error-message');
-    if (errorDiv) {
-        errorDiv.classList.add('hidden');
-    }
-}
-
 function setLoadingState(isLoading) {
     const button = document.getElementById('generate-button');
     const buttonText = document.getElementById('button-text');
@@ -237,6 +210,7 @@ function setLoadingState(isLoading) {
 window.showError = showError;
 window.hideError = hideError;
 window.setLoadingState = setLoadingState;
+
 
 
 
