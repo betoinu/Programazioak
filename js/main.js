@@ -113,87 +113,23 @@ function setupBidirectionalSystem() {
     });
 }
 
-function disableAnalysisButton(message) {
-    const button = document.getElementById('global-analysis-btn');
-    if (button) {
-        button.disabled = true;
-        button.textContent = message;
-        button.style.opacity = '0.6';
-    }
-}
-
+/ ✅ ACTUALIZAR launchGlobalAnalysis (si la necesitas):
 async function launchGlobalAnalysis() {
-    // Egiaztatu moduluak kargatuta daudela
-    if (!CompetenceAnalyzer || !CurriculumLoader || !AnalysisDisplay) {
-        showError('Analisi Globala moduluak oraindik ez daude kargatuta. Itxi eta berriz ireki.');
-        return;
-    }
-
-    const button = document.getElementById('global-analysis-btn');
-    const buttonText = document.getElementById('global-analysis-text');
-    const loader = document.getElementById('global-analysis-loader');
-    const resultsContainer = document.getElementById('global-analysis-results');
-    
     try {
-        // Egoera kargatzen
-        button.disabled = true;
-        buttonText.textContent = 'Analizatzen...';
-        loader.classList.remove('hidden');
-        if (resultsContainer) resultsContainer.classList.add('hidden');
-        
-        console.log('🚀 Analisi Globala abiarazten...');
-        
-        // Exekutatu analisia
-        const results = await CompetenceAnalyzer.performGlobalAnalysis();
-        
-        // Erakutsi emaitzak
-        displayCompetenceAnalysis(results);
-        
-        // Arrakasta
-        buttonText.textContent = 'Analisia Osatuta!';
-        setTimeout(() => {
-            buttonText.textContent = 'Berriro Hasi Analisia';
-            button.disabled = false;
-            loader.classList.add('hidden');
-        }, 2000);
-        
+        setLoadingState(true);
+        await initializeGlobalAnalysis(); // Usar el nuevo sistema ANECA
+        setLoadingState(false);
     } catch (error) {
-        console.error('❌ Errorea analisi globalean:', error);
-        
-        // Error egoera
-        buttonText.textContent = 'Errorea - Saiatu Berriro';
-        button.disabled = false;
-        loader.classList.add('hidden');
-        
-        showError(`Analisi globalean errorea: ${error.message}`);
+        showError(`Error en análisis: ${error.message}`);
+        setLoadingState(false);
     }
 }
-
-function displayCompetenceAnalysis(results) {
-    const resultsContainer = document.getElementById('global-analysis-results');
-    const summaryContent = document.getElementById('summary-content');
-    const areaContent = document.getElementById('area-content');
-    const recommendationsContent = document.getElementById('recommendations-content');
-    
-    if (!resultsContainer || !summaryContent || !areaContent || !recommendationsContent) {
-        showError('Emaitzak erakusteko elementuak ez daude aurkitu');
-        return;
-    }
-    
-    // Erakutsi edukiontzia
-    resultsContainer.classList.remove('hidden');
-    
-    // Erabili display helper
-    summaryContent.innerHTML = AnalysisDisplay.buildSummaryHTML(results);
-    areaContent.innerHTML = AnalysisDisplay.buildAreaAnalysisHTML(results.areaAnalyses);
-    recommendationsContent.innerHTML = AnalysisDisplay.buildRecommendationsHTML(results);
-}
-
 
 // Exportatu funtzioak globalak izateko
 window.showError = showError;
 window.hideError = hideError;
 window.setLoadingState = setLoadingState;
+
 
 
 
