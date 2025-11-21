@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         await initializeApp();
         setupEventListeners();
-        await APIKeyManager.initialize();
+        await APIKeyManager.init();
         
         // Inicializar análisis global (ahora mejorado con ANECA)
         initializeGlobalAnalysis();
