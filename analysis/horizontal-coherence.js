@@ -1,4 +1,4 @@
-class HorizontalCoherence {
+export class HorizontalCoherence {
     static generarMatrizCompetenciasAsignaturas(curriculumData) {
         const matriz = [];
         const distribucionCarga = {};
@@ -111,6 +111,7 @@ class HorizontalCoherence {
     }
     
 }
+
 
 
 
