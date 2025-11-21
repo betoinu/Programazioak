@@ -23,7 +23,7 @@ static async generarMatrizCompetenciasRA(curriculumData) {
                 nivelBloom: comp.nivelBloom,
                 cursos: comp.cursos,
                 asignaturas: comp.asignaturasRelacionadas,
-                rasConstituyentes: comp.rasConstituyentes?.length || 0,
+                rasConstituyentes: (comp.rasConstituyentes && comp.rasConstituyentes.length) || 0,
                 creditos: comp.creditosTotales,
                 progresion: comp.progresion,
                 instrumentosEvaluacion: comp.instrumentosEvaluacion
@@ -197,6 +197,7 @@ static analizarProgresionCurricular(competencias) {
         };
     }
 }
+
 
 
 
