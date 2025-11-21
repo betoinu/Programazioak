@@ -82,4 +82,33 @@ export class HorizontalCoherence {
         });
     }
 
+    static determinarNivelCompetencia(competencia, asignatura) {
+    const texto = (asignatura.contenidos?.join(' ') + ' ' + asignatura.objetivos?.join(' ')).toLowerCase();
+    const competenciaText = competencia.descripcion?.toLowerCase() || competencia.toLowerCase();
+    
+    if (texto.includes('avanzado') || texto.includes('profund')) return 'AVANZADO';
+    if (texto.includes('intermedio') || texto.includes('desarroll')) return 'INTERMEDIO';
+    return 'BÁSICO';
 }
+
+    static calcularPesoCompetencia(competencia, asignatura) {
+        // Peso basado en créditos y nivel de competencia
+        const creditos = asignatura.creditos || 3;
+        const nivel = this.determinarNivelCompetencia(competencia, asignatura);
+        
+        const pesos = { 'BÁSICO': 0.3, 'INTERMEDIO': 0.6, 'AVANZADO': 1.0 };
+        return creditos * (pesos[nivel] || 0.5);
+    }
+    
+    static analizarEquilibrioAsignatura(fila) {
+        const totalCompetencias = fila.competencias.length;
+        
+        if (totalCompetencias === 0) return 'Sin competencias definidas';
+        if (totalCompetencias > 5) return 'Posible sobrecarga de competencias';
+        if (totalCompetencias === 1) return 'Competencia única - considerar diversificar';
+        
+        return 'Equilibrio adecuado';
+    }
+    
+}
+
