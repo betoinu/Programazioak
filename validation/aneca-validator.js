@@ -83,11 +83,13 @@ class AnecaValidator {
             }
         ];
     }
-  }  
-// ✅ Exportar al ámbito global para scripts no módulo
+  }
+export { AnecaValidator };
+
 if (typeof window !== 'undefined') {
     window.AnecaValidator = AnecaValidator;
 }
+
 
 
 
