@@ -29,22 +29,18 @@ import { AnecaValidator } from '../analysis/aneca-validator.js';
 import { ContentAlignment } from '../analysis/content-alignment.js';
 import { MatrixDisplay } from '../visualization/matrix-display.js';
 import { GapAnalyzer } from '../visualization/gap-analyzer.js';
+import { showError, hideError, setLoadingState } from '../utils/ui-helpers.js';
 
-// ===== APLIKAZIOA HASIERATU =====
-document.addEventListener('DOMContentLoaded', async () => {
+// ===== INICIALIZACIÓN PRINCIPAL =====
+document.addEventListener('DOMContentLoaded', async function() {
     try {
         console.log('🚀 Aplikazioa hasieratzen...');
         
-        // 1. Datu-basea kargatu
-        await CurriculumDataService.loadData();
-        
-        // 2. Interfazea hasieratu
         await initializeApp();
-        
-        // 3. Event listener-ak konfiguratu
         setupEventListeners();
+        await APIKeyManager.initialize();
         
-        // 4. Analisi Globala hasieratu
+        // Inicializar análisis global (ahora mejorado con ANECA)
         initializeGlobalAnalysis();
         
         console.log('✅ Aplikazioa prest!');
@@ -115,17 +111,6 @@ function setupBidirectionalSystem() {
         const { asignatura, cambios } = event.detail;
         this.actualizarAnalisisGlobal(asignatura, cambios);
     });
-}
-
-function setupAnalysisButton() {
-    const button = document.getElementById('global-analysis-btn');
-    if (button) {
-        button.addEventListener('click', launchGlobalAnalysis);
-        button.disabled = false;
-        console.log('🔍 Analisi botoia konfiguratuta');
-    } else {
-        console.warn('⚠️ Analisi botoia ez da aurkitu');
-    }
 }
 
 function disableAnalysisButton(message) {
@@ -252,6 +237,7 @@ function setLoadingState(isLoading) {
 window.showError = showError;
 window.hideError = hideError;
 window.setLoadingState = setLoadingState;
+
 
 
 
