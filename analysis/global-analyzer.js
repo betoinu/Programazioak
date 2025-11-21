@@ -145,7 +145,7 @@ calcularDensidadCompetencial(progresion) {
         totalCompetencias: totalCompetencias.size,
         distribucion: this.analizarDistribucionCompetencias(progresion)
     };
-},
+}
 
 analizarDistribucionCompetencias(progresion) {
     const distribucion = {};
@@ -162,3 +162,4 @@ analizarDistribucionCompetencias(progresion) {
     
     return distribucion;
 }
+
