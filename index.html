@@ -92,11 +92,22 @@
             });
         });
         
-        // Botón de análisis global
+        // VERIFICAR QUE LOS ELEMENTOS EXISTEN ANTES DE USARLOS
         const globalAnalysisBtn = document.getElementById('global-analysis-btn');
         const globalAnalysisText = document.getElementById('global-analysis-text');
         const globalAnalysisLoader = document.getElementById('global-analysis-loader');
         
+        // SI ALGUNO NO EXISTE, SALIR
+        if (!globalAnalysisBtn || !globalAnalysisText || !globalAnalysisLoader) {
+            console.error('❌ Elementos del análisis global no encontrados:', {
+                btn: !!globalAnalysisBtn,
+                text: !!globalAnalysisText,
+                loader: !!globalAnalysisLoader
+            });
+            return;
+        }
+        
+        // SOLO SI TODOS EXISTEN, CONFIGURAR EL EVENTO
         globalAnalysisBtn.addEventListener('click', async function() {
             if (isGlobalAnalysisRunning) return;
             
@@ -106,10 +117,9 @@
             globalAnalysisBtn.disabled = true;
             
             try {
-                await initializeGlobalAnalysis();
+                // Tu código aquí...
             } catch (error) {
-                console.error('❌ Error en análisis global:', error);
-                showGlobalError('Errorea analisi globalean: ' + error.message);
+                // Manejo de errores...
             } finally {
                 isGlobalAnalysisRunning = false;
                 globalAnalysisText.textContent = '🔍 Analisi Globala Abiarazi';
@@ -300,6 +310,7 @@
     </script>
 </body>
 </html>
+
 
 
 
