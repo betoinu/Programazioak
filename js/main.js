@@ -189,27 +189,12 @@ function displayCompetenceAnalysis(results) {
     recommendationsContent.innerHTML = AnalysisDisplay.buildRecommendationsHTML(results);
 }
 
-function setLoadingState(isLoading) {
-    const button = document.getElementById('generate-button');
-    const buttonText = document.getElementById('button-text');
-    const loader = document.getElementById('button-loader');
-    
-    if (button && buttonText && loader) {
-        button.disabled = isLoading;
-        if (isLoading) {
-            buttonText.textContent = 'Sortzen...';
-            loader.classList.remove('hidden');
-        } else {
-            buttonText.textContent = 'Iradokizunak Sortu';
-            loader.classList.add('hidden');
-        }
-    }
-}
 
 // Exportatu funtzioak globalak izateko
 window.showError = showError;
 window.hideError = hideError;
 window.setLoadingState = setLoadingState;
+
 
 
 
