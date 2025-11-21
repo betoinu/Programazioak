@@ -50,7 +50,7 @@ export class GlobalAnalyzer {
         });
         
         return ambitosDepurados;
-    },
+    }
     
     calcularFortalezaAmbito(datosAmbito) {
         const puntuacion = 
@@ -61,7 +61,7 @@ export class GlobalAnalyzer {
         if (puntuacion > 2) return 'ALTA';
         if (puntuacion > 1) return 'MEDIA';
         return 'BAJA';
-    },
+    }
     
     extraerCompetenciasDeRA(ra) {
         // Extraer competencias básicas del texto del RA
@@ -123,3 +123,4 @@ export class GlobalAnalyzer {
         return this.derivarAccionesEspecificas(issues);
     }
 }
+
