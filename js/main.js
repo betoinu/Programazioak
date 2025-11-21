@@ -95,7 +95,7 @@ async function initializeGlobalAnalysis() {
 const resultados = 
         
         // ✅ USAR LA FUNCIÓN CORRECTA
-        window.mostrarResultadosAnalisisGlobal(resultados);
+        ResultsDisplay.displayAnecaResults(resultados);
         console.log("✅ Dashboard mostrado en interfaz");
         
     } catch (error) {  // ← MANTENER el catch
@@ -167,6 +167,7 @@ window.initializeGlobalAnalysis = initializeGlobalAnalysis;
 window.setupBidirectionalSystem = setupBidirectionalSystem;
 
 console.log('✅ Todos los módulos ANECA exportados al objeto global');
+
 
 
 
