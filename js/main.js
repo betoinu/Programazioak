@@ -1,30 +1,22 @@
-// Configuración
-import { APP_CONFIG } from '../config/app-config.js';
-
-// Servicios
-import { GroqAPIService } from '../services/api-service.js';
-import { CurriculumDataService } from '../services/data-service.js';
-
-// Utils
-import { PromptBuilder } from '../utils/prompt-builder.js';
-
-// Components
-import { ResultsDisplay } from '../components/results-display.js';
-import { initializeApp } from '../components/app-initializer.js';
-import { setupEventListeners } from '../components/event-manager.js';
-import { APIKeyManager } from '../components/api-key-manager.js';
-
-
-import { GlobalAnalyzer } from '../analysis/global-analyzer.js';
-import { CompetenceMapper } from '../analysis/competence-mapper.js';
-import { ANECA_STANDARDS } from '../data/aneca-standards.js';
-import { CurriculumCoverage } from '../analysis/curriculum-coverage.js';
-import { HorizontalCoherence } from '../analysis/horizontal-coherence.js';
-import { AnecaValidator } from '../analysis/aneca-validator.js';
-import { ContentAlignment } from '../analysis/content-alignment.js';
-import { MatrixDisplay } from '../visualization/matrix-display.js';
-import { GapAnalyzer } from '../visualization/gap-analyzer.js';
-import { showError, hideError, setLoadingState } from '../utils/ui-helpers.js';
+// ✅ IMPORTS CORREGIDOS EN main.js:
+import { APP_CONFIG } from './config/app-config.js';
+import { GroqAPIService } from './services/api-service.js';
+import { CurriculumDataService } from './services/data-service.js';    // ✅ CORREGIDO
+import { PromptBuilder } from './utils/prompt-builder.js';
+import { ResultsDisplay } from './components/results-display.js';
+import { initializeApp } from './components/app-initializer.js';
+import { setupEventListeners } from './components/event-manager.js';
+import { APIKeyManager } from './components/api-key-manager.js';
+import { GlobalAnalyzer } from './analysis/global-analyzer.js';
+import { CompetenceMapper } from './analysis/competence-mapper.js';
+import { ANECA_STANDARDS } from './data/aneca-standards.js';
+import { CurriculumCoverage } from './analysis/curriculum-coverage.js';
+import { HorizontalCoherence } from './analysis/horizontal-coherence.js';
+import { AnecaValidator } from './validation/aneca-validator.js';      // ✅ CORREGIDO
+import { ContentAlignment } from './analysis/content-alignment.js';
+import { MatrixDisplay } from './visualization/matrix-display.js';
+import { GapAnalyzer } from './visualization/gap-analyzer.js';
+import { showError, hideError, setLoadingState } from './utils/ui-helpers.js'; // ✅ CORREGIDO
 
 // ===== INICIALIZACIÓN PRINCIPAL =====
 document.addEventListener('DOMContentLoaded', async function() {
@@ -143,6 +135,7 @@ window.initializeGlobalAnalysis = initializeGlobalAnalysis;
 window.setupBidirectionalSystem = setupBidirectionalSystem;
 
 console.log('✅ Todos los módulos ANECA exportados al objeto global');
+
 
 
 
