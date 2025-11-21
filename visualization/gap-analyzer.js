@@ -1,4 +1,4 @@
-export class GapAnalyzer {
+class GapAnalyzer {
     static analizarHuecosCurriculares(curriculumData, matricesANECA) {
     console.log("📦 curriculumData:", curriculumData);
     console.log("📊 matricesANECA:", matricesANECA);
@@ -242,6 +242,7 @@ export class GapAnalyzer {
         return asignaturas.length > 0 ? asignaturas : ['Por determinar'];
     }
 }
+
 
 
 
