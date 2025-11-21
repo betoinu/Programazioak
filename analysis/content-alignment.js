@@ -1,4 +1,4 @@
-class ContentAlignment {
+export class ContentAlignment {
     static generarMatrizContenidosRA(curriculumData) {
         const matriz = [];
         
@@ -172,4 +172,5 @@ class ContentAlignment {
         return evidencias.length > 0 ? evidencias : ['Actividades de aprendizaje'];
     }
 }
+
 
