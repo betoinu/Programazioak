@@ -365,57 +365,120 @@
     }
 
     // Función para mostrar resultados del análisis global
-    window.mostrarResultadosAnalisisGlobal = function(resultados) {
-        console.log('📊 Analisi globalaren emaitzak bistaratzen:', resultados);
-        
-        // Actualizar pestaña de resumen
-        const summaryContent = document.getElementById('summary-content');
-        if (resultados.ambitosProfesionales) {
-            summaryContent.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div class="bg-blue-50 p-4 rounded-lg">
-                        <h4 class="font-semibold text-blue-800">🎓 Arlo Profesionalak</h4>
-                        <p class="text-2xl font-bold text-blue-600">${Object.keys(resultados.ambitosProfesionales).length}</p>
-                    </div>
-                    <div class="bg-green-50 p-4 rounded-lg">
-                        <h4 class="font-semibold text-green-800">📈 Konpetentziak</h4>
-                        <p class="text-2xl font-bold text-green-600">${resultados.matrices?.competenciasRA?.metricas?.totalCompetencias || resultados.matrices?.competenciasRA?.matriz?.competencias?.length || 0}</p>
-                    </div>
-                    <div class="bg-orange-50 p-4 rounded-lg">
-                        <h4 class="font-semibold text-orange-800">⚠️ Hobespenak</h4>
-                        <p class="text-2xl font-bold text-orange-600">${resultados.analisisHuecos?.huecos ? Object.values(resultados.analisisHuecos.huecos).flat().length : 0}</p>
-                    </div>
+// Función para mostrar resultados del análisis global
+window.mostrarResultadosAnalisisGlobal = function(resultados) {
+    console.log('📊 Analisi globalaren emaitzak bistaratzen:', resultados);
+    
+    // ✅ DETECTAR tipo de estructura
+    const matrizCompetencias = resultados.matrices?.competenciasRA;
+    const esEstructuraNueva = matrizCompetencias?.competencias && Array.isArray(matrizCompetencias.competencias);
+    
+    const totalCompetencias = esEstructuraNueva ? 
+        matrizCompetencias.competencias.length : 
+        (matrizCompetencias?.metricas?.totalCompetencias || 0);
+    
+    const totalRAs = esEstructuraNueva ?
+        (matrizCompetencias.metricas?.totalRAs || totalCompetencias) :
+        totalCompetencias; // En estructura vieja, 1 RA = 1 competencia
+
+    // Actualizar pestaña de resumen
+    const summaryContent = document.getElementById('summary-content');
+    if (resultados.ambitosProfesionales || resultados.matrices) {
+        summaryContent.innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-blue-800">🎓 ${esEstructuraNueva ? 'Konpetentziak' : 'RAs'}</h4>
+                    <p class="text-2xl font-bold text-blue-600">${totalCompetencias}</p>
+                    ${esEstructuraNueva ? `<p class="text-xs text-blue-600">${totalRAs} RAtatik</p>` : ''}
                 </div>
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <h4 class="font-semibold mb-2">🏆 Analisi Globala Osatuta</h4>
-                    <p class="text-sm text-gray-600">Planaren diagnostiko osoa burutu da. Ikusi gainontzeko fitxak xehetasun gehiagorako.</p>
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-green-800">📈 Progresioa</h4>
+                    <p class="text-2xl font-bold text-green-600">${matrizCompetencias?.metricas?.competenciasConProgresion || 0}</p>
+                    <p class="text-xs text-green-600">konpetentzia progresibo</p>
                 </div>
-            `;
-        }
+                <div class="bg-orange-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-orange-800">⚠️ Hobespenak</h4>
+                    <p class="text-2xl font-bold text-orange-600">${resultados.analisisHuecos?.huecos ? Object.values(resultados.analisisHuecos.huecos).flat().length : 0}</p>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-lg">
+                    <h4 class="font-semibold text-purple-800">🧠 Bloom</h4>
+                    <p class="text-2xl font-bold text-purple-600">${Object.keys(matrizCompetencias?.distribucionBloom || {}).length}</p>
+                    <p class="text-xs text-purple-600">maila kognitibo</p>
+                </div>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="font-semibold mb-2">🏆 Analisi Globala Osatuta</h4>
+                <p class="text-sm text-gray-600">Planaren diagnostiko osoa burutu da. ${esEstructuraNueva ? `${totalCompetencias} konpetentzia agrupatu dira ${totalRAs} RAtatik.` : ''}</p>
+            </div>
+        `;
+    }
 
         // Actualizar pestaña de competencias
-        const competenceContent = document.getElementById('competence-content');
-        if (resultados.ambitosProfesionales) {
-            let competenciasHTML = '';
-            Object.entries(resultados.ambitosProfesionales).forEach(([ambito, competencias]) => {
-                competenciasHTML += `
-                    <div class="mb-6">
-                        <h4 class="font-semibold text-lg mb-2">${ambito.replace('_', ' ').toUpperCase()}</h4>
-                        <div class="space-y-2">
-                            ${competencias.slice(0, 5).map(comp => `
-                                <div class="competence-card p-3 rounded">
+    // Actualizar pestaña de competencias - VERSIÓN COMPATIBLE
+    const competenceContent = document.getElementById('competence-content');
+    const matrizCompetencias = resultados.matrices?.competenciasRA;
+    const esEstructuraNueva = matrizCompetencias?.competencias && Array.isArray(matrizCompetencias.competencias);
+    
+    if (esEstructuraNueva && matrizCompetencias.ambitos) {
+        // ✅ NUEVA ESTRUCTURA: Competencias agrupadas
+        let competenciasHTML = '';
+        Object.entries(matrizCompetencias.ambitos).forEach(([ambito, competencias]) => {
+            competenciasHTML += `
+                <div class="mb-6">
+                    <h4 class="font-semibold text-lg mb-2">${ambito.replace('_', ' ').toUpperCase()}</h4>
+                    <div class="space-y-3">
+                        ${competencias.slice(0, 5).map(comp => `
+                            <div class="competence-card p-4 rounded-lg border-l-4" style="border-left-color: ${comp.nivelBloom?.color || '#4f46e5'}">
+                                <div class="flex justify-between items-start">
                                     <div class="font-medium">${comp.nombre}</div>
-                                    <div class="text-sm text-gray-600">${comp.descripcion.substring(0, 100)}...</div>
-                                    <div class="text-xs text-gray-500 mt-1">${comp.nivelBloom} • ${comp.instrumentosEvaluacion?.length || 0} ebaluazio-instrumentu</div>
+                                    <span class="text-xs px-2 py-1 rounded-full" style="background-color: ${comp.nivelBloom?.color || '#4f46e5'}20; color: ${comp.nivelBloom?.color || '#4f46e5'}">
+                                        ${comp.nivelBloom?.icono || '📚'} ${comp.nivelBloom?.nivel || 'RECORDAR'}
+                                    </span>
                                 </div>
-                            `).join('')}
-                            ${competencias.length > 5 ? `<div class="text-sm text-gray-500 mt-2">... eta ${competencias.length - 5} gehiago</div>` : ''}
-                        </div>
+                                <div class="text-sm text-gray-600 mt-1">${comp.descripcion}</div>
+                                <div class="text-xs text-gray-500 mt-2 flex justify-between">
+                                    <span>${comp.rasConstituyentes?.length || 0} RA • ${comp.cursos?.join(', ') || '?'}.curso</span>
+                                    <span>${comp.instrumentosEvaluacion?.length || 0} instrumentu</span>
+                                </div>
+                                ${comp.progresion ? `
+                                    <div class="text-xs text-blue-600 mt-1">
+                                        📈 ${comp.progresion.cursoInicio} → ${comp.progresion.cursoConsolidacion}.curso
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `).join('')}
+                        ${competencias.length > 5 ? `<div class="text-sm text-gray-500 mt-2">... eta ${competencias.length - 5} gehiago</div>` : ''}
                     </div>
-                `;
-            });
-            competenceContent.innerHTML = competenciasHTML || '<p>Ez daude kompetentziak eskuragarri</p>';
-        }
+                </div>
+            `;
+        });
+        competenceContent.innerHTML = competenciasHTML;
+    } 
+    else if (resultados.ambitosProfesionales) {
+        // ✅ ESTRUCTURA ANTIGUA: Mantener compatibilidad
+        let competenciasHTML = '';
+        Object.entries(resultados.ambitosProfesionales).forEach(([ambito, competencias]) => {
+            competenciasHTML += `
+                <div class="mb-6">
+                    <h4 class="font-semibold text-lg mb-2">${ambito.replace('_', ' ').toUpperCase()}</h4>
+                    <div class="space-y-2">
+                        ${competencias.slice(0, 5).map(comp => `
+                            <div class="competence-card p-3 rounded">
+                                <div class="font-medium">${comp.nombre}</div>
+                                <div class="text-sm text-gray-600">${comp.descripcion?.substring(0, 100) || ''}...</div>
+                                <div class="text-xs text-gray-500 mt-1">${comp.nivelBloom} • ${comp.instrumentosEvaluacion?.length || 0} ebaluazio-instrumentu</div>
+                            </div>
+                        `).join('')}
+                        ${competencias.length > 5 ? `<div class="text-sm text-gray-500 mt-2">... eta ${competencias.length - 5} gehiago</div>` : ''}
+                    </div>
+                </div>
+            `;
+        });
+        competenceContent.innerHTML = competenciasHTML || '<p>Ez daude kompetentziak eskuragarri</p>';
+    }
+    else {
+        competenceContent.innerHTML = '<p>Ez daude kompetentziak eskuragarri</p>';
+    }
 
         // Actualizar pestaña de huecos
         const gapContent = document.getElementById('gap-content');
@@ -437,30 +500,46 @@
         }
 
         // Actualizar pestaña de matrices
-        const matrixContent = document.getElementById('matrix-content');
-        matrixContent.innerHTML = `
-            <div class="matrix-grid">
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <h4 class="font-semibold">📊 Konpetentzien Matrizea</h4>
-                    <p class="text-sm text-gray-600">${resultados.matrices?.competenciasRA?.metricas?.totalCompetencias || resultados.matrices?.competenciasRA?.matriz?.competencias?.length || 0} konpetentzia</p>
-                    <div class="text-xs text-green-600 mt-1">✅ Kargatuta</div>
-                </div>
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <h4 class="font-semibold">🎯 IE-Asignatura Matrizea</h4>
-                    <p class="text-sm text-gray-600">Estaldura analisia</p>
-                    <div class="text-xs text-yellow-600 mt-1">🔄 Prest</div>
-                </div>
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <h4 class="font-semibold">🔗 Koherentzia Horizontala</h4>
-                    <p class="text-sm text-gray-600">Asignatura arteko loturak</p>
-                    <div class="text-xs text-yellow-600 mt-1">🔄 Prest</div>
+    // Actualizar pestaña de matrices
+    const matrixContent = document.getElementById('matrix-content');
+    const metricas = matrizCompetencias?.metricas || {};
+    
+    matrixContent.innerHTML = `
+        <div class="matrix-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="font-semibold">📊 Konpetentzien Matrizea</h4>
+                <p class="text-sm text-gray-600">${totalCompetencias} konpetentzia${esEstructuraNueva ? ` (${totalRAs} RAtatik)` : ''}</p>
+                <div class="text-xs ${esEstructuraNueva ? 'text-green-600' : 'text-yellow-600'} mt-1">
+                    ${esEstructuraNueva ? '✅ Agrupatuta' : '🔄 Banatuta'}
                 </div>
             </div>
-        `;
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="font-semibold">🎯 Progresioa</h4>
+                <p class="text-sm text-gray-600">${metricas.competenciasConProgresion || 0} konpetentzia progresibo</p>
+                <div class="text-xs text-green-600 mt-1">✅ Analizatuta</div>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h4 class="font-semibold">🧠 Bloom Mailak</h4>
+                <p class="text-sm text-gray-600">${Object.keys(matrizCompetencias?.distribucionBloom || {}).length} maila kognitibo</p>
+                <div class="text-xs text-purple-600 mt-1">✅ Hobetuta</div>
+            </div>
+        </div>
+        ${matrizCompetencias?.alertas?.length > 0 ? `
+            <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <h4 class="font-semibold text-yellow-800">⚠️ Alertak</h4>
+                <div class="text-sm text-yellow-700">
+                    ${matrizCompetencias.alertas.map(alerta => `
+                        <div class="mt-1">• ${alerta.mensaje}</div>
+                    `).join('')}
+                </div>
+            </div>
+        ` : ''}
+    `;
     };
     </script>
 </body>
 </html>
+
 
 
 
