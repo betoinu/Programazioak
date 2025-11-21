@@ -54,12 +54,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// ===== ANALISI GLOBALA - VERSIÓN TEMPORAL =====
-// ===== NUEVOS IMPORTS ANECA =====
-import { GlobalAnalyzer } from '../analysis/global-analyzer.js';
-import { CompetenceMapper } from '../analysis/competence-mapper.js';
-import { ANECA_STANDARDS } from '../data/aneca-standards.js';
-
 // ===== ANALISIS GLOBAL ACTUALIZADO =====
 async function initializeGlobalAnalysis() {
     try {
@@ -258,6 +252,7 @@ function setLoadingState(isLoading) {
 window.showError = showError;
 window.hideError = hideError;
 window.setLoadingState = setLoadingState;
+
 
 
 
