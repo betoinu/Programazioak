@@ -36,8 +36,10 @@ class CurriculumDataService {
         return null;
     }
 }
-// ✅ AÑADIR export
-export { CurriculumDataService };
+// if (typeof window !== 'undefined') {
+//     window.CurriculumDataService = CurriculumDataService;
+// }
+
 
 
 
