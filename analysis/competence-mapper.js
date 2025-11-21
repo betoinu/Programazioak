@@ -5,33 +5,42 @@ static async generarMatrizCompetenciasRA(curriculumData) {
     console.log("🔄 Generando matriz de competencias agrupadas...");
     
     try {
-        // Obtener competencias ya agrupadas desde la API
         const competenciasAgrupadas = await AnecaAPI.interpretarCompetencias(curriculumData);
-        
-        // Aplanar todas las competencias de todos los ámbitos
         const todasCompetencias = Object.values(competenciasAgrupadas).flat();
         
         console.log(`📊 Procesando ${todasCompetencias.length} competencias agrupadas`);
         
-        // Crear matriz con la nueva estructura
+        // ✅ AÑADIR dentro del método existente:
+        const matrizCompetenciasRA = todasCompetencias.map(comp => ({
+            // Campos existentes que ya tienes:
+            id: comp.id,
+            nombre: comp.nombre,
+            descripcion: comp.descripcion,
+            ambito: comp.ambito,
+            nivelBloom: comp.nivelBloom,
+            cursos: comp.cursos,
+            asignaturas: comp.asignaturasRelacionadas,
+            rasConstituyentes: (comp.rasConstituyentes && comp.rasConstituyentes.length) || 0,
+            creditos: comp.creditosTotales,
+            progresion: comp.progresion,
+            instrumentosEvaluacion: comp.instrumentosEvaluacion,
+            
+            // ✅ NUEVOS CAMPOS PARA MATRIZ ANECA:
+            codigo: comp.codigo || this.generarCodigoCompetencia(comp), // NUEVO
+            resultadosAprendizaje: this.extraerResultadosAprendizaje(comp), // NUEVO
+            nivel: this.determinarNivelANECA(comp.nivelBloom), // NUEVO
+            evidenciasLogro: this.generarEvidenciasLogro(comp), // NUEVO
+            instrumentosEvaluacionEstandar: this.mapearInstrumentosEvaluacion(comp.instrumentosEvaluacion) // NUEVO
+        }));
+        
         const matriz = {
-            competencias: todasCompetencias.map(comp => ({
-                id: comp.id,
-                nombre: comp.nombre,
-                descripcion: comp.descripcion,
-                ambito: comp.ambito,
-                nivelBloom: comp.nivelBloom,
-                cursos: comp.cursos,
-                asignaturas: comp.asignaturasRelacionadas,
-                rasConstituyentes: (comp.rasConstituyentes && comp.rasConstituyentes.length) || 0,
-                creditos: comp.creditosTotales,
-                progresion: comp.progresion,
-                instrumentosEvaluacion: comp.instrumentosEvaluacion
-            })),
+            competencias: matrizCompetenciasRA, // ✅ Esto reemplaza tu estructura actual
             metricas: this.calcularMetricasCompetencias(todasCompetencias),
             ambitos: this.agruparPorAmbitos(todasCompetencias),
             distribucionBloom: this.analizarDistribucionBloom(todasCompetencias),
-            progresionCurricular: this.analizarProgresionCurricular(todasCompetencias)
+            progresionCurricular: this.analizarProgresionCurricular(todasCompetencias),
+            // ✅ NUEVA SECCIÓN:
+            coherenciaVertical: this.analizarCoherenciaVertical(todasCompetencias) // NUEVO
         };
         
         return matriz;
@@ -57,7 +66,8 @@ static calcularDistribucionCursos(competencias) {
     
 // NUEVOS MÉTODOS PARA LA NUEVA ESTRUCTURA
 static calcularMetricasCompetencias(competencias) {
-    return {
+    // ✅ MANTENER tu código exactamente como está:
+    const metricasBase = {
         totalCompetencias: competencias.length,
         totalRAs: competencias.reduce((sum, comp) => sum + (comp.rasConstituyentes?.length || 0), 0),
         promedioRAsPorCompetencia: competencias.length > 0 ? 
@@ -65,8 +75,93 @@ static calcularMetricasCompetencias(competencias) {
         competenciasConProgresion: competencias.filter(comp => comp.cursos && comp.cursos.length > 1).length,
         distribucionCursos: this.calcularDistribucionCursos(competencias)
     };
+
+    // ✅ AÑADIR las nuevas métricas ANECA sin modificar las existentes:
+    return {
+        ...metricasBase, // Tus métricas originales se mantienen intactas
+        // === NUEVAS MÉTRICAS PARA MATRIZ ANECA ===
+        distribucionNivelesANECA: this.calcularDistribucionNivelesANECA(competencias),
+        porcentajeCompetenciasConRA: this.calcularPorcentajeRA(competencias),
+        coberturaVertical: this.calcularCoberturaVertical(competencias),
+        estadoCumplimientoANECA: this.evaluarCumplimientoANECA(competencias)
+    };
 }
 
+// === MÉTODOS NUEVOS - AÑADIR AL FINAL ===
+
+// ✅ NUEVO: Calcular distribución de niveles ANECA
+static calcularDistribucionNivelesANECA(competencias) {
+    const distribucion = { Introductorio: 0, Medio: 0, Avanzado: 0 };
+    
+    competencias.forEach(comp => {
+        const nivel = this.determinarNivelANECA(comp.nivelBloom);
+        distribucion[nivel] = (distribucion[nivel] || 0) + 1;
+    });
+    
+    return distribucion;
+}
+
+// ✅ NUEVO: Calcular porcentaje de competencias con RA
+static calcularPorcentajeRA(competencias) {
+    const conRA = competencias.filter(comp => 
+        comp.rasConstituyentes && comp.rasConstituyentes.length > 0
+    ).length;
+    
+    return (conRA / competencias.length * 100).toFixed(1);
+}
+
+// ✅ NUEVO: Calcular cobertura vertical
+static calcularCoberturaVertical(competencias) {
+    const conRA = competencias.filter(comp => 
+        comp.rasConstituyentes && comp.rasConstituyentes.length > 0
+    ).length;
+    
+    return {
+        porcentaje: (conRA / competencias.length * 100).toFixed(1),
+        competenciasConRA: conRA,
+        competenciasSinRA: competencias.length - conRA,
+        estado: conRA === competencias.length ? 'ÓPTIMA' : 
+               conRA >= competencias.length * 0.8 ? 'ACEPTABLE' : 'DEFICIENTE'
+    };
+}
+
+// ✅ NUEVO: Evaluar cumplimiento ANECA
+static evaluarCumplimientoANECA(competencias) {
+    const cobertura = this.calcularCoberturaVertical(competencias);
+    const distribucion = this.calcularDistribucionNivelesANECA(competencias);
+    
+    const criterios = {
+        coberturaMinima: parseFloat(cobertura.porcentaje) >= 80,
+        tieneNivelesVariados: distribucion.Avanzado > 0 && distribucion.Medio > 0,
+        balanceAdecuado: distribucion.Avanzado >= competencias.length * 0.2
+    };
+    
+    return {
+        cumpleRequisitos: criterios.coberturaMinima && criterios.tieneNivelesVariados,
+        criterios: criterios,
+        puntuacion: this.calcularPuntuacionANECA(criterios, competencias.length)
+    };
+}
+
+// ✅ NUEVO: Calcular puntuación ANECA
+static calcularPuntuacionANECA(criterios, totalCompetencias) {
+    let puntuacion = 0;
+    if (criterios.coberturaMinima) puntuacion += 40;
+    if (criterios.tieneNivelesVariados) puntuacion += 30;
+    if (criterios.balanceAdecuado) puntuacion += 30;
+    return puntuacion;
+}
+
+// ✅ NUEVO: Determinar nivel ANECA (necesario para los métodos anteriores)
+static determinarNivelANECA(nivelBloom) {
+    const nivel = nivelBloom?.nivel || nivelBloom;
+    const mapeoNiveles = {
+        'RECORDAR': 'Introductorio', 'COMPRENDER': 'Introductorio', 
+        'APLICAR': 'Medio', 'ANALIZAR': 'Medio', 'EVALUAR': 'Avanzado', 'CREAR': 'Avanzado'
+    };
+    return mapeoNiveles[nivel] || 'Medio';
+}
+    
 static agruparPorAmbitos(competencias) {
     const ambitos = {};
     competencias.forEach(comp => {
@@ -225,6 +320,7 @@ static analizarProgresionCurricular(competencias) {
         };
     }
 }
+
 
 
 
