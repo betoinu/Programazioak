@@ -35,54 +35,64 @@ export class GapAnalyzer {
     }
     
     static detectarHuecosProgresion(curriculumData) {
-        const huecos = [];
-        const cursos = [1, 2, 3, 4];
+    const huecos = [];
+    const cursos = [1, 2, 3, 4];
+    
+    cursos.forEach(curso => {
+        // ✅ CONTAR competencias REALES del curso (no las hipotéticas)
+        let competenciasCurso = 0;
         
-        cursos.forEach(curso => {
-            const asignaturasCurso = curriculumData.asignaturas?.filter(a => a.curso === curso) || [];
-            const competenciasCurso = new Set();
-            
-            asignaturasCurso.forEach(asig => {
-                asig.competencias?.forEach(comp => competenciasCurso.add(comp));
-            });
-            
-            if (competenciasCurso.size < 5) { // Mínimo de competencias por curso
-                huecos.push({
-                    tipo: 'PROGRESION',
-                    descripcion: `Curso ${curso} tiene solo ${competenciasCurso.size} competencias distintas`,
-                    accionRecomendada: 'Diversificar competencias en este curso',
-                    impactoANECA: 'MEDIO',
-                    urgencia: 'MEDIA'
+        // Buscar en la estructura real del curriculum
+        Object.values(curriculumData).forEach(grado => {
+            if (grado[curso]) {
+                grado[curso].forEach(asignatura => {
+                    if (asignatura.currentOfficialRAs) {
+                        competenciasCurso += asignatura.currentOfficialRAs.length;
+                    }
                 });
             }
         });
         
-        return huecos;
-    }
+        if (competenciasCurso < 10) { // Ajustar umbral según necesidad
+            huecos.push({
+                tipo: 'PROGRESION',
+                descripcion: `Curso ${curso} tiene solo ${competenciasCurso} RAs (potenciales competencias)`,
+                accionRecomendada: 'Diversificar competencias en este curso',
+                impactoANECA: 'MEDIO',
+                urgencia: 'MEDIA'
+            });
+        }
+    });
+    
+    return huecos;
+}
     
     static detectarHuecosEvaluacion(matrizCompetenciasRA) {
     console.log("🔍 detectarHuecosEvaluacion - matrizCompetenciasRA:", matrizCompetenciasRA);
     
-    // VERIFICACIÓN DE SEGURIDAD
+    // VERIFICACIÓN DE SEGURIDAD (MANTENER ESTO)
     if (!matrizCompetenciasRA) {
         console.warn("⚠️ matrizCompetenciasRA es undefined");
         return [];
     }
     
-    // BUSCAR COMPETENCIAS EN LA ESTRUCTURA REAL
+    // BUSCAR COMPETENCIAS EN LA ESTRUCTURA REAL (ACTUALIZAR ESTA PARTE)
     let competencias = [];
     
-    // Opción 1: En matriz
-    if (matrizCompetenciasRA.matriz && typeof matrizCompetenciasRA.matriz === 'object') {
+    // ✅ NUEVA OPCIÓN: Estructura de competencias agrupadas
+    if (matrizCompetenciasRA.competencias && Array.isArray(matrizCompetenciasRA.competencias)) {
+        competencias = matrizCompetenciasRA.competencias;
+        console.log("✅ Competencias encontradas en .competencias (nueva estructura)");
+    }
+    // ✅ MANTENER las opciones anteriores para compatibilidad
+    else if (matrizCompetenciasRA.matriz && typeof matrizCompetenciasRA.matriz === 'object') {
         competencias = Object.values(matrizCompetenciasRA.matriz);
         console.log("✅ Competencias encontradas en .matriz");
     }
-    // Opción 2: En metricas  
     else if (matrizCompetenciasRA.metricas && typeof matrizCompetenciasRA.metricas === 'object') {
         competencias = Object.values(matrizCompetenciasRA.metricas);
         console.log("✅ Competencias encontradas en .metricas");
     }
-    // Opción 3: En data (por si acaso)
     else if (matrizCompetenciasRA.data && Array.isArray(matrizCompetenciasRA.data)) {
         competencias = matrizCompetenciasRA.data;
         console.log("✅ Competencias encontradas en .data");
@@ -100,14 +110,41 @@ export class GapAnalyzer {
     competencias.forEach((comp, index) => {
         console.log(`🔍 Competencia ${index}:`, comp);
         
+        // ✅ ADAPTAR para nueva estructura de competencias agrupadas
         const instrumentos = comp.instrumentosEvaluacion || comp.evaluationInstruments || comp.instrumentos || [];
+        const nombreCompetencia = comp.nombre || comp.competencia || comp.id || 'Sin nombre';
+        const rasCount = comp.rasConstituyentes || 0;
+        
+        // Hueco: Sin instrumentos de evaluación
         if (instrumentos.length === 0) {
             huecos.push({
                 tipo: 'EVALUACION',
-                descripcion: `Competencia "${comp.competencia || comp.nombre || comp.id || 'Sin nombre'}" carece de instrumentos de evaluación`,
+                descripcion: `Competencia "${nombreCompetencia}" carece de instrumentos de evaluación`,
                 accionRecomendada: 'Definir rúbricas o instrumentos de evaluación',
                 impactoANECA: 'ALTO', 
                 urgencia: 'INMEDIATA'
+            });
+        }
+        
+        // ✅ NUEVO: Competencia compleja con evaluación simple
+        if (rasCount > 5 && instrumentos.length < 3) {
+            huecos.push({
+                tipo: 'EVALUACION_COMPLEJA',
+                descripcion: `Competencia compleja "${nombreCompetencia}" (${rasCount} RAs) requiere evaluación más sofisticada`,
+                accionRecomendada: 'Implementar evaluación por rúbricas y portafolio',
+                impactoANECA: 'ALTO',
+                urgencia: 'MEDIA'
+            });
+        }
+        
+        // ✅ NUEVO: Competencia sin progresión evaluativa
+        if (comp.cursos && comp.cursos.length > 1 && instrumentos.length === 1) {
+            huecos.push({
+                tipo: 'PROGRESION_EVALUATIVA', 
+                descripcion: `Competencia progresiva "${nombreCompetencia}" necesita evaluación diferenciada por curso`,
+                accionRecomendada: 'Diseñar instrumentos de evaluación progresivos',
+                impactoANECA: 'MEDIO',
+                urgencia: 'MEDIA'
             });
         }
     });
@@ -242,6 +279,7 @@ export class GapAnalyzer {
         return asignaturas.length > 0 ? asignaturas : ['Por determinar'];
     }
 }
+
 
 
 
