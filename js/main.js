@@ -14,9 +14,6 @@ import { initializeApp } from '../components/app-initializer.js';
 import { setupEventListeners } from '../components/event-manager.js';
 import { APIKeyManager } from '../components/api-key-manager.js';
 
-// Analysis - NOMBRE CORRECTO
-import { CompetenceAnalyzer } from '../analysis/competence-analyzer.js';
-
 // Data - SI LO NECESITAS
 import { CurriculumLoader } from '../data/curriculum-loader.js';
 
@@ -47,27 +44,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-// ===== ANALISI GLOBALA =====
+// ===== ANALISI GLOBALA - VERSIÓN TEMPORAL =====
 async function initializeGlobalAnalysis() {
     try {
-        // Kargatu moduluak dinamikoki
-        const competenceModule = await import('../analysis/competence-analyzer.js');
-        const curriculumModule = await import('../data/curriculum-loader.js');
-        const displayModule = await import('../visualization/analysis-display.js');
+        console.log('🔧 Análisis Global - EN RECONSTRUCCIÓN para ANECA');
+        console.log('📌 Próximamente: Matrices competencias-RA, detección huecos curriculares, validación ANECA');
         
-        // ✅ Ahora estas variables son locales a la función
-        const CompetenceAnalyzer = competenceModule.CompetenceAnalyzer;
-        const CurriculumLoader = curriculumModule.CurriculumLoader; 
-        const AnalysisDisplay = displayModule.AnalysisDisplay;
+        // TODO: IMPLEMENTAR NUEVOS MÓDULOS ANECA:
+        // 1. GlobalAnalyzer - Análisis macro de titulación
+        // 2. CompetenceMapper - Matriz competencias-RA 
+        // 3. AnecaValidator - Validador estándares
+        // 4. GapAnalyzer - Detector huecos curriculares
         
-        console.log('✅ Analisi Globala moduluak kargatuta');
+        // ⚠️ TEMPORALMENTE: Mostrar mensaje al usuario
+        const analysisButton = document.getElementById('globalAnalysisBtn');
+        if (analysisButton) {
+            analysisButton.innerHTML = '🔧 Análisis Global - En Construcción';
+            analysisButton.style.opacity = '0.6';
+            analysisButton.title = 'Próximamente: Análisis completo ANECA con matrices profesionales';
+        }
         
-        // Konfiguratu botoia
-        setupAnalysisButton();
+        console.log('✅ Análisis Global preparado para nueva implementación ANECA');
         
     } catch (error) {
-        console.error('❌ Errorea Analisi Globala moduluak kargatzean:', error);
-        disableAnalysisButton('Analisia Eskuragarri Ez');
+        console.log('⚠️ Análisis Global en transición:', error.message);
+        // No mostrar error al usuario durante la reconstrucción
     }
 }
 
