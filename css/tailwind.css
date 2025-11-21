@@ -262,3 +262,651 @@
 .checklist-item.unchecked {
     @apply bg-red-50 border-red-200;
 }
+/* 📁 css/tailwind.css - CLASES NUEVAS PARA ANECA */
+
+/* ===== NAVEGACIÓN ANECA ===== */
+.aneca-navigation {
+    @apply bg-white shadow-lg rounded-lg p-6 mb-6 border-l-4 border-blue-600;
+}
+
+.aneca-navigation h2 {
+    @apply text-2xl font-bold text-gray-800 mb-4 text-center;
+}
+
+.nav-tabs {
+    @apply flex flex-wrap gap-2 justify-center;
+}
+
+.nav-tab {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 border border-gray-300 bg-white text-gray-700 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700;
+}
+
+.nav-tab.active {
+    @apply bg-blue-600 text-white border-blue-600 shadow-md;
+}
+
+.tab-content {
+    @apply hidden;
+}
+
+.tab-content.active {
+    @apply block;
+}
+
+/* ===== DASHBOARD PRINCIPAL ===== */
+.aneca-dashboard {
+    @apply space-y-6;
+}
+
+.dashboard-header {
+    @apply bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 shadow-sm border border-blue-100;
+}
+
+.global-score {
+    @apply flex justify-center mb-6;
+}
+
+.score-circle {
+    @apply w-32 h-32 rounded-full flex flex-col items-center justify-center border-4 shadow-lg;
+}
+
+.score-circle.score-high {
+    @apply border-green-500 bg-green-50;
+}
+
+.score-circle.score-medium {
+    @apply border-yellow-500 bg-yellow-50;
+}
+
+.score-circle.score-low {
+    @apply border-red-500 bg-red-50;
+}
+
+.score-circle .score {
+    @apply text-3xl font-bold;
+}
+
+.score-circle .label {
+    @apply text-sm text-gray-600 mt-1;
+}
+
+.metrics-grid {
+    @apply grid grid-cols-2 md:grid-cols-4 gap-4 mt-6;
+}
+
+.metric-card {
+    @apply bg-white rounded-lg p-4 text-center shadow-sm border border-gray-200 hover:shadow-md transition-shadow;
+}
+
+.metric-value {
+    @apply block text-2xl font-bold text-blue-600;
+}
+
+.metric-label {
+    @apply block text-sm text-gray-600 mt-1;
+}
+
+/* ===== ACCESO RÁPIDO A MATRICES ===== */
+.quick-access {
+    @apply bg-white rounded-xl p-6 shadow-sm border border-gray-200;
+}
+
+.quick-access h3 {
+    @apply text-xl font-semibold text-gray-800 mb-4;
+}
+
+.matrices-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4;
+}
+
+.matrix-quick-card {
+    @apply bg-gradient-to-br from-white to-gray-50 rounded-lg p-4 border border-gray-300 cursor-pointer transition-all duration-200 hover:shadow-lg hover:border-blue-300 hover:transform hover:-translate-y-1;
+}
+
+.matrix-quick-card:hover .matrix-icon {
+    @apply transform scale-110;
+}
+
+.matrix-icon {
+    @apply text-3xl mb-3 transition-transform duration-200;
+}
+
+.matrix-quick-card h4 {
+    @apply font-semibold text-gray-800 mb-1;
+}
+
+.matrix-quick-card p {
+    @apply text-sm text-gray-600 mb-2;
+}
+
+.matrix-stats {
+    @apply text-xs text-blue-600 font-medium;
+}
+
+/* ===== INDICADORES CLAVE ===== */
+.key-indicators {
+    @apply bg-white rounded-xl p-6 shadow-sm border border-gray-200;
+}
+
+.key-indicators h3 {
+    @apply text-xl font-semibold text-gray-800 mb-4;
+}
+
+.indicators-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+}
+
+.indicator-card {
+    @apply rounded-lg p-4 border-l-4;
+}
+
+.indicator-card.cumple_totalmente {
+    @apply border-green-500 bg-green-50;
+}
+
+.indicator-card.cumple_parcialmente {
+    @apply border-yellow-500 bg-yellow-50;
+}
+
+.indicator-card.no_cumple {
+    @apply border-red-500 bg-red-50;
+}
+
+.indicator-header {
+    @apply flex justify-between items-center mb-2;
+}
+
+.indicator-header .criterio {
+    @apply text-sm font-semibold uppercase tracking-wide;
+}
+
+.indicator-header .estado {
+    @apply text-xs px-2 py-1 rounded-full font-medium;
+}
+
+.indicator-card.cumple_totalmente .estado {
+    @apply bg-green-200 text-green-800;
+}
+
+.indicator-card.cumple_parcialmente .estado {
+    @apply bg-yellow-200 text-yellow-800;
+}
+
+.indicator-card.no_cumple .estado {
+    @apply bg-red-200 text-red-800;
+}
+
+.indicador-nombre {
+    @apply text-sm text-gray-700 mb-3;
+}
+
+.indicador-puntuacion {
+    @apply flex items-center gap-3;
+}
+
+.indicador-puntuacion .puntuacion {
+    @apply text-lg font-bold;
+}
+
+.indicator-card.cumple_totalmente .puntuacion {
+    @apply text-green-700;
+}
+
+.indicator-card.cumple_parcialmente .puntuacion {
+    @apply text-yellow-700;
+}
+
+.indicator-card.no_cumple .puntuacion {
+    @apply text-red-700;
+}
+
+.progress-bar {
+    @apply flex-1 h-2 bg-gray-200 rounded-full overflow-hidden;
+}
+
+.progress {
+    @apply h-full transition-all duration-500;
+}
+
+.indicator-card.cumple_totalmente .progress {
+    @apply bg-green-500;
+}
+
+.indicator-card.cumple_parcialmente .progress {
+    @apply bg-yellow-500;
+}
+
+.indicator-card.no_cumple .progress {
+    @apply bg-red-500;
+}
+
+/* ===== ALERTAS PRIORITARIAS ===== */
+.priority-alerts {
+    @apply bg-white rounded-xl p-6 shadow-sm border border-red-200;
+}
+
+.priority-alerts h3 {
+    @apply text-xl font-semibold text-red-800 mb-4;
+}
+
+.no-alerts {
+    @apply text-green-600 text-center py-4 bg-green-50 rounded-lg;
+}
+
+.alerts-list {
+    @apply space-y-3;
+}
+
+.alerta-item {
+    @apply bg-red-50 border border-red-200 rounded-lg p-4 hover:bg-red-100 transition-colors;
+}
+
+.alerta-header {
+    @apply flex justify-between items-center mb-2;
+}
+
+.alerta-header strong {
+    @apply text-red-800 font-semibold;
+}
+
+.alerta-puntuacion {
+    @apply bg-red-200 text-red-800 px-2 py-1 rounded text-sm font-bold;
+}
+
+.alerta-texto {
+    @apply text-red-700 text-sm mb-1;
+}
+
+.alerta-criterio {
+    @apply text-xs text-red-600;
+}
+
+/* ===== MATRICES ANECA ===== */
+.aneca-matrix {
+    @apply bg-white rounded-xl shadow-lg border border-gray-300 p-6 mb-6;
+}
+
+.aneca-matrix h3 {
+    @apply text-xl font-bold text-gray-800 mb-4 flex items-center gap-2;
+}
+
+.compliance-badge {
+    @apply inline-block px-4 py-2 rounded-full text-sm font-semibold mb-4;
+}
+
+.compliance-badge.compliant {
+    @apply bg-green-100 text-green-800 border border-green-300;
+}
+
+.compliance-badge.non-compliant {
+    @apply bg-red-100 text-red-800 border border-red-300;
+}
+
+/* Estadísticas de matrices */
+.coverage-stats,
+.matrix-stats-horizontal,
+.alignment-stats {
+    @apply grid grid-cols-3 gap-4 mb-6 p-4 bg-blue-50 rounded-lg;
+}
+
+.coverage-stats .stat,
+.matrix-stats-horizontal .stat,
+.alignment-stats .stat {
+    @apply text-center;
+}
+
+.coverage-stats .number,
+.matrix-stats-horizontal .number,
+.alignment-stats .number {
+    @apply block text-2xl font-bold text-blue-600;
+}
+
+.coverage-stats .label,
+.matrix-stats-horizontal .label,
+.alignment-stats .label {
+    @apply block text-sm text-gray-600 mt-1;
+}
+
+/* Tablas de matrices */
+.matrix-table {
+    @apply w-full overflow-x-auto;
+}
+
+.matrix-table table {
+    @apply w-full border-collapse;
+}
+
+.matrix-table th {
+    @apply bg-gray-100 text-gray-700 font-semibold py-3 px-4 text-left border-b border-gray-300;
+}
+
+.matrix-table td {
+    @apply py-3 px-4 border-b border-gray-200;
+}
+
+.matrix-table.compact th {
+    @apply py-2 px-3 text-sm;
+}
+
+.matrix-table.compact td {
+    @apply py-2 px-3 text-sm;
+}
+
+/* Celdas especiales */
+.competence-cell,
+.ra-cell,
+.asignatura-cell,
+.contenido-cell {
+    @apply max-w-xs;
+}
+
+.competence-cell strong,
+.asignatura-cell strong {
+    @apply text-blue-700;
+}
+
+.competence-cell small,
+.asignatura-cell small {
+    @apply text-gray-500 text-xs;
+}
+
+.ra-text,
+.contenido-text {
+    @apply text-gray-700 line-clamp-2;
+}
+
+/* Listas dentro de tablas */
+.ra-item,
+.ra-item-small {
+    @apply text-sm text-gray-600 mb-1;
+}
+
+.ra-item-small .fuerza {
+    @apply text-xs bg-gray-100 px-1 rounded ml-1;
+}
+
+.asignatura-item {
+    @apply text-xs mb-1 px-2 py-1 rounded;
+}
+
+.asignatura-item.I {
+    @apply bg-blue-100 text-blue-800;
+}
+
+.asignatura-item.D {
+    @apply bg-yellow-100 text-yellow-800;
+}
+
+.asignatura-item.Dp {
+    @apply bg-green-100 text-green-800;
+}
+
+.asignatura-item .nivel {
+    @apply text-xs opacity-75;
+}
+
+.competencias-list {
+    @apply flex flex-wrap gap-1;
+}
+
+.competencia-tag {
+    @apply text-xs px-2 py-1 rounded border;
+}
+
+.competencia-tag.i {
+    @apply bg-blue-100 text-blue-800 border-blue-200;
+}
+
+.competencia-tag.d {
+    @apply bg-yellow-100 text-yellow-800 border-yellow-200;
+}
+
+.competencia-tag.dp {
+    @apply bg-green-100 text-green-800 border-green-200;
+}
+
+.more-tag {
+    @apply text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded;
+}
+
+/* Estados y status */
+.status {
+    @apply inline-flex items-center gap-1 px-2 py-1 rounded text-sm font-medium;
+}
+
+.status.compliant {
+    @apply bg-green-100 text-green-800;
+}
+
+.status.non-compliant {
+    @apply bg-red-100 text-red-800;
+}
+
+.equilibrium.balanced {
+    @apply text-green-600;
+}
+
+.equilibrium.unbalanced {
+    @apply text-yellow-600;
+}
+
+.bloom-level {
+    @apply px-2 py-1 rounded text-xs font-medium;
+}
+
+.bloom-level.RECORDAR {
+    @apply bg-gray-100 text-gray-800;
+}
+
+.bloom-level.COMPRENDER {
+    @apply bg-blue-100 text-blue-800;
+}
+
+.bloom-level.APLICAR {
+    @apply bg-green-100 text-green-800;
+}
+
+.bloom-level.ANALIZAR {
+    @apply bg-yellow-100 text-yellow-800;
+}
+
+.bloom-level.EVALUAR {
+    @apply bg-orange-100 text-orange-800;
+}
+
+.bloom-level.CREAR {
+    @apply bg-purple-100 text-purple-800;
+}
+
+.nivel-contribucion {
+    @apply px-2 py-1 rounded text-xs font-medium;
+}
+
+.nivel-contribucion.alto {
+    @apply bg-green-100 text-green-800;
+}
+
+.nivel-contribucion.medio {
+    @apply bg-yellow-100 text-yellow-800;
+}
+
+.nivel-contribucion.bajo {
+    @apply bg-red-100 text-red-800;
+}
+
+.nivel-contribucion.sin_relacion {
+    @apply bg-gray-100 text-gray-800;
+}
+
+.adecuacion.adequate {
+    @apply text-green-600;
+}
+
+.adecuacion.inadequate {
+    @apply text-red-600;
+}
+
+.adecuacion small {
+    @apply block text-xs mt-1;
+}
+
+/* Secciones de alertas y problemas */
+.alertas-section,
+.desequilibrios-section,
+.desalineados-section {
+    @apply mt-6 p-4 bg-orange-50 border border-orange-200 rounded-lg;
+}
+
+.alertas-section h4,
+.desequilibrios-section h4,
+.desalineados-section h4 {
+    @apply text-lg font-semibold text-orange-800 mb-3;
+}
+
+.alerta {
+    @apply mb-3 p-3 rounded border-l-4;
+}
+
+.alerta.alta {
+    @apply bg-red-50 border-red-500 text-red-800;
+}
+
+.alerta.media {
+    @apply bg-yellow-50 border-yellow-500 text-yellow-800;
+}
+
+.alerta.baja {
+    @apply bg-blue-50 border-blue-500 text-blue-800;
+}
+
+.alerta .accion {
+    @apply text-sm mt-1 italic;
+}
+
+.desequilibrios-grid,
+.desalineados-list {
+    @apply space-y-2;
+}
+
+.desequilibrio-item,
+.desalineado-item {
+    @apply p-3 rounded border;
+}
+
+.desequilibrio-item.sobrecargada {
+    @apply bg-red-50 border-red-200 text-red-800;
+}
+
+.desequilibrio-item.subcargada {
+    @apply bg-blue-50 border-blue-200 text-blue-800;
+}
+
+.desalineado-item {
+    @apply bg-red-50 border-red-200;
+}
+
+.desequilibrio-item strong,
+.desalineado-item strong {
+    @apply block mb-1;
+}
+
+.des-details,
+.problema-details {
+    @apply text-sm;
+}
+
+.contenido-problema {
+    @apply text-gray-600 text-sm my-1;
+}
+
+.problema {
+    @apply text-red-700 text-sm;
+}
+
+.sugerencia {
+    @apply text-gray-500 text-xs mt-1;
+}
+
+/* Items adicionales */
+.more-items {
+    @apply text-center py-3 text-gray-500 text-sm bg-gray-50 rounded-b;
+}
+
+/* ===== ERRORES ===== */
+.error-container {
+    @apply bg-red-50 border border-red-200 rounded-xl p-6 text-center;
+}
+
+.error-container h3 {
+    @apply text-xl font-semibold text-red-800 mb-2;
+}
+
+.error-container p {
+    @apply text-red-600 mb-4;
+}
+
+.retry-btn {
+    @apply bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .nav-tabs {
+        @apply flex-col;
+    }
+    
+    .nav-tab {
+        @apply text-center;
+    }
+    
+    .metrics-grid {
+        @apply grid-cols-2 gap-2;
+    }
+    
+    .matrices-grid {
+        @apply grid-cols-1;
+    }
+    
+    .indicators-grid {
+        @apply grid-cols-1;
+    }
+    
+    .matrix-table {
+        @apply text-xs;
+    }
+    
+    .coverage-stats,
+    .matrix-stats-horizontal,
+    .alignment-stats {
+        @apply grid-cols-1 gap-2;
+    }
+}
+
+/* ===== UTILIDADES ===== */
+.line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Animaciones suaves */
+.aneca-matrix,
+.matrix-quick-card,
+.indicator-card,
+.alerta-item {
+    transition: all 0.3s ease;
+}
+
+/* Estados de hover para mejor UX */
+.matrix-table tr:hover {
+    @apply bg-gray-50;
+}
+
+.aneca-matrix:hover {
+    @apply shadow-xl;
+}
