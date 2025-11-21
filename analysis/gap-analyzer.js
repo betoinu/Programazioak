@@ -1,18 +1,27 @@
 export class GapAnalyzer {
     static analizarHuecosCurriculares(curriculumData, matricesANECA) {
-        const huecos = {
-            cobertura: this.detectarHuecosCobertura(matricesANECA.RAsignaturas),
-            progresion: this.detectarHuecosProgresion(curriculumData),
-            evaluacion: this.detectarHuecosEvaluacion(matricesANECA.competenciasRA),
-            integracion: this.detectarHuecosIntegracion(curriculumData)
-        };
-        
-        return {
-            huecos,
-            prioridad: this.calcularPrioridadHuecos(huecos),
-            planMejora: this.generarPlanMejora(huecos)
-        };
-    }
+    console.log("📦 curriculumData:", curriculumData);
+    console.log("📊 matricesANECA:", matricesANECA);
+    
+    // VERIFICACIÓN DE SEGURIDAD - Si no hay matricesANECA, crear estructura vacía
+    const matricesSeguras = matricesANECA || {
+        RAsignaturas: { alertas: [] },
+        competenciasRA: { competencias: [] }
+    };
+    
+    const huecos = {
+        cobertura: this.detectarHuecosCobertura(matricesSeguras.RAsignaturas),
+        progresion: this.detectarHuecosProgresion(curriculumData),
+        evaluacion: this.detectarHuecosEvaluacion(matricesSeguras.competenciasRA),
+        integracion: this.detectarHuecosIntegracion(curriculumData)
+    };
+    
+    return {
+        huecos,
+        prioridad: this.calcularPrioridadHuecos(huecos),
+        planMejora: this.generarPlanMejora(huecos)
+    };
+}
     
     static detectarHuecosCobertura(matrizRAsignaturas) {
         return matrizRAsignaturas.alertas.map(alerta => ({
@@ -195,3 +204,4 @@ export class GapAnalyzer {
         return asignaturas.length > 0 ? asignaturas : ['Por determinar'];
     }
 }
+
