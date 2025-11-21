@@ -14,11 +14,6 @@ import { initializeApp } from '../components/app-initializer.js';
 import { setupEventListeners } from '../components/event-manager.js';
 import { APIKeyManager } from '../components/api-key-manager.js';
 
-// Data - SI LO NECESITAS
-import { CurriculumLoader } from '../data/curriculum-loader.js';
-
-// Visualization - SI LO NECESITAS  
-import { AnalysisDisplay } from '../visualization/analysis-display.js';
 
 import { GlobalAnalyzer } from '../analysis/global-analyzer.js';
 import { CompetenceMapper } from '../analysis/competence-mapper.js';
@@ -113,22 +108,11 @@ function setupBidirectionalSystem() {
     });
 }
 
-/ ✅ ACTUALIZAR launchGlobalAnalysis (si la necesitas):
-async function launchGlobalAnalysis() {
-    try {
-        setLoadingState(true);
-        await initializeGlobalAnalysis(); // Usar el nuevo sistema ANECA
-        setLoadingState(false);
-    } catch (error) {
-        showError(`Error en análisis: ${error.message}`);
-        setLoadingState(false);
-    }
-}
-
 // Exportatu funtzioak globalak izateko
 window.showError = showError;
 window.hideError = hideError;
 window.setLoadingState = setLoadingState;
+
 
 
 
