@@ -1,35 +1,94 @@
 // 📁 analysis/competence-mapper.js - ACTUALIZADO
 export class CompetenceMapper {
-    static async generarMatrizCompetenciasRA(curriculumData) {
-        console.log("🔄 Generando matriz de competencias desde API...");
+    // REEMPLAZAR el método generarMatrizCompetenciasRA
+static async generarMatrizCompetenciasRA(curriculumData) {
+    console.log("🔄 Generando matriz de competencias agrupadas...");
+    
+    try {
+        // Obtener competencias ya agrupadas desde la API
+        const competenciasAgrupadas = await AnecaAPI.interpretarCompetencias(curriculumData);
         
-        try {
-            // 1. Llamar a la API para interpretar competencias
-            const competenciasAgrupadas = await AnecaAPI.interpretarCompetencias(curriculumData);
-            
-            // 2. Calcular métricas
-            const metricas = this.calcularMetricasCompetencias(competenciasAgrupadas);
-            
-            // 3. Generar alertas
-            const alertas = this.generarAlertasCompetencias(competenciasAgrupadas, metricas);
-            
-            return {
-                matriz: {
-                    competencias: this.aplanarCompetencias(competenciasAgrupadas),
-                    ambitos: competenciasAgrupadas,
-                    coberturaRA: this.calcularCoberturaRA(competenciasAgrupadas),
-                    nivelesBloom: this.analizarNivelesBloom(competenciasAgrupadas),
-                    evidencias: this.generarEvidencias(competenciasAgrupadas)
-                },
-                metricas: metricas,
-                alertas: alertas
-            };
-            
-        } catch (error) {
-            console.error("❌ Error al generar competencias:", error);
-            return this.estructuraVacia();
-        }
+        // Aplanar todas las competencias de todos los ámbitos
+        const todasCompetencias = Object.values(competenciasAgrupadas).flat();
+        
+        console.log(`📊 Procesando ${todasCompetencias.length} competencias agrupadas`);
+        
+        // Crear matriz con la nueva estructura
+        const matriz = {
+            competencias: todasCompetencias.map(comp => ({
+                id: comp.id,
+                nombre: comp.nombre,
+                descripcion: comp.descripcion,
+                ambito: comp.ambito,
+                nivelBloom: comp.nivelBloom,
+                cursos: comp.cursos,
+                asignaturas: comp.asignaturasRelacionadas,
+                rasConstituyentes: comp.rasConstituyentes?.length || 0,
+                creditos: comp.creditosTotales,
+                progresion: comp.progresion,
+                instrumentosEvaluacion: comp.instrumentosEvaluacion
+            })),
+            metricas: this.calcularMetricasCompetencias(todasCompetencias),
+            ambitos: this.agruparPorAmbitos(todasCompetencias),
+            distribucionBloom: this.analizarDistribucionBloom(todasCompetencias),
+            progresionCurricular: this.analizarProgresionCurricular(todasCompetencias)
+        };
+        
+        return matriz;
+        
+    } catch (error) {
+        console.error('❌ Error al generar matriz de competencias:', error);
+        throw error;
     }
+}
+
+// NUEVOS MÉTODOS PARA LA NUEVA ESTRUCTURA
+static calcularMetricasCompetencias(competencias) {
+    return {
+        totalCompetencias: competencias.length,
+        totalRAs: competencias.reduce((sum, comp) => sum + (comp.rasConstituyentes?.length || 0), 0),
+        promedioRAsPorCompetencia: competencias.length > 0 ? 
+            (competencias.reduce((sum, comp) => sum + (comp.rasConstituyentes?.length || 0), 0) / competencias.length).toFixed(1) : 0,
+        competenciasConProgresion: competencias.filter(comp => comp.cursos.length > 1).length,
+        distribucionCursos: this.calcularDistribucionCursos(competencias)
+    };
+}
+
+static agruparPorAmbitos(competencias) {
+    const ambitos = {};
+    competencias.forEach(comp => {
+        if (!ambitos[comp.ambito]) {
+            ambitos[comp.ambito] = [];
+        }
+        ambitos[comp.ambito].push(comp);
+    });
+    return ambitos;
+}
+
+static analizarDistribucionBloom(competencias) {
+    const distribucion = {};
+    competencias.forEach(comp => {
+        const nivel = comp.nivelBloom?.nivel || 'RECORDAR';
+        distribucion[nivel] = (distribucion[nivel] || 0) + 1;
+    });
+    return distribucion;
+}
+
+static analizarProgresionCurricular(competencias) {
+    const progresion = { cursos: {} };
+    
+    competencias.forEach(comp => {
+        comp.cursos.forEach(curso => {
+            if (!progresion.cursos[curso]) {
+                progresion.cursos[curso] = { competencias: 0, creditos: 0 };
+            }
+            progresion.cursos[curso].competencias++;
+            progresion.cursos[curso].creditos += comp.creditosTotales / comp.cursos.length;
+        });
+    });
+    
+    return progresion;
+}
     
     static aplanarCompetencias(competenciasAgrupadas) {
         const todasCompetencias = [];
@@ -138,6 +197,7 @@ export class CompetenceMapper {
         };
     }
 }
+
 
 
 
