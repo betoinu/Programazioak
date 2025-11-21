@@ -176,6 +176,9 @@ export class AnecaAPI {
         return competencias;
     }
 }    
+if (typeof window !== 'undefined') {
+    window.AnecaAPI = AnecaAPI;
+}
 
 
 
