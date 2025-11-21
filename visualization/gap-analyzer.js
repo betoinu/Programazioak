@@ -69,11 +69,29 @@ export class GapAnalyzer {
         return [];
     }
     
-    const competencias = matrizCompetenciasRA.competencias || matrizCompetenciasRA.data || [];
+    // BUSCAR COMPETENCIAS EN LA ESTRUCTURA REAL
+    let competencias = [];
+    
+    // Opción 1: En matriz
+    if (matrizCompetenciasRA.matriz && typeof matrizCompetenciasRA.matriz === 'object') {
+        competencias = Object.values(matrizCompetenciasRA.matriz);
+        console.log("✅ Competencias encontradas en .matriz");
+    }
+    // Opción 2: En metricas  
+    else if (matrizCompetenciasRA.metricas && typeof matrizCompetenciasRA.metricas === 'object') {
+        competencias = Object.values(matrizCompetenciasRA.metricas);
+        console.log("✅ Competencias encontradas en .metricas");
+    }
+    // Opción 3: En data (por si acaso)
+    else if (matrizCompetenciasRA.data && Array.isArray(matrizCompetenciasRA.data)) {
+        competencias = matrizCompetenciasRA.data;
+        console.log("✅ Competencias encontradas en .data");
+    }
+    
     console.log("📊 Competencias para evaluación:", competencias);
     
-    if (!Array.isArray(competencias)) {
-        console.warn("⚠️ competencias no es un array:", competencias);
+    if (!Array.isArray(competencias) || competencias.length === 0) {
+        console.warn("⚠️ No se encontraron competencias para evaluar");
         return [];
     }
     
@@ -82,13 +100,13 @@ export class GapAnalyzer {
     competencias.forEach((comp, index) => {
         console.log(`🔍 Competencia ${index}:`, comp);
         
-        const instrumentos = comp.instrumentosEvaluacion || comp.evaluationInstruments || [];
+        const instrumentos = comp.instrumentosEvaluacion || comp.evaluationInstruments || comp.instrumentos || [];
         if (instrumentos.length === 0) {
             huecos.push({
                 tipo: 'EVALUACION',
-                descripcion: `Competencia "${comp.competencia || comp.nombre || 'Sin nombre'}" carece de instrumentos de evaluación`,
+                descripcion: `Competencia "${comp.competencia || comp.nombre || comp.id || 'Sin nombre'}" carece de instrumentos de evaluación`,
                 accionRecomendada: 'Definir rúbricas o instrumentos de evaluación',
-                impactoANECA: 'ALTO',
+                impactoANECA: 'ALTO', 
                 urgencia: 'INMEDIATA'
             });
         }
@@ -224,5 +242,6 @@ export class GapAnalyzer {
         return asignaturas.length > 0 ? asignaturas : ['Por determinar'];
     }
 }
+
 
 
