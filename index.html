@@ -416,8 +416,6 @@ window.mostrarResultadosAnalisisGlobal = function(resultados) {
         // Actualizar pestaña de competencias
     // Actualizar pestaña de competencias - VERSIÓN COMPATIBLE
     const competenceContent = document.getElementById('competence-content');
-    const matrizCompetencias = resultados.matrices?.competenciasRA;
-    const esEstructuraNueva = matrizCompetencias?.competencias && Array.isArray(matrizCompetencias.competencias);
     
     if (esEstructuraNueva && matrizCompetencias.ambitos) {
         // ✅ NUEVA ESTRUCTURA: Competencias agrupadas
@@ -539,6 +537,7 @@ window.mostrarResultadosAnalisisGlobal = function(resultados) {
     </script>
 </body>
 </html>
+
 
 
 
