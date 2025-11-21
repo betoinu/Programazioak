@@ -1,22 +1,22 @@
 // ✅ IMPORTS CORREGIDOS EN main.js:
-import { APP_CONFIG } from './config/app-config.js';
-import { GroqAPIService } from './services/api-service.js';
-import { CurriculumDataService } from './services/data-service.js';    // ✅ CORREGIDO
-import { PromptBuilder } from './utils/prompt-builder.js';
-import { ResultsDisplay } from './components/results-display.js';
-import { initializeApp } from './components/app-initializer.js';
-import { setupEventListeners } from './components/event-manager.js';
-import { APIKeyManager } from './components/api-key-manager.js';
-import { GlobalAnalyzer } from './analysis/global-analyzer.js';
-import { CompetenceMapper } from './analysis/competence-mapper.js';
-import { ANECA_STANDARDS } from './data/aneca-standards.js';
-import { CurriculumCoverage } from './analysis/curriculum-coverage.js';
-import { HorizontalCoherence } from './analysis/horizontal-coherence.js';
-import { AnecaValidator } from './validation/aneca-validator.js';      // ✅ CORREGIDO
-import { ContentAlignment } from './analysis/content-alignment.js';
-import { MatrixDisplay } from './visualization/matrix-display.js';
-import { GapAnalyzer } from './visualization/gap-analyzer.js';
-import { showError, hideError, setLoadingState } from './utils/ui-helpers.js'; // ✅ CORREGIDO
+import { APP_CONFIG } from '/Programazioak/config/app-config.js';
+import { GroqAPIService } from '/Programazioak/services/api-service.js';
+import { CurriculumDataService } from '/Programazioak/services/data-service.js';
+import { PromptBuilder } from '/Programazioak/utils/prompt-builder.js';
+import { ResultsDisplay } from '/Programazioak/components/results-display.js';
+import { initializeApp } from '/Programazioak/components/app-initializer.js';
+import { setupEventListeners } from '/Programazioak/components/event-manager.js';
+import { APIKeyManager } from '/Programazioak/components/api-key-manager.js';
+import { GlobalAnalyzer } from '/Programazioak/analysis/global-analyzer.js';
+import { CompetenceMapper } from '/Programazioak/analysis/competence-mapper.js';
+import { ANECA_STANDARDS } from '/Programazioak/data/aneca-standards.js';
+import { CurriculumCoverage } from '/Programazioak/analysis/curriculum-coverage.js';
+import { HorizontalCoherence } from '/Programazioak/analysis/horizontal-coherence.js';
+import { AnecaValidator } from '/Programazioak/validation/aneca-validator.js';
+import { ContentAlignment } from '/Programazioak/analysis/content-alignment.js';
+import { MatrixDisplay } from '/Programazioak/visualization/matrix-display.js';
+import { GapAnalyzer } from '/Programazioak/visualization/gap-analyzer.js';
+import { showError, hideError, setLoadingState } from '/Programazioak/utils/ui-helpers.js';
 
 // ===== INICIALIZACIÓN PRINCIPAL =====
 document.addEventListener('DOMContentLoaded', async function() {
@@ -135,6 +135,7 @@ window.initializeGlobalAnalysis = initializeGlobalAnalysis;
 window.setupBidirectionalSystem = setupBidirectionalSystem;
 
 console.log('✅ Todos los módulos ANECA exportados al objeto global');
+
 
 
 
