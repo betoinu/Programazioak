@@ -1,4 +1,4 @@
-export class GlobalAnalyzer {
+class GlobalAnalyzer {
     constructor(curriculumData) {
         this.curriculum = curriculumData;
         this.ambitosProfesionales = this.identificarAmbitosProfesionales();
@@ -169,3 +169,4 @@ export class GlobalAnalyzer {
         return [];
     }
 }
+
