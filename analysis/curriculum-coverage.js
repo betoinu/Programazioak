@@ -1,4 +1,4 @@
-export class CurriculumCoverage {
+class CurriculumCoverage {
     static generarMatrizRAsignaturas(curriculumData) {
         const matriz = [];
         const alertas = [];
@@ -191,4 +191,5 @@ export class CurriculumCoverage {
 }
     
 }
+
 
