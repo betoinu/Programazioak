@@ -39,7 +39,7 @@ export class HorizontalCoherence {
             matriz,
             distribucionCarga,
             desequilibrios: this.identificarDesequilibrios(distribucionCarga),
-            recomendaciones: this.generarRecomendacionesEquilibrio(desequilibrios)
+            recomendaciones: this.generarRecomendacionesEquilibrio(this.identificarDesequilibrios(distribucionCarga))
         };
     }
     
@@ -111,4 +111,5 @@ export class HorizontalCoherence {
     }
     
 }
+
 
