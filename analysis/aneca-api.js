@@ -175,10 +175,12 @@ class AnecaAPI {
         
         return competencias;
     }
+}    
 // ✅ Exportar al ámbito global para scripts no módulo
 if (typeof window !== 'undefined') {
     window.AnecaAPI = AnecaAPI;
 }
-}
+
+
 
 
