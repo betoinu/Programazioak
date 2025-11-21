@@ -49,7 +49,7 @@ static calcularMetricasCompetencias(competencias) {
         totalRAs: competencias.reduce((sum, comp) => sum + (comp.rasConstituyentes?.length || 0), 0),
         promedioRAsPorCompetencia: competencias.length > 0 ? 
             (competencias.reduce((sum, comp) => sum + (comp.rasConstituyentes?.length || 0), 0) / competencias.length).toFixed(1) : 0,
-        competenciasConProgresion: competencias.filter(comp => comp.cursos.length > 1).length,
+        competenciasConProgresion: competencias.filter(comp => comp.cursos && comp.cursos.length > 1).length,
         distribucionCursos: this.calcularDistribucionCursos(competencias)
     };
 }
@@ -197,6 +197,7 @@ static analizarProgresionCurricular(competencias) {
         };
     }
 }
+
 
 
 
