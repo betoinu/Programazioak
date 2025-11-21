@@ -55,7 +55,7 @@ async function initializeGlobalAnalysis() {
     try {
         console.log('🚀 Iniciando Análisis Global ANECA Completo');
         
-        const curriculumData = await CurriculumDataService.loadCompleteCurriculumData();
+        const curriculumData = await CurriculumDataService.loadData();
         
         // 1. ANÁLISIS MACRO
         const globalAnalyzer = new GlobalAnalyzer(curriculumData);
@@ -194,6 +194,7 @@ function displayCompetenceAnalysis(results) {
 window.showError = showError;
 window.hideError = hideError;
 window.setLoadingState = setLoadingState;
+
 
 
 
