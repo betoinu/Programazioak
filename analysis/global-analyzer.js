@@ -31,8 +31,6 @@ export class GlobalAnalyzer {
         return this.depurarYAnalizarAmbitos(ambitos);
     }
 
-    // EN global-analyzer.js, DESPUÉS de identificarAmbitosProfesionales(), AGREGA:
-    
     depurarYAnalizarAmbitos(ambitos) {
         // Eliminar ámbitos vacíos y analizar
         const ambitosDepurados = {};
@@ -117,49 +115,57 @@ export class GlobalAnalyzer {
         return this.calcularDensidadCompetencial(progresion);
     }
     
+    calcularDensidadCompetencial(progresion) {
+        const densidad = {};
+        const totalCompetencias = new Set();
+        
+        // Calcular densidad por curso
+        Object.entries(progresion).forEach(([curso, competencias]) => {
+            const competenciasCurso = Object.keys(competencias);
+            densidad[curso] = {
+                total: competenciasCurso.length,
+                densidad: competenciasCurso.length / 10, // Asumiendo 10 como máximo esperado
+                competencias: competenciasCurso
+            };
+            
+            competenciasCurso.forEach(comp => totalCompetencias.add(comp));
+        });
+        
+        return {
+            porCurso: densidad,
+            totalCompetencias: totalCompetencias.size,
+            distribucion: this.analizarDistribucionCompetencias(progresion)
+        };
+    }
+
+    analizarDistribucionCompetencias(progresion) {
+        const distribucion = {};
+        
+        // Contar en cuántos cursos aparece cada competencia
+        Object.values(progresion).forEach(competenciasCurso => {
+            Object.keys(competenciasCurso).forEach(competencia => {
+                if (!distribucion[competencia]) {
+                    distribucion[competencia] = 0;
+                }
+                distribucion[competencia]++;
+            });
+        });
+        
+        return distribucion;
+    }
+    
     // Conectar con análisis específico
     generarRecomendacionesMejora() {
         const issues = this.detectarProblemasCoherencia();
         return this.derivarAccionesEspecificas(issues);
     }
-}
 
-calcularDensidadCompetencial(progresion) {
-    const densidad = {};
-    const totalCompetencias = new Set();
-    
-    // Calcular densidad por curso
-    Object.entries(progresion).forEach(([curso, competencias]) => {
-        const competenciasCurso = Object.keys(competencias);
-        densidad[curso] = {
-            total: competenciasCurso.length,
-            densidad: competenciasCurso.length / 10, // Asumiendo 10 como máximo esperado
-            competencias: competenciasCurso
-        };
-        
-        competenciasCurso.forEach(comp => totalCompetencias.add(comp));
-    });
-    
-    return {
-        porCurso: densidad,
-        totalCompetencias: totalCompetencias.size,
-        distribucion: this.analizarDistribucionCompetencias(progresion)
-    };
-}
+    // Métodos placeholder para evitar errores
+    detectarProblemasCoherencia() {
+        return [];
+    }
 
-analizarDistribucionCompetencias(progresion) {
-    const distribucion = {};
-    
-    // Contar en cuántos cursos aparece cada competencia
-    Object.values(progresion).forEach(competenciasCurso => {
-        Object.keys(competenciasCurso).forEach(competencia => {
-            if (!distribucion[competencia]) {
-                distribucion[competencia] = 0;
-            }
-            distribucion[competencia]++;
-        });
-    });
-    
-    return distribucion;
+    derivarAccionesEspecificas(issues) {
+        return [];
+    }
 }
-
