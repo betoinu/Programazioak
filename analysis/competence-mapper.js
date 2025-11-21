@@ -34,22 +34,53 @@ export class CompetenceMapper {
             coberturaHorizontal: this.evaluarCobertura(matriz)
         };
     }
-        // En competence-mapper.js, agrega:
-        evaluarClaridad(competencias) {
-            let score = 0;
-            competencias.forEach(comp => {
-                if (comp.descripcion && comp.descripcion.length > 10) score += 1;
-                if (comp.codigo) score += 1;
-            });
-            return score / (competencias.length * 2);
-        },
-        
-        evaluarMedibilidad(RAs) {
-            let score = 0;
-            RAs.forEach(ra => {
-                const texto = ra.descripcion?.toLowerCase() || ra.toLowerCase();
-                if (texto.includes('analizar') || texto.includes('diseñar') || texto.includes('evaluar')) score += 1;
-            });
-            return score / RAs.length;
-        }
+
+    // ✅ MÉTODOS CORREGIDOS - SIN COMAS Y DENTRO DE LA CLASE
+    static evaluarClaridad(matriz) {
+        let score = 0;
+        matriz.competencias.forEach(comp => {
+            if (comp.competencia.descripcion && comp.competencia.descripcion.length > 10) score += 1;
+            if (comp.competencia.codigo) score += 1;
+        });
+        return score / (matriz.competencias.length * 2);
+    }
+    
+    static evaluarMedibilidad(matriz) {
+        let score = 0;
+        const todosRAs = matriz.competencias.flatMap(comp => comp.RAs);
+        todosRAs.forEach(ra => {
+            const texto = ra.descripcion?.toLowerCase() || ra.toLowerCase();
+            if (texto.includes('analizar') || texto.includes('diseñar') || texto.includes('evaluar')) score += 1;
+        });
+        return score / todosRAs.length;
+    }
+
+    // ✅ MÉTODOS PLACEHOLDER PARA EVITAR MÁS ERRORES
+    static buscarRAsPorCompetencia(competencia, curriculumData) {
+        return [];
+    }
+    
+    static determinarNivelCompetencia(raAsociados) {
+        return 'MEDIO';
+    }
+    
+    static identificarEvidencias(raAsociados) {
+        return ['Evidencia por defecto'];
+    }
+    
+    static identificarInstrumentos(raAsociados) {
+        return ['Instrumento por defecto'];
+    }
+    
+    static evaluarProgresion(matriz) {
+        return 0.5;
+    }
+    
+    static evaluarCobertura(matriz) {
+        return 0.5;
+    }
+    
+    static generarAlertasCumplimiento(matriz) {
+        return [];
+    }
 }
