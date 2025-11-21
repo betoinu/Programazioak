@@ -1,4 +1,4 @@
-export class AnecaValidator {
+class AnecaValidator {
     static validarCumplimientoCompleto(curriculumData) {
         const validaciones = {
             perfilEgreso: this.validarPerfilEgreso(curriculumData),
@@ -88,3 +88,4 @@ if (typeof window !== 'undefined') {
     window.AnecaValidator = AnecaValidator;
 }
 }
+
