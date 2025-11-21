@@ -97,33 +97,7 @@ static analizarProgresionCurricular(competencias) {
         });
         return todasCompetencias;
     }
-    
-    static calcularMetricasCompetencias(competenciasAgrupadas) {
-        const metricas = {
-            totalCompetencias: 0,
-            porAmbito: {},
-            porNivelBloom: {},
-            porCurso: {1: 0, 2: 0, 3: 0, 4: 0}
-        };
-        
-        Object.entries(competenciasAgrupadas).forEach(([ambito, competencias]) => {
-            metricas.porAmbito[ambito] = competencias.length;
-            metricas.totalCompetencias += competencias.length;
-            
-            competencias.forEach(comp => {
-                // Contar por nivel Bloom
-                metricas.porNivelBloom[comp.nivelBloom] = (metricas.porNivelBloom[comp.nivelBloom] || 0) + 1;
-                
-                // Contar por curso
-                if (comp.cursoRecomendado && metricas.porCurso[comp.cursoRecomendado] !== undefined) {
-                    metricas.porCurso[comp.cursoRecomendado]++;
-                }
-            });
-        });
-        
-        return metricas;
-    }
-    
+       
     static generarAlertasCompetencias(competenciasAgrupadas, metricas) {
         const alertas = [];
         
@@ -197,6 +171,7 @@ static analizarProgresionCurricular(competencias) {
         };
     }
 }
+
 
 
 
