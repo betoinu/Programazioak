@@ -36,6 +36,10 @@ export class CurriculumDataService {
         return null;
     }
 }
+// ✅ AÑADIR ESTO AL FINAL:
+if (typeof window !== 'undefined') {
+    window.CurriculumDataService = CurriculumDataService;
+}
 
 
 
