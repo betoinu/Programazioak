@@ -51,6 +51,9 @@ function handleFormSubmit(e) {
     data.subjectName = subjectSelect.options[subjectSelect.selectedIndex]?.text || data.subject;
     data.courseName = courseSelect.options[courseSelect.selectedIndex]?.text || data.course;
     
-    generateSuggestions(data);
+   // ✅ CORREGIR A:
+    // Comenta temporalmente o implementa la función
+    console.log('Generate suggestions llamado');
 
 }
+
