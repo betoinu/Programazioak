@@ -142,7 +142,11 @@ export class AnecaValidator {
         
         return (claridad + medibilidad + alineacion) / 3;
     }
+    static calcularPuntuacionCobertura(matrizCobertura) {
+    return matrizCobertura.cumplimientoANECA || 75;
+}
   }
+
 
 
 
