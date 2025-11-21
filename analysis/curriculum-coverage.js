@@ -94,4 +94,74 @@ export class CurriculumCoverage {
             asignaturasSobrecargadas: this.identificarAsignaturasSobrecargadas(matriz)
         };
     }
+    
+    static identificarAsignaturasSobrecargadas(matriz) {
+        const asignaturaCount = {};
+        
+        // Contar cuántos RAs tiene cada asignatura
+        matriz.forEach(ra => {
+            ra.asignaturas.forEach(asignatura => {
+                const nombre = asignatura.asignatura;
+                if (!asignaturaCount[nombre]) {
+                    asignaturaCount[nombre] = 0;
+                }
+                asignaturaCount[nombre]++;
+            });
+        });
+        
+        // Identificar asignaturas con más de 5 RAs
+        return Object.entries(asignaturaCount)
+            .filter(([_, count]) => count > 5)
+            .map(([nombre, count]) => ({
+                asignatura: nombre,
+                totalRAs: count,
+                recomendacion: 'Considerar redistribuir carga'
+            }));
+    }
+
+    static calcularNivelesContribucion(asignaturasQueCubren, ra) {
+        const niveles = [];
+        
+        asignaturasQueCubren.forEach(asignatura => {
+            if (asignatura.nivelContribucion) {
+                niveles.push(asignatura.nivelContribucion);
+            }
+        });
+        
+        return [...new Set(niveles)]; // Eliminar duplicados
+    }
+    
+    static generarAlertasCobertura(asignaturasQueCubren, nivelesContribucion) {
+        const alertas = [];
+        
+        if (asignaturasQueCubren.length === 0) {
+            alertas.push('RA no cubierto por ninguna asignatura');
+        } else if (asignaturasQueCubren.length === 1) {
+            alertas.push('RA cubierto por solo una asignatura');
+        }
+        
+        if (!nivelesContribucion.includes('Dp')) {
+            alertas.push('Falta nivel de profundización (Dp)');
+        }
+        
+        return alertas;
+    }
+    
+    static calcularPorcentajeCumplimiento(matriz) {
+        const totalRAs = matriz.length;
+        const RAsCumplenMinimo = matriz.filter(ra => ra.cumpleMinimoANECA).length;
+        
+        return (RAsCumplenMinimo / totalRAs) * 100;
+    }
+    
+    static hayCoincidenciaRA(textoRA, textoAsignatura) {
+        // Coincidencia básica por palabras clave
+        const palabrasClave = textoRA.toLowerCase().split(' ').filter(p => p.length > 4);
+        const textoAsignaturaLower = textoAsignatura.toLowerCase();
+        
+        return palabrasClave.some(palabra => 
+            textoAsignaturaLower.includes(palabra)
+        );
+    }
+    
 }
