@@ -40,24 +40,14 @@
     <script src="visualization/matrix-display.js"></script>
     <script src="analysis/global-analyzer.js"></script>
 
-    <!-- ✅ CORREGIR: Módulos principales como scripts normales -->
-    <script src="js/data-service.js"></script>
-    <script src="js/ui-helpers.js"></script>
-    
-    <!-- ✅ CORREGIR: main.js como módulo pero con imports corregidos -->
-    <script type="module">
-        // Importar solo lo que realmente existe
-        import { DataService } from './js/data-service.js';
-        import { showError, showSuccess } from './js/ui-helpers.js';
-        
-        // Hacer disponibles globalmente
-        window.DataService = DataService;
-        window.showError = showError;
-        window.showSuccess = showSuccess;
-        
-        console.log('✅ Módulos principales cargados correctamente');
-    </script>
-   
+    <!-- ✅ MÓDULOS PRINCIPALES (scripts normales) -->
+    <script src="services/data-service.js"></script>
+    <script src="utils/ui-helpers.js"></script>
+
+    <!-- ✅ MAIN.JS como módulo ES6 -->
+    <script type="module" src="js/main.js"></script>
+
+    <!-- ✅ TU CÓDIGO PERSONALIZADO -->
     <script>
     // Estados del análisis global
     let isGlobalAnalysisRunning = false;
@@ -299,3 +289,4 @@
     </script>
 </body>
 </html>
+
