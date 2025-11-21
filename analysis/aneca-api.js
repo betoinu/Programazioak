@@ -1,5 +1,5 @@
 // 📁 analysis/aneca-api.js
-class AnecaAPI {
+export class AnecaAPI {
     static async interpretarCompetencias(curriculumData) {
         console.log("🧠 API: Interpretando competencias desde RAs reales en euskera...");
         
@@ -176,10 +176,8 @@ class AnecaAPI {
         return competencias;
     }
 }    
-// ✅ Exportar al ámbito global para scripts no módulo
-if (typeof window !== 'undefined') {
-    window.AnecaAPI = AnecaAPI;
-}
+
+
 
 
 
