@@ -692,6 +692,125 @@ static establecerPrioridadesAccion(indicadores) {
         responsable: 'Coordinación de titulación'
     }));
 }
+
+  // === MÉTODOS FALTANTES IDENTIFICADOS ===
+
+static analizarVerbosAccion(matrizCompetenciaRA) {
+    console.log("🔍 Analizando verbos de acción en RAs...");
+    
+    if (!matrizCompetenciaRA?.competencias) {
+        return { total: 0, verbos: [], cobertura: 0 };
+    }
+    
+    const verbosAccion = [
+        'analizar', 'aplicar', 'calcular', 'clasificar', 'comparar', 'crear',
+        'demostrar', 'diseñar', 'evaluar', 'explicar', 'identificar', 'implementar',
+        'interpretar', 'justificar', 'organizar', 'planificar', 'resolver', 'sintetizar'
+    ];
+    
+    const conteoVerbos = {};
+    let totalRAs = 0;
+    let rasConVerboAccion = 0;
+    
+    matrizCompetenciaRA.competencias.forEach(competencia => {
+        competencia.resultadosAprendizaje?.forEach(ra => {
+            totalRAs++;
+            const descripcion = ra.descripcion?.toLowerCase() || '';
+            const primerVerbo = descripcion.split(' ')[0];
+            
+            if (verbosAccion.includes(primerVerbo)) {
+                rasConVerboAccion++;
+                conteoVerbos[primerVerbo] = (conteoVerbos[primerVerbo] || 0) + 1;
+            }
+        });
+    });
+    
+    return {
+        total: totalRAs,
+        conVerboAccion: rasConVerboAccion,
+        sinVerboAccion: totalRAs - rasConVerboAccion,
+        porcentaje: totalRAs > 0 ? (rasConVerboAccion / totalRAs) * 100 : 0,
+        verbos: conteoVerbos,
+        verbosMasUsados: Object.entries(conteoVerbos)
+            .sort(([,a], [,b]) => b - a)
+            .slice(0, 5)
+    };
+}
+
+static extraerCriteriosEvaluacion(curriculumData) {
+    console.log("🔍 Extrayendo criterios de evaluación...");
+    return {
+        criteriosIdentificados: curriculumData.criteriosEvaluacion || [],
+        instrumentos: curriculumData.instrumentosEvaluacion || [],
+        evidencias: curriculumData.tiposEvidencias || []
+    };
+}
+
+static evaluarCoberturaNiveles(matrizRAsAsignaturas) {
+    console.log("🔍 Evaluando cobertura de niveles de dominio...");
+    
+    if (!matrizRAsAsignaturas?.matriz) return 'NO_EVALUADO';
+    
+    const raConDominioDp = matrizRAsAsignaturas.matriz.filter(ra => 
+        ra.niveles?.includes('Dp') || ra.asignaturas?.some(a => a.nivel === 'Dp')
+    ).length;
+    
+    const totalRA = matrizRAsAsignaturas.matriz.length;
+    const porcentaje = totalRA > 0 ? (raConDominioDp / totalRA) * 100 : 0;
+    
+    if (porcentaje >= 80) return 'CUMPLE_TOTALMENTE';
+    if (porcentaje >= 60) return 'CUMPLE_PARCIALMENTE';
+    return 'NO_CUMPLE';
+}
+
+static contarRAsConDominio(matrizRAsAsignaturas) {
+    if (!matrizRAsAsignaturas?.matriz) return 0;
+    
+    return matrizRAsAsignaturas.matriz.filter(ra => 
+        ra.niveles?.includes('Dp') || ra.asignaturas?.some(a => a.nivel === 'Dp')
+    ).length;
+}
+
+static calcularPorcentajeDominio(matrizRAsAsignaturas) {
+    const totalRA = matrizRAsAsignaturas?.matriz?.length || 0;
+    const raConDominio = this.contarRAsConDominio(matrizRAsAsignaturas);
+    
+    return totalRA > 0 ? (raConDominio / totalRA) * 100 : 0;
+}
+
+static calcularPuntuacionDominio(matrizRAsAsignaturas) {
+    return this.calcularPorcentajeDominio(matrizRAsAsignaturas);
+}
+
+static calcularPuntuacionSecuencia(matrices) {
+    const secuencia = matrices.raSubject?.analisisSecuencia;
+    if (!secuencia) return 0;
+    
+    return secuencia.esValida ? 100 : 40;
+}
+
+static generarRecomendacionesDominio(matrizRAsAsignaturas) {
+    const porcentaje = this.calcularPorcentajeDominio(matrizRAsAsignaturas);
+    const recomendaciones = [];
+    
+    if (porcentaje < 60) {
+        recomendaciones.push({
+            problema: "Baja cobertura de nivel dominio profesional (Dp)",
+            recomendacion: "Incluir asignaturas de nivel Dp para los RA críticos"
+        });
+    }
+    
+    if (porcentaje < 80) {
+        recomendaciones.push({
+            problema: "Cobertura insuficiente de niveles avanzados",
+            recomendacion: "Revisar la progresión I → D → Dp en el plan de estudios"
+        });
+    }
+    
+    return recomendaciones;
+}
+
+// Continúa con los demás métodos faltantes...  
     
     // === MÉTODOS DE FECHA Y TEMPORALIDAD ===
     static calcularFechaProximaEvaluacion() {
@@ -701,4 +820,5 @@ static establecerPrioridadesAccion(indicadores) {
     }
 
 }
+
 
