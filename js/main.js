@@ -18,6 +18,7 @@ import { MatrixDisplay } from '/Programazioak/visualization/matrix-display.js';
 import { GapAnalyzer } from '/Programazioak/visualization/gap-analyzer.js';
 import { showError, hideError, setLoadingState } from '/Programazioak/utils/ui-helpers.js';
 import { AccreditationIndicators } from '/Programazioak/analysis/accreditation-indicators.js';
+import { DiagnosticSystem } from '/Programazioak/utils/diagnostic-system.js';
 
 // ===== INICIALIZACIÓN PRINCIPAL =====
 document.addEventListener('DOMContentLoaded', async function() {
@@ -42,7 +43,20 @@ document.addEventListener('DOMContentLoaded', async function() {
 async function initializeGlobalAnalysis() {
     try {
         console.log('🚀 Iniciando Análisis Global ANECA Completo');
+
+        // ✅ EJECUTAR DIAGNÓSTICO COMPLETO
+        console.log("🩺 Ejecutando diagnóstico completo...");
+        const diagnostico = DiagnosticSystem.diagnosticarAplicacionCompleta();
         
+        if (diagnostico.estado === 'INCOMPLETO') {
+            console.warn("⚠️  Módulos incompletos detectados. Generando reporte de reparación...");
+            DiagnosticSystem.generarReporteReparacion();
+            
+            // Preguntar si continuar
+            if (!confirm(`Se detectaron ${diagnostico.totalMetodosFaltantes} métodos faltantes. ¿Continuar igualmente?`)) {
+                throw new Error("Análisis cancelado por el usuario");
+            }
+        }
         const curriculumData = await CurriculumDataService.loadData();
         
         // 1. ANÁLISIS MACRO
@@ -165,6 +179,7 @@ window.initializeGlobalAnalysis = initializeGlobalAnalysis;
 window.setupBidirectionalSystem = setupBidirectionalSystem;
 
 console.log('✅ Todos los módulos ANECA exportados al objeto global');
+
 
 
 
