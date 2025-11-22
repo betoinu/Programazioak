@@ -1,7 +1,26 @@
 // 📁 analysis/competence-mapper.js - ACTUALIZADO
 export class CompetenceMapper {
     // REEMPLAZAR el método generarMatrizCompetenciasRA
-static async generarMatrizCompetenciasRA(curriculumData) {
+    static verificarMetodos() {
+        console.group("🔍 VERIFICACIÓN CompetenceMapper");
+        
+        const metodosCriticos = [
+            'generarCodigoCompetencia',
+            'extraerResultadosAprendizaje', 
+            'generarEvidenciasLogro',
+            'mapearInstrumentosEvaluacion',
+            'analizarCoherenciaVertical',
+            'extraerVerbosAccion'
+        ];
+        
+        metodosCriticos.forEach(metodo => {
+            console.log(`- ${metodo}:`, typeof CompetenceMapper[metodo]);
+        });
+        
+        console.groupEnd();
+        return metodosCriticos.every(metodo => typeof CompetenceMapper[metodo] === 'function');
+    }
+    static async generarMatrizCompetenciasRA(curriculumData) {
     console.log("🔄 Generando matriz de competencias agrupadas...");
     
     try {
@@ -408,6 +427,7 @@ static extraerVerbosAccion(descripcion) {
         };
     }
 }
+
 
 
 
