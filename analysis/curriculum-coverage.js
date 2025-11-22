@@ -346,6 +346,89 @@ export class CurriculumCoverage {
         };
         return instrumentos[nivel] || ['Instrumento de evaluación'];
     }
+
+    // 📁 analysis/curriculum-coverage.js - AÑADE AL FINAL
+
+export class CurriculumCoverage {
+    // ... tus métodos existentes ...
+
+    // ✅ AÑADIR MÉTODOS FALTANTES
+    static generarAnalisisANECACompleto(matriz, curriculumData) {
+        return {
+            criterioB1: CurriculumCoverage.evaluarCriterioB1(matriz),
+            criterioB2: CurriculumCoverage.evaluarCriterioB2(matriz),
+            mapaCurricular: CurriculumCoverage.generarMapaCurricular(matriz, curriculumData),
+            recomendacionesGlobales: CurriculumCoverage.generarRecomendacionesGlobales(matriz)
+        };
+    }
+
+    static evaluarCriterioB1(matriz) {
+        const totalRA = matriz.length;
+        const raCumplen = matriz.filter(ra => ra.cumpleMinimoANECA).length;
+        
+        return {
+            cumplido: raCumplen === totalRA,
+            porcentaje: (raCumplen / totalRA) * 100,
+            totalRA: totalRA,
+            raCumplen: raCumplen
+        };
+    }
+
+    static evaluarCriterioB2(matriz) {
+        const totalRA = matriz.length;
+        const raConDominio = matriz.filter(ra => ra.tieneProfundizacion).length;
+        
+        return {
+            cumplido: raConDominio > 0,
+            porcentaje: (raConDominio / totalRA) * 100,
+            totalRA: totalRA,
+            raConDominio: raConDominio
+        };
+    }
+
+    static generarMapaCurricular(matriz, curriculumData) {
+        return {
+            asignaturas: curriculumData.asignaturas?.length || 0,
+            cursos: CurriculumCoverage.obtenerCursos(curriculumData),
+            distribucion: CurriculumCoverage.calcularDistribucionCursos(matriz)
+        };
+    }
+
+    static generarRecomendacionesGlobales(matriz) {
+        const problemas = [];
+        
+        if (matriz.filter(ra => !ra.cumpleMinimoANECA).length > 0) {
+            problemas.push("Algunos RA no tienen cobertura mínima de 2 asignaturas");
+        }
+        
+        if (matriz.filter(ra => !ra.tieneProfundizacion).length > 0) {
+            problemas.push("Falta nivel de dominio (Dp) en algunos RA");
+        }
+        
+        return problemas.length > 0 ? problemas : ["Cumple con los criterios ANECA"];
+    }
+
+    // ✅ MÉTODOS AUXILIARES
+    static obtenerCursos(curriculumData) {
+        const cursos = new Set();
+        curriculumData.asignaturas?.forEach(asig => {
+            if (asig.curso) cursos.add(asig.curso);
+        });
+        return Array.from(cursos).sort();
+    }
+
+    static calcularDistribucionCursos(matriz) {
+        const distribucion = {};
+        matriz.forEach(ra => {
+            ra.asignaturas?.forEach(asig => {
+                if (asig.curso) {
+                    distribucion[asig.curso] = (distribucion[asig.curso] || 0) + 1;
+                }
+            });
+        });
+        return distribucion;
+    }
+} // ← NO OLVIDES CERRAR LA CLASE SI NO ESTÁ
     
     static extraerEvidenciasContribucion(asignatura, ra) {
     const evidencias = [];
@@ -374,6 +457,7 @@ export class CurriculumCoverage {
 }
     
 }
+
 
 
 
