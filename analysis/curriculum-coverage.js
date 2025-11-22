@@ -8,6 +8,7 @@ export class CurriculumCoverage {
             const asignaturasQueCubren = this.identificarAsignaturasPorRA(ra, curriculumData);
             const nivelesContribucion = this.calcularNivelesContribucion(asignaturasQueCubren, ra);
             const analisisANECA = this.analizarCumplimientoANECA(asignaturasQueCubren, nivelesContribucion);
+            
             const coberturaRA = {
                 resultadoAprendizaje: ra.descripcion || ra,
                 codigo: ra.codigo || `RA${ra.id}`,
@@ -24,7 +25,6 @@ export class CurriculumCoverage {
             
             matriz.push(coberturaRA);
             
-            // Generar alertas ANECA
             // ✅ MEJORA: Alertas ANECA más específicas
             if (!coberturaRA.cumpleMinimoANECA) {
                 alertas.push({
@@ -46,16 +46,17 @@ export class CurriculumCoverage {
                     accion: 'Incluir asignatura con nivel Dp para este RA',
                     asignaturasSugeridas: this.sugerirAsignaturasDominio(ra, curriculumData)
                 });
-            }            // ✅ NUEVO: Alerta por secuencia incorrecta
-                if (!coberturaRA.secuenciaProgresion.esValida) {
-                    alertas.push({
-                        tipo: 'SECUENCIA_PROGRESION',
-                        mensaje: `RA "${ra.codigo}" tiene problemas en la secuencia I→D→Dp`,
-                        gravedad: 'MEDIA',
-                        detalles: coberturaRA.secuenciaProgresion.problemas
-                    });
-                }
-            
+            }
+
+            // ✅ NUEVO: Alerta por secuencia incorrecta
+            if (!coberturaRA.secuenciaProgresion.esValida) {
+                alertas.push({
+                    tipo: 'SECUENCIA_PROGRESION',
+                    mensaje: `RA "${ra.codigo}" tiene problemas en la secuencia I→D→Dp`,
+                    gravedad: 'MEDIA',
+                    detalles: coberturaRA.secuenciaProgresion.problemas
+                });
+            }
         });
         
         return {
@@ -94,12 +95,21 @@ export class CurriculumCoverage {
     }
     
     static determinarNivelContribucion(ra, textoAsignatura) {
-        const palabrasIntroductorias = ['introduc', 'básic', 'fundament', 'inicial', 'concepto'];
-        const palabrasDesarrollo = ['desarroll', 'aplic', 'implement', 'ejercic', 'práctica'];
-        const palabrasProfundizacion = ['profund', 'avanzad', 'complex', 'investig', 'proyecto', 'integrado'];
+        const palabrasIntroductorias = ['introduc', 'básic', 'fundament', 'inicial', 'concepto', 'definir'];
+        const palabrasDesarrollo = ['desarroll', 'aplic', 'implement', 'ejercic', 'práctica', 'analizar', 'comparar'];
+        const palabrasProfundizacion = ['profund', 'avanzad', 'complex', 'investig', 'proyecto', 'integrado', 'evaluar', 'diseñar', 'crear'];
         
-        if (palabrasProfundizacion.some(p => textoAsignatura.includes(p))) return 'Dp';
-        if (palabrasDesarrollo.some(p => textoAsignatura.includes(p))) return 'D';
+        // ✅ MEJORA: Análisis más preciso por verbos de Bloom
+        const textoCompleto = textoAsignatura.toLowerCase();
+        let puntuacion = 0;
+        
+        if (palabrasProfundizacion.some(p => textoCompleto.includes(p))) puntuacion += 3;
+        if (palabrasDesarrollo.some(p => textoCompleto.includes(p))) puntuacion += 2;
+        if (palabrasIntroductorias.some(p => textoCompleto.includes(p))) puntuacion += 1;
+        
+        // ✅ NUEVO: Determinar nivel basado en puntuación
+        if (puntuacion >= 3) return 'Dp';
+        if (puntuacion >= 2) return 'D';
         return 'I';
     }
     
@@ -144,25 +154,6 @@ export class CurriculumCoverage {
                 recomendacion: 'Considerar redistribuir carga'
             }));
     }
-
-    static determinarNivelContribucion(ra, textoAsignatura) {
-        const palabrasIntroductorias = ['introduc', 'básic', 'fundament', 'inicial', 'concepto', 'definir'];
-        const palabrasDesarrollo = ['desarroll', 'aplic', 'implement', 'ejercic', 'práctica', 'analizar', 'comparar'];
-        const palabrasProfundizacion = ['profund', 'avanzad', 'complex', 'investig', 'proyecto', 'integrado', 'evaluar', 'diseñar', 'crear'];
-        
-        // ✅ MEJORA: Análisis más preciso por verbos de Bloom
-        const textoCompleto = textoAsignatura.toLowerCase();
-        let puntuacion = 0;
-        
-        if (palabrasProfundizacion.some(p => textoCompleto.includes(p))) puntuacion += 3;
-        if (palabrasDesarrollo.some(p => textoCompleto.includes(p))) puntuacion += 2;
-        if (palabrasIntroductorias.some(p => textoCompleto.includes(p))) puntuacion += 1;
-        
-        // ✅ NUEVO: Determinar nivel basado en puntuación
-        if (puntuacion >= 3) return 'Dp';
-        if (puntuacion >= 2) return 'D';
-        return 'I';
-    }
     
     static generarAlertasCobertura(asignaturasQueCubren, nivelesContribucion) {
         const alertas = [];
@@ -197,9 +188,34 @@ export class CurriculumCoverage {
         );
     }
 
-        // === MÉTODOS NUEVOS PARA ANECA ===
+    static extraerEvidenciasContribucion(asignatura, ra) {
+        const evidencias = [];
+        
+        // Buscar evidencias en contenidos, objetivos, actividades
+        const textoCombinado = [
+            ...(asignatura.contenidos || []),
+            ...(asignatura.objetivos || []),
+            ...(asignatura.actividades || [])
+        ].join(' ').toLowerCase();
+        
+        const textoRA = ra.descripcion?.toLowerCase() || ra.toLowerCase();
+        
+        // Coincidencias básicas
+        if (textoCombinado.includes('proyecto') && textoRA.includes('proyecto')) {
+            evidencias.push('Proyecto aplicado');
+        }
+        if (textoCombinado.includes('ejercicio') && textoRA.includes('aplicar')) {
+            evidencias.push('Ejercicios prácticos');
+        }
+        if (textoCombinado.includes('caso') && textoRA.includes('analizar')) {
+            evidencias.push('Estudios de caso');
+        }
+        
+        return evidencias.length > 0 ? evidencias : ['Actividades de aprendizaje'];
+    }
 
-    // ✅ NUEVO: Analizar cumplimiento específico ANECA
+    // === MÉTODOS ANECA FALTANTES ===
+
     static analizarCumplimientoANECA(asignaturas, niveles) {
         return {
             cumpleCriterioB1: asignaturas.length >= 2,
@@ -211,7 +227,6 @@ export class CurriculumCoverage {
         };
     }
 
-    // ✅ NUEVO: Analizar secuencia de progresión
     static analizarSecuenciaProgresion(asignaturas) {
         const cursos = {};
         const problemas = [];
@@ -243,7 +258,6 @@ export class CurriculumCoverage {
         };
     }
 
-    // ✅ NUEVO: Generar evidencias detalladas
     static generarEvidenciasDetalladas(asignaturas, ra) {
         return asignaturas.map(asignatura => ({
             asignatura: asignatura.asignatura,
@@ -254,7 +268,6 @@ export class CurriculumCoverage {
         }));
     }
 
-    // ✅ NUEVO: Calcular distribución de niveles
     static calcularDistribucionNiveles(matriz) {
         const distribucion = { I: 0, D: 0, Dp: 0 };
         
@@ -269,7 +282,6 @@ export class CurriculumCoverage {
         return distribucion;
     }
 
-    // ✅ NUEVO: Evaluar progresión global
     static evaluarProgresionGlobal(matriz) {
         let progresionCorrecta = 0;
         let totalRA = 0;
@@ -288,7 +300,6 @@ export class CurriculumCoverage {
         };
     }
 
-    // ✅ NUEVO: Calcular puntuación ANECA
     static calcularPuntuacionANECA(matriz) {
         let puntuacion = 0;
         const totalRA = matriz.length;
@@ -302,63 +313,12 @@ export class CurriculumCoverage {
         return totalRA > 0 ? (puntuacion / totalRA) : 0;
     }
 
-    // ✅ NUEVO: Generar análisis ANECA completo
     static generarAnalisisANECACompleto(matriz, curriculumData) {
         return {
             criterioB1: this.evaluarCriterioB1(matriz),
             criterioB2: this.evaluarCriterioB2(matriz),
             mapaCurricular: this.generarMapaCurricular(matriz, curriculumData),
             recomendacionesGlobales: this.generarRecomendacionesGlobales(matriz)
-        };
-    }
-
-    // ✅ NUEVO: Métodos auxiliares
-    static sugerirAsignaturasCompatibles(ra, curriculumData) {
-        // Lógica para sugerir asignaturas que podrían cubrir este RA
-        return curriculumData.asignaturas
-            ?.filter(a => this.esAsignaturaCompatible(a, ra))
-            ?.slice(0, 3)
-            ?.map(a => a.nombre) || [];
-    }
-
-    static sugerirAsignaturasDominio(ra, curriculumData) {
-        // Sugerir asignaturas de último curso para dominio
-        return curriculumData.asignaturas
-            ?.filter(a => a.curso === 4 || a.tipo === 'proyecto' || a.tipo === 'tfg')
-            ?.slice(0, 2)
-            ?.map(a => a.nombre) || [];
-    }
-
-    static generarEvidenciasPorNivel(nivel) {
-        const evidencias = {
-            'I': ['Ejercicios básicos', 'Cuestionarios', 'Participación'],
-            'D': ['Casos prácticos', 'Informes', 'Simulaciones'],
-            'Dp': ['Proyectos complejos', 'Investigaciones', 'Defensas']
-        };
-        return evidencias[nivel] || ['Actividades de aprendizaje'];
-    }
-
-    static mapearInstrumentosEvaluacion(nivel) {
-        const instrumentos = {
-            'I': ['Rúbrica básica', 'Lista de cotejo'],
-            'D': ['Rúbrica analítica', 'Escala de valoración'],
-            'Dp': ['Rúbrica compleja', 'Portafolio', 'Evaluación por pares']
-        };
-        return instrumentos[nivel] || ['Instrumento de evaluación'];
-    }
-
-    // 📁 analysis/curriculum-coverage.js - AÑADE AL FINAL
-
-export class CurriculumCoverage {
-    // ... tus métodos existentes ...
-
-    // ✅ AÑADIR MÉTODOS FALTANTES
-    static generarAnalisisANECACompleto(matriz, curriculumData) {
-        return {
-            criterioB1: CurriculumCoverage.evaluarCriterioB1(matriz),
-            criterioB2: CurriculumCoverage.evaluarCriterioB2(matriz),
-            mapaCurricular: CurriculumCoverage.generarMapaCurricular(matriz, curriculumData),
-            recomendacionesGlobales: CurriculumCoverage.generarRecomendacionesGlobales(matriz)
         };
     }
 
@@ -389,8 +349,8 @@ export class CurriculumCoverage {
     static generarMapaCurricular(matriz, curriculumData) {
         return {
             asignaturas: curriculumData.asignaturas?.length || 0,
-            cursos: CurriculumCoverage.obtenerCursos(curriculumData),
-            distribucion: CurriculumCoverage.calcularDistribucionCursos(matriz)
+            cursos: this.obtenerCursos(curriculumData),
+            distribucion: this.calcularDistribucionCursos(matriz)
         };
     }
 
@@ -408,7 +368,8 @@ export class CurriculumCoverage {
         return problemas.length > 0 ? problemas : ["Cumple con los criterios ANECA"];
     }
 
-    // ✅ MÉTODOS AUXILIARES
+    // === MÉTODOS AUXILIARES ===
+
     static obtenerCursos(curriculumData) {
         const cursos = new Set();
         curriculumData.asignaturas?.forEach(asig => {
@@ -428,37 +389,78 @@ export class CurriculumCoverage {
         });
         return distribucion;
     }
-} // ← NO OLVIDES CERRAR LA CLASE SI NO ESTÁ
-    
-    static extraerEvidenciasContribucion(asignatura, ra) {
-    const evidencias = [];
-    
-    // Buscar evidencias en contenidos, objetivos, actividades
-    const textoCombinado = [
-        ...(asignatura.contenidos || []),
-        ...(asignatura.objetivos || []),
-        ...(asignatura.actividades || [])
-    ].join(' ').toLowerCase();
-    
-    const textoRA = ra.descripcion?.toLowerCase() || ra.toLowerCase();
-    
-    // Coincidencias básicas
-    if (textoCombinado.includes('proyecto') && textoRA.includes('proyecto')) {
-        evidencias.push('Proyecto aplicado');
+
+    static sugerirAsignaturasCompatibles(ra, curriculumData) {
+        return curriculumData.asignaturas
+            ?.filter(a => this.esAsignaturaCompatible(a, ra))
+            ?.slice(0, 3)
+            ?.map(a => a.nombre) || [];
     }
-    if (textoCombinado.includes('ejercicio') && textoRA.includes('aplicar')) {
-        evidencias.push('Ejercicios prácticos');
+
+    static sugerirAsignaturasDominio(ra, curriculumData) {
+        return curriculumData.asignaturas
+            ?.filter(a => a.curso === 4 || a.tipo === 'proyecto' || a.tipo === 'tfg')
+            ?.slice(0, 2)
+            ?.map(a => a.nombre) || [];
     }
-    if (textoCombinado.includes('caso') && textoRA.includes('analizar')) {
-        evidencias.push('Estudios de caso');
+
+    static generarEvidenciasPorNivel(nivel) {
+        const evidencias = {
+            'I': ['Ejercicios básicos', 'Cuestionarios', 'Participación'],
+            'D': ['Casos prácticos', 'Informes', 'Simulaciones'],
+            'Dp': ['Proyectos complejos', 'Investigaciones', 'Defensas']
+        };
+        return evidencias[nivel] || ['Actividades de aprendizaje'];
     }
-    
-    return evidencias.length > 0 ? evidencias : ['Actividades de aprendizaje'];
-}
-    
-}
 
+    static mapearInstrumentosEvaluacion(nivel) {
+        const instrumentos = {
+            'I': ['Rúbrica básica', 'Lista de cotejo'],
+            'D': ['Rúbrica analítica', 'Escala de valoración'],
+            'Dp': ['Rúbrica compleja', 'Portafolio', 'Evaluación por pares']
+        };
+        return instrumentos[nivel] || ['Instrumento de evaluación'];
+    }
 
+    static sugerirActividadesPorNivel(nivel) {
+        const actividades = {
+            'I': ['Ejercicios guiados', 'Lecturas básicas', 'Discusiones dirigidas'],
+            'D': ['Casos prácticos', 'Simulaciones', 'Proyectos pequeños'],
+            'Dp': ['Proyectos integradores', 'Investigaciones', 'Defensas públicas']
+        };
+        return actividades[nivel] || ['Actividades de aprendizaje'];
+    }
 
+    static generarRecomendacionesANECA(asignaturas, niveles) {
+        const recomendaciones = [];
+        if (asignaturas.length < 2) {
+            recomendaciones.push('Añadir al menos una asignatura más para cumplir criterio ANECA');
+        }
+        if (!niveles.includes('Dp')) {
+            recomendaciones.push('Incluir asignatura con nivel de dominio (Dp)');
+        }
+        return recomendaciones;
+    }
 
+    static esAsignaturaCompatible(asignatura, ra) {
+        // Lógica básica de compatibilidad
+        const textoAsignatura = [
+            ...(asignatura.contenidos || []),
+            ...(asignatura.objetivos || []),
+            ...(asignatura.competencias || [])
+        ].join(' ').toLowerCase();
+        
+        const textoRA = ra.descripcion?.toLowerCase() || ra.toLowerCase();
+        return this.hayCoincidenciaRA(textoRA, textoAsignatura);
+    }
 
+    static calcularNivelesContribucion(asignaturasQueCubren, ra) {
+        const niveles = [];
+        asignaturasQueCubren.forEach(asignatura => {
+            if (asignatura.nivelContribucion) {
+                niveles.push(asignatura.nivelContribucion);
+            }
+        });
+        return [...new Set(niveles)]; // Eliminar duplicados
+    }
+} // ✅ ÚNICA LLAVE DE CIERRE AL FINAL
