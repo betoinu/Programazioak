@@ -405,7 +405,294 @@ export class AccreditationIndicators {
         
         return totalIndicadores > 0 ? puntuacionTotal / totalIndicadores : 0;
     }
+    // === MÉTODOS DE RECOMENDACIONES PARA CRITERIO A ===
 
+static generarRecomendacionesCompetencias(competencias) {
+    console.log("🎯 Generando recomendaciones para competencias...");
+    
+    const recomendaciones = {
+        fortalezas: [],
+        mejoras: [],
+        criticas: []
+    };
+
+    if (!competencias || competencias.length === 0) {
+        recomendaciones.criticas.push({
+            problema: "No se encontraron competencias definidas",
+            recomendacion: "Definir el perfil de competencias del título"
+        });
+        return recomendaciones;
+    }
+
+    // Analizar claridad de las competencias
+    competencias.forEach((competencia, index) => {
+        const descripcion = competencia.descripcion || competencia.nombre || '';
+        const palabras = descripcion.split(' ').length;
+        
+        // Recomendaciones basadas en longitud y claridad
+        if (palabras < 8) {
+            recomendaciones.mejoras.push({
+                competencia: `Competencia ${index + 1}`,
+                problema: "Descripción demasiado breve",
+                recomendacion: "Ampliar la descripción para mayor claridad"
+            });
+        } else if (palabras > 25) {
+            recomendaciones.mejoras.push({
+                competencia: `Competencia ${index + 1}`,
+                problema: "Descripción demasiado extensa",
+                recomendacion: "Simplificar la redacción para mejor comprensión"
+            });
+        } else {
+            recomendaciones.fortalezas.push({
+                competencia: `Competencia ${index + 1}`,
+                aspecto: "Longitud adecuada de la descripción"
+            });
+        }
+
+        // Verificar verbos de acción
+        const verbosAccion = ['analizar', 'diseñar', 'implementar', 'evaluar', 'crear', 'gestionar', 
+                            'aplicar', 'desarrollar', 'resolver', 'planificar'];
+        const tieneVerboAccion = verbosAccion.some(verbo => 
+            descripcion.toLowerCase().includes(verbo)
+        );
+
+        if (!tieneVerboAccion) {
+            recomendaciones.mejoras.push({
+                competencia: `Competencia ${index + 1}`,
+                problema: "Falta verbo de acción claro",
+                recomendacion: "Incluir verbos de acción medibles (analizar, diseñar, implementar, etc.)"
+            });
+        }
+
+        // Verificar especificidad
+        const palabrasVagas = ['conocer', 'saber', 'entender', 'familiarizarse', 'comprender'];
+        const tienePalabraVaga = palabrasVagas.some(palabra =>
+            descripcion.toLowerCase().includes(palabra)
+        );
+
+        if (tienePalabraVaga) {
+            recomendaciones.criticas.push({
+                competencia: `Competencia ${index + 1}`,
+                problema: "Verbo no medible o muy vago",
+                recomendacion: "Reemplazar por verbos de acción específicos y medibles"
+            });
+        }
+
+        // Verificar contexto y criterios
+        const tieneContexto = descripcion.includes('en ') || descripcion.includes('para ') || 
+                            descripcion.includes('mediante ') || descripcion.includes('utilizando ');
+        
+        if (!tieneContexto) {
+            recomendaciones.mejoras.push({
+                competencia: `Competencia ${index + 1}`,
+                problema: "Falta contexto o criterios de desempeño",
+                recomendacion: "Especificar contexto, condiciones o criterios de evaluación"
+            });
+        }
+    });
+
+    // Análisis de coherencia global
+    const totalCompetencias = competencias.length;
+    const competenciasConProblemas = recomendaciones.mejoras.length + recomendaciones.criticas.length;
+    const porcentajeProblemas = (competenciasConProblemas / totalCompetencias) * 100;
+
+    if (porcentajeProblemas > 50) {
+        recomendaciones.criticas.push({
+            problema: "Alta proporción de competencias con problemas de formulación",
+            recomendacion: "Revisión integral del perfil de competencias del título"
+        });
+    }
+
+    // Recomendación general basada en el análisis
+    if (recomendaciones.fortalezas.length > recomendaciones.mejoras.length + recomendaciones.criticas.length) {
+        recomendaciones.fortalezas.push({
+            aspecto: "Formulación general de competencias",
+            observacion: "La mayoría de competencias están bien formuladas"
+        });
+    }
+
+    return recomendaciones;
+}
+
+// También necesitas estos métodos auxiliares que se llaman:
+
+static generarRecomendacionesRA(matrizCompetenciaRA) {
+    const recomendaciones = [];
+    
+    if (!matrizCompetenciaRA?.competencias) {
+        return [{
+            problema: "No hay datos de resultados de aprendizaje",
+            recomendacion: "Definir los resultados de aprendizaje asociados a las competencias"
+        }];
+    }
+
+    // Analizar RAs por competencia
+    matrizCompetenciaRA.competencias.forEach((competencia, index) => {
+        const ras = competencia.resultadosAprendizaje || [];
+        
+        if (ras.length === 0) {
+            recomendaciones.push({
+                competencia: `Competencia ${index + 1}`,
+                problema: "No tiene resultados de aprendizaje asociados",
+                recomendacion: "Definir al menos 2-3 resultados de aprendizaje medibles"
+            });
+        } else if (ras.length < 2) {
+            recomendaciones.push({
+                competencia: `Competencia ${index + 1}`,
+                problema: "Tiene muy pocos resultados de aprendizaje",
+                recomendacion: "Ampliar a 2-3 resultados de aprendizaje para cubrir diferentes niveles"
+            });
+        }
+
+        // Verificar si los RAs son medibles
+        const rasNoMedibles = ras.filter(ra => !this.esRAMedible(ra.descripcion));
+        if (rasNoMedibles.length > 0) {
+            recomendaciones.push({
+                competencia: `Competencia ${index + 1}`,
+                problema: `${rasNoMedibles.length} RA no son medibles`,
+                recomendacion: "Reformular RAs con verbos de acción observables"
+            });
+        }
+    });
+
+    return recomendaciones;
+}
+
+static generarRecomendacionesCoherenciaVertical(coherenciaVertical) {
+    const recomendaciones = [];
+    
+    if (coherenciaVertical.competenciasSinRA > 0) {
+        recomendaciones.push({
+            problema: `${coherenciaVertical.competenciasSinRA} competencias sin RA asociados`,
+            recomendacion: "Definir resultados de aprendizaje para todas las competencias"
+        });
+    }
+
+    if (coherenciaVertical.porcentajeCoherencia < 80) {
+        recomendaciones.push({
+            problema: "Baja coherencia vertical competencias-RA",
+            recomendacion: "Revisar y mejorar la alineación entre competencias y resultados de aprendizaje"
+        });
+    }
+
+    return recomendaciones.length > 0 ? recomendaciones : [{
+        aspecto: "Coherencia vertical",
+        observacion: "La alineación entre competencias y RA es adecuada"
+    }];
+}
+
+// === MÉTODOS PARA OTROS CRITERIOS ===
+
+static generarRecomendacionesMapeoRA(matrizRAsAsignaturas) {
+    const recomendaciones = [];
+    
+    if (!matrizRAsAsignaturas?.matriz) {
+        return [{
+            problema: "No hay datos de mapeo RA-Asignaturas",
+            recomendacion: "Completar la matriz de relación RA-Asignaturas"
+        }];
+    }
+
+    const raSinCobertura = matrizRAsAsignaturas.matriz.filter(ra => !ra.cumpleMinimoANECA);
+    
+    if (raSinCobertura.length > 0) {
+        recomendaciones.push({
+            problema: `${raSinCobertura.length} RA no cumplen cobertura mínima ANECA`,
+            recomendacion: "Asignar al menos 2 asignaturas por RA"
+        });
+    }
+
+    return recomendaciones;
+}
+
+static generarRecomendacionesSecuencia(matrices) {
+    const secuencia = matrices.raSubject?.analisisSecuencia;
+    const recomendaciones = [];
+    
+    if (!secuencia) {
+        return [{
+            problema: "No se pudo analizar la secuencia de progresión",
+            recomendacion: "Verificar la estructura del mapa curricular"
+        }];
+    }
+
+    if (!secuencia.esValida) {
+        recomendaciones.push({
+            problema: "Problemas en la secuencia de progresión de aprendizajes",
+            recomendacion: "Revisar la distribución de niveles (I → D → Dp) en el plan de estudios"
+        });
+    }
+
+    if (secuencia.brechas && secuencia.brechas.length > 0) {
+        recomendaciones.push({
+            problema: `Se detectaron ${secuencia.brechas.length} brechas en la secuencia`,
+            recomendacion: "Completar la progresión de aprendizajes en las brechas identificadas"
+        });
+    }
+
+    return recomendaciones;
+}
+
+// Métodos de evaluación que también pueden faltar:
+
+static determinarEstadoGeneral(indicadores) {
+    const puntuacionGlobal = this.calcularPuntuacionGlobal(indicadores);
+    
+    if (puntuacionGlobal >= 80) return 'EXCELENTE';
+    if (puntuacionGlobal >= 60) return 'SATISFACTORIO';
+    if (puntuacionGlobal >= 40) return 'MEJORABLE';
+    return 'CRÍTICO';
+}
+
+static identificarFortalezasPrincipales(indicadores) {
+    const fortalezas = [];
+    
+    Object.entries(indicadores).forEach(([criterio, subindicadores]) => {
+        Object.entries(subindicadores).forEach(([codigo, indicador]) => {
+            if (indicador.puntuacion >= 80) {
+                fortalezas.push({
+                    criterio: codigo,
+                    indicador: indicador.indicador,
+                    puntuacion: indicador.puntuacion
+                });
+            }
+        });
+    });
+    
+    return fortalezas;
+}
+
+static identificarDebilidadesCriticas(indicadores) {
+    const debilidades = [];
+    
+    Object.entries(indicadores).forEach(([criterio, subindicadores]) => {
+        Object.entries(subindicadores).forEach(([codigo, indicador]) => {
+            if (indicador.puntuacion < 60) {
+                debilidades.push({
+                    criterio: codigo,
+                    indicador: indicador.indicador,
+                    puntuacion: indicador.puntuacion,
+                    estado: indicador.estado
+                });
+            }
+        });
+    });
+    
+    return debilidades;
+}
+
+static establecerPrioridadesAccion(indicadores) {
+    const debilidades = this.identificarDebilidadesCriticas(indicadores);
+    
+    return debilidades.map(debilidad => ({
+        prioridad: debilidad.puntuacion < 40 ? 'ALTA' : 'MEDIA',
+        area: debilidad.criterio,
+        accion: `Mejorar ${debilidad.indicador.toLowerCase()}`,
+        plazo: debilidad.puntuacion < 40 ? '3 meses' : '6 meses',
+        responsable: 'Coordinación de titulación'
+    }));
+}
+    
     // === MÉTODOS DE FECHA Y TEMPORALIDAD ===
     static calcularFechaProximaEvaluacion() {
         const fecha = new Date();
@@ -414,3 +701,4 @@ export class AccreditationIndicators {
     }
 
 }
+
