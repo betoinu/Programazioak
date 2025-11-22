@@ -809,7 +809,509 @@ static generarRecomendacionesDominio(matrizRAsAsignaturas) {
     
     return recomendaciones;
 }
+// === MÉTODOS PARA CRITERIO C: EVALUACIÓN ===
 
+static evaluarExistenciaRubricas(curriculumData) {
+    console.log("🔍 Evaluando existencia de rúbricas...");
+    
+    const tieneRubricas = curriculumData.rubricas || curriculumData.instrumentosEvaluacion?.some(instr => 
+        instr.tipo === 'rúbrica' || instr.tipo === 'rubrica'
+    );
+    
+    return tieneRubricas ? 'CUMPLE_TOTALMENTE' : 'NO_CUMPLE';
+}
+
+static identificarInstrumentosEvaluacion(matrices) {
+    console.log("🔍 Identificando instrumentos de evaluación...");
+    
+    const instrumentos = [];
+    
+    // Buscar en las matrices de competencias
+    if (matrices.competenciaRA?.competencias) {
+        matrices.competenciaRA.competencias.forEach(comp => {
+            if (comp.instrumentosEvaluacion) {
+                instrumentos.push(...comp.instrumentosEvaluacion);
+            }
+        });
+    }
+    
+    // Instrumentos comunes por defecto
+    const instrumentosDefault = [
+        'exámenes escritos', 'trabajos prácticos', 'proyectos', 'presentaciones orales',
+        'portafolios', 'evaluaciones continuas', 'rúbricas', 'listas de cotejo'
+    ];
+    
+    return instrumentos.length > 0 ? instrumentos : instrumentosDefault;
+}
+
+static calcularCoberturaRubricas(curriculumData) {
+    const competencias = curriculumData.competencias || [];
+    const rubricas = curriculumData.rubricas || [];
+    
+    if (competencias.length === 0) return 0;
+    
+    const competenciasConRubrica = competencias.filter(comp => 
+        rubricas.some(rub => rub.competenciaId === comp.id)
+    ).length;
+    
+    return (competenciasConRubrica / competencias.length) * 100;
+}
+
+static calcularPuntuacionRubricas(curriculumData) {
+    return this.calcularCoberturaRubricas(curriculumData);
+}
+
+static generarRecomendacionesRubricas(curriculumData) {
+    const cobertura = this.calcularCoberturaRubricas(curriculumData);
+    const recomendaciones = [];
+    
+    if (cobertura === 0) {
+        recomendaciones.push({
+            problema: "No hay rúbricas definidas para las competencias",
+            recomendacion: "Desarrollar rúbricas de evaluación para todas las competencias",
+            prioridad: "ALTA"
+        });
+    } else if (cobertura < 100) {
+        recomendaciones.push({
+            problema: `Solo ${Math.round(cobertura)}% de las competencias tienen rúbricas`,
+            recomendacion: "Completar las rúbricas para todas las competencias",
+            prioridad: "MEDIA"
+        });
+    }
+    
+    return recomendaciones;
+}
+
+static evaluarEvaluacionEvidencias(curriculumData) {
+    console.log("🔍 Evaluando evaluación basada en evidencias...");
+    
+    const evidencias = curriculumData.tiposEvidencias || [];
+    const tieneEvidenciasComplejas = evidencias.some(ev => 
+        ['portafolio', 'proyecto', 'práctica profesional', 'caso real'].includes(ev.toLowerCase())
+    );
+    
+    return tieneEvidenciasComplejas ? 'CUMPLE_TOTALMENTE' : 'CUMPLE_PARCIALMENTE';
+}
+
+static identificarTiposEvidencias(matrices) {
+    const evidencias = new Set();
+    
+    // Buscar en datos de asignaturas
+    if (matrices.raSubject?.asignaturas) {
+        matrices.raSubject.asignaturas.forEach(asig => {
+            if (asig.evidencias) {
+                asig.evidencias.forEach(ev => evidencias.add(ev));
+            }
+        });
+    }
+    
+    // Evidencias por defecto
+    const evidenciasDefault = [
+        'exámenes', 'trabajos', 'proyectos', 'presentaciones', 
+        'portafolios', 'prácticas', 'informes'
+    ];
+    
+    return Array.from(evidencias).length > 0 ? Array.from(evidencias) : evidenciasDefault;
+}
+
+static identificarProyectosIntegradores(curriculumData) {
+    const proyectos = curriculumData.asignaturas?.filter(asig => 
+        asig.tipo === 'proyecto' || 
+        asig.nombre?.toLowerCase().includes('proyecto') ||
+        asig.nombre?.toLowerCase().includes('tfg') ||
+        asig.nombre?.toLowerCase().includes('trabajo fin')
+    ) || [];
+    
+    return proyectos;
+}
+
+static verificarPracticasProfesionales(curriculumData) {
+    const tienePracticas = curriculumData.asignaturas?.some(asig => 
+        asig.tipo === 'práctica' || 
+        asig.nombre?.toLowerCase().includes('práctica') ||
+        asig.nombre?.toLowerCase().includes('practicum')
+    );
+    
+    return tienePracticas;
+}
+
+static calcularPuntuacionEvidencias(curriculumData) {
+    let puntuacion = 0;
+    
+    // Puntos por tipos de evidencias
+    const evidencias = this.identificarTiposEvidencias({});
+    const proyectos = this.identificarProyectosIntegradores(curriculumData);
+    const tienePracticas = this.verificarPracticasProfesionales(curriculumData);
+    
+    if (evidencias.length >= 5) puntuacion += 40;
+    else if (evidencias.length >= 3) puntuacion += 25;
+    
+    if (proyectos.length > 0) puntuacion += 30;
+    if (tienePracticas) puntuacion += 30;
+    
+    return Math.min(puntuacion, 100);
+}
+
+static generarRecomendacionesEvidencias(curriculumData) {
+    const recomendaciones = [];
+    const proyectos = this.identificarProyectosIntegradores(curriculumData);
+    const tienePracticas = this.verificarPracticasProfesionales(curriculumData);
+    
+    if (proyectos.length === 0) {
+        recomendaciones.push({
+            problema: "No hay proyectos integradores identificados",
+            recomendacion: "Incluir proyectos que integren múltiples competencias",
+            prioridad: "ALTA"
+        });
+    }
+    
+    if (!tienePracticas) {
+        recomendaciones.push({
+            problema: "No hay prácticas profesionales definidas",
+            recomendacion: "Incorporar prácticas profesionales en el plan de estudios",
+            prioridad: "MEDIA"
+        });
+    }
+    
+    return recomendaciones;
+}
+
+static evaluarDiversidadInstrumentos(matrices) {
+    const instrumentos = this.identificarInstrumentosEvaluacion(matrices);
+    
+    if (instrumentos.length >= 6) return 'CUMPLE_TOTALMENTE';
+    if (instrumentos.length >= 4) return 'CUMPLE_PARCIALMENTE';
+    return 'NO_CUMPLE';
+}
+
+static contarInstrumentosPorCompetencia(matrices) {
+    const conteo = {};
+    
+    if (matrices.competenciaRA?.competencias) {
+        matrices.competenciaRA.competencias.forEach(comp => {
+            const instrumentos = comp.instrumentosEvaluacion || ['examen escrito', 'trabajo práctico'];
+            conteo[comp.nombre || `Competencia ${comp.id}`] = instrumentos.length;
+        });
+    }
+    
+    return conteo;
+}
+
+static calcularVariedadInstrumentos(matrices) {
+    const instrumentos = this.identificarInstrumentosEvaluacion(matrices);
+    return instrumentos.length;
+}
+
+static calcularCoberturaInstrumentos(matrices) {
+    const instrumentosPorCompetencia = this.contarInstrumentosPorCompetencia(matrices);
+    const valores = Object.values(instrumentosPorCompetencia);
+    
+    if (valores.length === 0) return 0;
+    
+    const promedio = valores.reduce((sum, val) => sum + val, 0) / valores.length;
+    return Math.min((promedio / 3) * 100, 100); // Meta: 3 instrumentos por competencia
+}
+
+static calcularPuntuacionInstrumentos(matrices) {
+    const variedad = this.calcularVariedadInstrumentos(matrices);
+    const cobertura = this.calcularCoberturaInstrumentos(matrices);
+    
+    return (variedad * 0.4 + cobertura * 0.6);
+}
+
+static generarRecomendacionesInstrumentos(matrices) {
+    const recomendaciones = [];
+    const variedad = this.calcularVariedadInstrumentos(matrices);
+    const cobertura = this.calcularCoberturaInstrumentos(matrices);
+    
+    if (variedad < 4) {
+        recomendaciones.push({
+            problema: "Baja variedad de instrumentos de evaluación",
+            recomendacion: "Diversificar los métodos de evaluación (rúbricas, portafolios, proyectos, etc.)",
+            prioridad: "MEDIA"
+        });
+    }
+    
+    if (cobertura < 60) {
+        recomendaciones.push({
+            problema: "Cobertura insuficiente de instrumentos por competencia",
+            recomendacion: "Asignar al menos 2-3 instrumentos diferentes por competencia",
+            prioridad: "MEDIA"
+        });
+    }
+    
+    return recomendaciones;
+}
+
+// === MÉTODOS PARA CRITERIO D: MEJORA CONTINUA ===
+
+static evaluarPlanMejora(curriculumData) {
+    const tienePlan = curriculumData.planesMejora && curriculumData.planesMejora.length > 0;
+    return tienePlan ? 'CUMPLE_TOTALMENTE' : 'NO_CUMPLE';
+}
+
+static identificarPlanesMejora(curriculumData) {
+    return curriculumData.planesMejora || [];
+}
+
+static identificarAccionesMejora(curriculumData) {
+    const acciones = [];
+    
+    if (curriculumData.planesMejora) {
+        curriculumData.planesMejora.forEach(plan => {
+            if (plan.acciones) {
+                acciones.push(...plan.acciones);
+            }
+        });
+    }
+    
+    return acciones;
+}
+
+static calcularPuntuacionMejora(curriculumData) {
+    const planes = this.identificarPlanesMejora(curriculumData);
+    const acciones = this.identificarAccionesMejora(curriculumData);
+    
+    let puntuacion = 0;
+    
+    if (planes.length > 0) puntuacion += 40;
+    if (acciones.length >= 3) puntuacion += 30;
+    if (curriculumData.informesSeguimiento) puntuacion += 30;
+    
+    return puntuacion;
+}
+
+static generarRecomendacionesMejora(curriculumData) {
+    const recomendaciones = [];
+    const planes = this.identificarPlanesMejora(curriculumData);
+    
+    if (planes.length === 0) {
+        recomendaciones.push({
+            problema: "No hay plan de mejora documentado",
+            recomendacion: "Elaborar e implementar un plan de mejora continua",
+            prioridad: "ALTA"
+        });
+    }
+    
+    return recomendaciones;
+}
+
+static evaluarParticipacionStakeholders(curriculumData) {
+    const mecanismos = this.identificarMecanismosParticipacion(curriculumData);
+    return mecanismos.length >= 2 ? 'CUMPLE_TOTALMENTE' : 'CUMPLE_PARCIALMENTE';
+}
+
+static verificarEncuestasStakeholders(curriculumData) {
+    const tieneEncuestas = curriculumData.encuestas && (
+        curriculumData.encuestas.estudiantes ||
+        curriculumData.encuestas.egresados ||
+        curriculumData.encuestas.empleadores
+    );
+    
+    return tieneEncuestas;
+}
+
+static identificarMecanismosParticipacion(curriculumData) {
+    const mecanismos = [];
+    
+    if (curriculumData.comisiones?.academica) mecanismos.push('Comisión Académica');
+    if (curriculumData.comisiones?.seguimiento) mecanismos.push('Comisión de Seguimiento');
+    if (curriculumData.encuestas?.estudiantes) mecanismos.push('Encuestas a Estudiantes');
+    if (curriculumData.encuestas?.egresados) mecanismos.push('Encuestas a Egresados');
+    if (curriculumData.encuestas?.empleadores) mecanismos.push('Encuestas a Empleadores');
+    
+    return mecanismos.length > 0 ? mecanismos : ['Encuestas a estudiantes'];
+}
+
+static calcularPuntuacionStakeholders(curriculumData) {
+    let puntuacion = 0;
+    const mecanismos = this.identificarMecanismosParticipacion(curriculumData);
+    const tieneEncuestas = this.verificarEncuestasStakeholders(curriculumData);
+    
+    if (mecanismos.length >= 3) puntuacion += 40;
+    else if (mecanismos.length >= 2) puntuacion += 25;
+    
+    if (tieneEncuestas) puntuacion += 30;
+    if (curriculumData.informesStakeholders) puntuacion += 30;
+    
+    return Math.min(puntuacion, 100);
+}
+
+static generarRecomendacionesStakeholders(curriculumData) {
+    const recomendaciones = [];
+    const mecanismos = this.identificarMecanismosParticipacion(curriculumData);
+    
+    if (mecanismos.length < 2) {
+        recomendaciones.push({
+            problema: "Participación limitada de stakeholders",
+            recomendacion: "Establecer mecanismos de participación para estudiantes, egresados y empleadores",
+            prioridad: "MEDIA"
+        });
+    }
+    
+    if (!this.verificarEncuestasStakeholders(curriculumData)) {
+        recomendaciones.push({
+            problema: "No hay sistema de encuestas a stakeholders",
+            recomendacion: "Implementar encuestas periódicas a estudiantes, egresados y empleadores",
+            prioridad: "MEDIA"
+        });
+    }
+    
+    return recomendaciones;
+}
+
+static evaluarSeguimientoEgresados(curriculumData) {
+    const tieneSistema = this.verificarSistemaSeguimiento(curriculumData);
+    return tieneSistema ? 'CUMPLE_PARCIALMENTE' : 'NO_CUMPLE';
+}
+
+static verificarSistemaSeguimiento(curriculumData) {
+    return !!(curriculumData.seguimientoEgresados || curriculumData.encuestas?.egresados);
+}
+
+static identificarInformesSeguimiento(curriculumData) {
+    return curriculumData.informesSeguimiento || [];
+}
+
+static identificarIndicadoresDesempeno(curriculumData) {
+    const indicadores = [];
+    
+    if (curriculumData.indicadores) {
+        indicadores.push(...curriculumData.indicadores);
+    }
+    
+    // Indicadores por defecto
+    if (indicadores.length === 0) {
+        indicadores.push(
+            'Tasa de empleabilidad',
+            'Tiempo para primer empleo',
+            'Satisfacción laboral',
+            'Coherencia formación-empleo'
+        );
+    }
+    
+    return indicadores;
+}
+
+static calcularPuntuacionSeguimiento(curriculumData) {
+    let puntuacion = 0;
+    
+    if (this.verificarSistemaSeguimiento(curriculumData)) puntuacion += 40;
+    if (this.identificarInformesSeguimiento(curriculumData).length > 0) puntuacion += 30;
+    if (this.identificarIndicadoresDesempeno(curriculumData).length >= 3) puntuacion += 30;
+    
+    return puntuacion;
+}
+
+static generarRecomendacionesSeguimiento(curriculumData) {
+    const recomendaciones = [];
+    
+    if (!this.verificarSistemaSeguimiento(curriculumData)) {
+        recomendaciones.push({
+            problema: "No hay sistema de seguimiento de egresados",
+            recomendacion: "Implementar sistema de seguimiento de egresados con indicadores de desempeño",
+            prioridad: "MEDIA"
+        });
+    }
+    
+    return recomendaciones;
+}
+// === MÉTODOS DE RESUMEN EJECUTIVO ===
+
+static generarResumenEjecutivo(curriculumData, matrices) {
+    const indicadores = this.generarReporteAcreditacionCompleto(curriculumData, matrices).indicadores;
+    
+    return {
+        puntuacionGlobal: this.calcularPuntuacionGlobal(indicadores),
+        estadoGeneral: this.determinarEstadoGeneral(indicadores),
+        fortalezasPrincipales: this.identificarFortalezasPrincipales(indicadores),
+        debilidadesCriticas: this.identificarDebilidadesCriticas(indicadores),
+        prioridadesAccion: this.establecerPrioridadesAccion(indicadores),
+        fechaGeneracion: new Date().toISOString()
+    };
+}
+
+static calcularCumplimientoGlobal() {
+    return {
+        puntuacionTotal: 0, // Se calculará dinámicamente
+        nivelCumplimiento: 'EN_PROCESO',
+        criteriosCumplidos: 0,
+        criteriosPendientes: 0,
+        fechaProximaEvaluacion: this.calcularFechaProximaEvaluacion()
+    };
+}
+
+static determinarEstadoGeneral(indicadores) {
+    const puntuacionGlobal = this.calcularPuntuacionGlobal(indicadores);
+    
+    if (puntuacionGlobal >= 80) return 'EXCELENTE';
+    if (puntuacionGlobal >= 60) return 'SATISFACTORIO';
+    if (puntuacionGlobal >= 40) return 'MEJORABLE';
+    return 'CRÍTICO';
+}
+
+static identificarFortalezasPrincipales(indicadores) {
+    const fortalezas = [];
+    
+    Object.entries(indicadores).forEach(([criterio, subindicadores]) => {
+        Object.entries(subindicadores).forEach(([codigo, indicador]) => {
+            if (indicador.puntuacion >= 80) {
+                fortalezas.push({
+                    criterio: codigo,
+                    indicador: indicador.indicador,
+                    puntuacion: indicador.puntuacion
+                });
+            }
+        });
+    });
+    
+    return fortalezas;
+}
+
+static identificarDebilidadesCriticas(indicadores) {
+    const debilidades = [];
+    
+    Object.entries(indicadores).forEach(([criterio, subindicadores]) => {
+        Object.entries(subindicadores).forEach(([codigo, indicador]) => {
+            if (indicador.puntuacion < 60) {
+                debilidades.push({
+                    criterio: codigo,
+                    indicador: indicador.indicador,
+                    puntuacion: indicador.puntuacion,
+                    estado: indicador.estado
+                });
+            }
+        });
+    });
+    
+    return debilidades;
+}
+
+static establecerPrioridadesAccion(indicadores) {
+    const debilidades = this.identificarDebilidadesCriticas(indicadores);
+    
+    return debilidades.map(debilidad => ({
+        prioridad: debilidad.puntuacion < 40 ? 'ALTA' : 'MEDIA',
+        area: debilidad.criterio,
+        accion: `Mejorar ${debilidad.indicador.toLowerCase()}`,
+        plazo: debilidad.puntuacion < 40 ? '3 meses' : '6 meses',
+        responsable: 'Coordinación de titulación'
+    }));
+}
+
+static calcularPuntuacionGlobal(indicadores) {
+    let puntuacionTotal = 0;
+    let totalIndicadores = 0;
+    
+    Object.values(indicadores).forEach(criterio => {
+        Object.values(criterio).forEach(indicador => {
+            puntuacionTotal += indicador.puntuacion || 0;
+            totalIndicadores++;
+        });
+    });
+    
+    return totalIndicadores > 0 ? puntuacionTotal / totalIndicadores : 0;
+}   
 // Continúa con los demás métodos faltantes...  
     
     // === MÉTODOS DE FECHA Y TEMPORALIDAD ===
@@ -820,5 +1322,6 @@ static generarRecomendacionesDominio(matrizRAsAsignaturas) {
     }
 
 }
+
 
 
