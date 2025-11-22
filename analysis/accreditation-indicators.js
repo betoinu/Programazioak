@@ -55,7 +55,7 @@ export class AccreditationIndicators {
                 evidencias: {
                     documento: "Plan de estudios oficial",
                     matriz: "Matriz Competencias-RA",
-                    metricas: this.calcularMetricasCompetencias(competencias)
+                    metricas: CompetenceMapper.calcularMetricasCompetencias(competencias),
                 },
                 puntuacion: this.calcularPuntuacionCompetencias(competencias),
                 recomendaciones: this.generarRecomendacionesCompetencias(competencias)
@@ -412,4 +412,5 @@ export class AccreditationIndicators {
         fecha.setMonth(fecha.getMonth() + 6); // 6 meses desde ahora
         return fecha.toISOString().split('T')[0];
     }
+
 }
