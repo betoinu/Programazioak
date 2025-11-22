@@ -387,7 +387,145 @@ export class ContentAlignment {
             areasMejora: this.identificarAreasMejoraAlineacion(matriz)
         };
     }
+    static calcularDistribucionNiveles(matriz) {
+        const distribucion = { I: 0, D: 0, Dp: 0 };
+        
+        matriz.forEach(item => {
+            if (distribucion[item.nivelContribucion] !== undefined) {
+                distribucion[item.nivelContribucion]++;
+            }
+        });
+        
+        return distribucion;
+    }
 
+    static calcularCoberturaRA(matriz) {
+        const todosRAs = new Set();
+        const niveles = { I: 0, D: 0, Dp: 0 };
+        
+        matriz.forEach(item => {
+            item.RAsRelacionados.forEach(ra => {
+                todosRAs.add(ra.codigo || ra.ra);
+            });
+            if (niveles[item.nivelContribucion] !== undefined) {
+                niveles[item.nivelContribucion]++;
+            }
+        });
+        
+        return {
+            totalRAsUnicos: todosRAs.size,
+            distribucionNiveles: niveles,
+            coberturaPorNivel: this.calcularCoberturaPorNivel(niveles)
+        };
+    }
+
+    static calcularCoberturaPorNivel(niveles) {
+        const total = niveles.I + niveles.D + niveles.Dp;
+        if (total === 0) return { I: 0, D: 0, Dp: 0 };
+        
+        return {
+            I: (niveles.I / total) * 100,
+            D: (niveles.D / total) * 100,
+            Dp: (niveles.Dp / total) * 100
+        };
+    }
+
+    static identificarFortalezasAlineacion(matriz) {
+        const fortalezas = [];
+        const metricas = this.calcularMetricasAdecuacion(matriz);
+        
+        if (metricas.porcentajeAdecuacion > 80) {
+            fortalezas.push("Alta alineación general entre contenidos y RA");
+        }
+        
+        if (metricas.relacionPromedio > 0.6) {
+            fortalezas.push("Fuerza de relación contenidos-RA adecuada");
+        }
+        
+        const distribucion = this.calcularDistribucionNiveles(matriz);
+        if (distribucion.Dp > 0) {
+            fortalezas.push("Presencia de contenidos de nivel dominio (Dp)");
+        }
+        
+        return fortalezas.length > 0 ? fortalezas : ["Alineación básica establecida"];
+    }
+
+    static identificarAreasMejoraAlineacion(matriz) {
+        const areasMejora = [];
+        const metricas = this.calcularMetricasAdecuacion(matriz);
+        
+        if (metricas.contenidosDesalineados > 0) {
+            areasMejora.push(`${metricas.contenidosDesalineados} contenidos sin relación con RA`);
+        }
+        
+        if (metricas.porcentajeAdecuacion < 70) {
+            areasMejora.push("Baja alineación general contenidos-RA");
+        }
+        
+        const distribucion = this.calcularDistribucionNiveles(matriz);
+        if (distribucion.Dp === 0) {
+            areasMejora.push("Faltan contenidos de nivel dominio (Dp)");
+        }
+        
+        return areasMejora.length > 0 ? areasMejora : ["Alineación adecuada en todas las áreas"];
+    }
+
+    // ✅ MÉTODOS AUXILIARES ADICIONALES QUE PUEDEN FALTAR
+    static analizarEquilibrioTipos(contenidos) {
+        const tipos = { TEÓRICO: 0, PRÁCTICO: 0, APLICADO: 0, SEMINARIO: 0 };
+        contenidos.forEach(c => {
+            tipos[c.tipo] = (tipos[c.tipo] || 0) + 1;
+        });
+        
+        const total = contenidos.length;
+        const max = Math.max(...Object.values(tipos));
+        const min = Math.min(...Object.values(tipos));
+        
+        return {
+            ...tipos,
+            balanceado: (max - min) <= Math.ceil(total * 0.3),
+            recomendacion: this.generarRecomendacionTiposContenidos(tipos)
+        };
+    }
+
+    static generarRecomendacionTiposContenidos(tipos) {
+        if (tipos.TEÓRICO === 0) return 'Incluir contenidos teóricos';
+        if (tipos.PRÁCTICO === 0) return 'Incorporar contenidos prácticos';
+        if (tipos.APLICADO === 0) return 'Añadir contenidos aplicados';
+        if (tipos.SEMINARIO === 0) return 'Considerar contenidos tipo seminario';
+        return 'Distribución adecuada de tipos';
+    }
+
+    static validarSecuenciaContenidos(contenidos) {
+        let secuenciaValida = true;
+        for (let i = 0; i < contenidos.length - 1; i++) {
+            const actual = contenidos[i];
+            const siguiente = contenidos[i + 1];
+            
+            // Validar progresión I → D → Dp
+            const niveles = { 'I': 1, 'D': 2, 'Dp': 3 };
+            if (niveles[actual.nivel] > niveles[siguiente.nivel]) {
+                secuenciaValida = false;
+                break;
+            }
+        }
+        return secuenciaValida;
+    }
+
+    static contarRAsAsignatura(asignatura) {
+        return asignatura.resultadosAprendizaje?.length || 0;
+    }
+
+    static contarRAsCubiertos(contenidos) {
+        const rasUnicos = new Set();
+        contenidos.forEach(contenido => {
+            contenido.rasAsociados.forEach(ra => {
+                rasUnicos.add(ra.codigo);
+            });
+        });
+        return rasUnicos.size;
+    }
+    
     static evaluarCumplimientoANECA(matriz) {
         const metricas = this.calcularMetricasAdecuacion(matriz);
         const puntuacion = metricas.porcentajeAdecuacion;
@@ -403,5 +541,6 @@ export class ContentAlignment {
         };
     }
 }
+
 
 
