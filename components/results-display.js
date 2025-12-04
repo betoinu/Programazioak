@@ -254,70 +254,291 @@ export class ResultsDisplay {
     }
 
     // ✅ NUEVO: Métodos para mostrar matrices individuales
+    // En ResultsDisplay, añade estos métodos:
+
     static mostrarMatriz1() {
         this.cambiarPestana('matriz1');
         const container = document.getElementById('aneca-matriz1');
+        if (!container) {
+            console.error("❌ Contenedor aneca-matriz1 no encontrado");
+            return;
+        }
         
-        if (window.anecaResults?.matrices?.competenciasRA && window.MatrixDisplay) {
-            // Asegúrate de que MatrixDisplay tenga el método correcto
-            if (MatrixDisplay.mostrarMatrizCompetenciasRA) {
-                MatrixDisplay.mostrarMatrizCompetenciasRA(
-                    window.anecaResults.matrices.competenciasRA, 
-                    'aneca-matriz1'
-                );
-            } else {
-                container.innerHTML = this.generarMatrizSimple(
-                    window.anecaResults.matrices.competenciasRA,
-                    'Matriz 1: Competencias - RA'
-                );
-            }
-        } else {
+        if (!window.anecaResults?.matrices?.competenciasRA) {
             container.innerHTML = '<p>❌ No hay datos de matriz disponibles</p>';
+            return;
+        }
+        
+        // Intentar usar MatrixDisplay si existe
+        if (window.MatrixDisplay?.mostrarMatrizCompetenciasRA) {
+            MatrixDisplay.mostrarMatrizCompetenciasRA(
+                window.anecaResults.matrices.competenciasRA, 
+                'aneca-matriz1'
+            );
+        } else {
+            // Fallback: mostrar matriz simple
+            container.innerHTML = this.generarMatrizCompetenciasRA(
+                window.anecaResults.matrices.competenciasRA
+            );
         }
     }
-
-    static generarMatrizSimple(datosMatriz, titulo) {
-        if (!datosMatriz?.competencias) return '<p>No hay datos de matriz</p>';
-        
-        let html = `<h3>${titulo}</h3><div class="matrix-container">`;
-        
-        datosMatriz.competencias.forEach(competencia => {
-            html += `
-                <div class="matrix-row">
-                    <div class="competence-cell"><strong>${competencia.nombre}</strong></div>
-                    <div class="ra-cell">${competencia.RAs?.length || 0} RAs</div>
-                </div>
-            `;
-        });
-        
-        html += '</div>';
-        return html;
-    }
-
+    
     static mostrarMatriz2() {
         this.cambiarPestana('matriz2');
         const container = document.getElementById('aneca-matriz2');
-        if (window.anecaResults && window.MatrixDisplay) {
-            MatrixDisplay.mostrarMatrizRAsignaturas(window.anecaResults.matrices.RAsignaturas, 'aneca-matriz2');
+        if (!container) return;
+        
+        if (!window.anecaResults?.matrices?.RAsignaturas) {
+            container.innerHTML = '<p>❌ No hay datos de matriz RA-Asignaturas</p>';
+            return;
+        }
+        
+        if (window.MatrixDisplay?.mostrarMatrizRAsignaturas) {
+            MatrixDisplay.mostrarMatrizRAsignaturas(
+                window.anecaResults.matrices.RAsignaturas,
+                'aneca-matriz2'
+            );
+        } else {
+            container.innerHTML = this.generarMatrizRAsignaturas(
+                window.anecaResults.matrices.RAsignaturas
+            );
         }
     }
-
+    
     static mostrarMatriz3() {
         this.cambiarPestana('matriz3');
         const container = document.getElementById('aneca-matriz3');
-        if (window.anecaResults && window.MatrixDisplay) {
-            MatrixDisplay.mostrarMatrizCompetenciasAsignaturas(window.anecaResults.matrices.competenciasAsignaturas, 'aneca-matriz3');
+        if (!container) return;
+        
+        if (!window.anecaResults?.matrices?.competenciasAsignaturas) {
+            container.innerHTML = '<p>❌ No hay datos de matriz Competencias-Asignaturas</p>';
+            return;
+        }
+        
+        if (window.MatrixDisplay?.mostrarMatrizCompetenciasAsignaturas) {
+            MatrixDisplay.mostrarMatrizCompetenciasAsignaturas(
+                window.anecaResults.matrices.competenciasAsignaturas,
+                'aneca-matriz3'
+            );
+        } else {
+            container.innerHTML = this.generarMatrizCompetenciasAsignaturas(
+                window.anecaResults.matrices.competenciasAsignaturas
+            );
         }
     }
-
+    
     static mostrarMatriz4() {
         this.cambiarPestana('matriz4');
         const container = document.getElementById('aneca-matriz4');
-        if (window.anecaResults && window.MatrixDisplay) {
-            MatrixDisplay.mostrarMatrizContenidosRA(window.anecaResults.matrices.contenidosRA, 'aneca-matriz4');
+        if (!container) return;
+        
+        if (!window.anecaResults?.matrices?.contenidosRA) {
+            container.innerHTML = '<p>❌ No hay datos de matriz Contenidos-RA</p>';
+            return;
+        }
+        
+        if (window.MatrixDisplay?.mostrarMatrizContenidosRA) {
+            MatrixDisplay.mostrarMatrizContenidosRA(
+                window.anecaResults.matrices.contenidosRA,
+                'aneca-matriz4'
+            );
+        } else {
+            container.innerHTML = this.generarMatrizContenidosRA(
+                window.anecaResults.matrices.contenidosRA
+            );
         }
     }
 
+    // Métodos auxiliares para generar matrices cuando MatrixDisplay no funciona
+    static generarMatrizCompetenciasRA(datosMatriz) {
+        if (!datosMatriz?.competencias) return '<p>No hay datos de competencias</p>';
+        
+        let html = `
+            <div class="matrix-header">
+                <h3>🔗 Matriz 1: Competencias - Resultados de Aprendizaje</h3>
+                <div class="matrix-stats">
+                    <span>${datosMatriz.competencias.length} competencias</span>
+                    <span>${datosMatriz.metricas?.totalRAs || 0} resultados de aprendizaje</span>
+                </div>
+            </div>
+            <div class="matrix-table-container">
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th>Competencia</th>
+                            <th>ID</th>
+                            <th>RAs</th>
+                            <th>Ámbito</th>
+                            <th>Nivel Bloom</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        datosMatriz.competencias.forEach(comp => {
+            html += `
+                <tr>
+                    <td><strong>${comp.nombre || 'Sin nombre'}</strong></td>
+                    <td><code>${comp.id || 'N/A'}</code></td>
+                    <td>${comp.RAs?.length || 0}</td>
+                    <td><span class="ambito-tag">${comp.ambito || 'General'}</span></td>
+                    <td>${comp.nivelBloom?.nivel || 'N/A'} (${comp.nivelBloom?.porcentaje || 0}%)</td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+        
+        return html;
+    }
+    
+    static generarMatrizRAsignaturas(datosMatriz) {
+        if (!datosMatriz?.matriz) return '<p>No hay datos de matriz RA-Asignaturas</p>';
+        
+        let html = `
+            <div class="matrix-header">
+                <h3>📚 Matriz 2: Resultados de Aprendizaje - Asignaturas</h3>
+                <div class="matrix-stats">
+                    <span>${datosMatriz.metricas?.totalRAs || datosMatriz.matriz.length} RAs</span>
+                    <span>${datosMatriz.metricas?.totalAsignaturas || '?'} asignaturas</span>
+                </div>
+            </div>
+        `;
+        
+        // Mostrar solo los primeros 10 RAs para no sobrecargar
+        const mostrarLimitado = datosMatriz.matriz.slice(0, 10);
+        
+        html += '<div class="matrix-table-container"><table class="matrix-table"><thead><tr><th>RA</th><th>Descripción</th><th>Asignaturas</th><th>Total</th></tr></thead><tbody>';
+        
+        mostrarLimitado.forEach(item => {
+            const asignaturasCount = item.asignaturas?.length || 0;
+            html += `
+                <tr>
+                    <td><code>${item.codigoRA || 'N/A'}</code></td>
+                    <td>${item.descripcionRA?.substring(0, 100) || 'Sin descripción'}...</td>
+                    <td>
+                        ${asignaturasCount > 0 
+                            ? `<div class="asignaturas-list">${item.asignaturas?.map(a => 
+                                `<span class="asignatura-tag">${a.codigo || a.nombre || 'N/A'}</span>`
+                            ).join('')}</div>`
+                            : '<span class="no-data">No asignado</span>'
+                        }
+                    </td>
+                    <td>${asignaturasCount}</td>
+                </tr>
+            `;
+        });
+        
+        html += '</tbody></table></div>';
+        
+        if (datosMatriz.matriz.length > 10) {
+            html += `<p class="matrix-notice">Mostrando 10 de ${datosMatriz.matriz.length} RAs. Usa la búsqueda para ver más.</p>`;
+        }
+        
+        return html;
+    }
+    
+    static generarMatrizCompetenciasAsignaturas(datosMatriz) {
+        if (!datosMatriz?.matriz) return '<p>No hay datos de matriz Competencias-Asignaturas</p>';
+        
+        let html = `
+            <div class="matrix-header">
+                <h3>🔄 Matriz 3: Competencias - Asignaturas</h3>
+            </div>
+            <div class="matrix-table-container">
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th>Competencia</th>
+                            <th>Asignaturas</th>
+                            <th>Cobertura</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        // Asegurar que datosMatriz.matriz es un array
+        const matriz = Array.isArray(datosMatriz.matriz) ? datosMatriz.matriz : [];
+        
+        matriz.forEach(item => {
+            const cobertura = item.cobertura || 0;
+            const coberturaClass = cobertura >= 80 ? 'high' : cobertura >= 60 ? 'medium' : 'low';
+            
+            html += `
+                <tr>
+                    <td><strong>${item.competencia || 'Sin nombre'}</strong></td>
+                    <td>
+                        ${item.asignaturas?.length 
+                            ? `<div class="asignaturas-list">${item.asignaturas.map(a => 
+                                `<span class="asignatura-tag">${a.codigo || a.nombre || 'N/A'}</span>`
+                            ).join('')}</div>`
+                            : '<span class="no-data">No asignada</span>'
+                        }
+                    </td>
+                    <td>
+                        <div class="coverage-bar">
+                            <div class="coverage-fill ${coberturaClass}" style="width: ${cobertura}%"></div>
+                            <span class="coverage-text">${cobertura}%</span>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        html += '</tbody></table></div>';
+        
+        return html;
+    }
+
+    static crearNavegacionAneca() {
+        const container = document.getElementById('results-container');
+        if (!container) return;
+    
+        // Limpiar contenedor
+        container.innerHTML = '';
+    
+        // Crear navegación
+        container.innerHTML += `
+            <div class="aneca-navigation">
+                <h2>🏛️ SISTEMA DE EVALUACIÓN ANECA/AUDIT</h2>
+                <div class="nav-tabs">
+                    <button class="nav-tab active" data-tab="dashboard">📊 Dashboard</button>
+                    <button class="nav-tab" data-tab="matriz1">🔗 Matriz 1: Comp-RA</button>
+                    <button class="nav-tab" data-tab="matriz2">📚 Matriz 2: RA-Asig</button>
+                    <button class="nav-tab" data-tab="matriz3">🔄 Matriz 3: Comp-Asig</button>
+                    <button class="nav-tab" data-tab="matriz4">🎯 Matriz 4: Cont-RA</button>
+                    <button class="nav-tab" data-tab="acreditacion">✅ Acreditación</button>
+                </div>
+            </div>
+            
+            <div class="aneca-content">
+                <div id="aneca-dashboard" class="tab-content active"></div>
+                <div id="aneca-matriz1" class="tab-content"></div>
+                <div id="aneca-matriz2" class="tab-content"></div>
+                <div id="aneca-matriz3" class="tab-content"></div>
+                <div id="aneca-matriz4" class="tab-content"></div>
+                <div id="aneca-acreditacion" class="tab-content"></div>
+            </div>
+        `;
+    
+        // ✅ Asegurar que los contenedores se crearon
+        console.log("✅ Contenedores creados:", {
+            dashboard: !!document.getElementById('aneca-dashboard'),
+            matriz1: !!document.getElementById('aneca-matriz1'),
+            matriz2: !!document.getElementById('aneca-matriz2'),
+            matriz3: !!document.getElementById('aneca-matriz3'),
+            matriz4: !!document.getElementById('aneca-matriz4'),
+            acreditacion: !!document.getElementById('aneca-acreditacion')
+        });
+    
+        // Configurar eventos de navegación
+        this.configurarNavegacionAneca();
+    }
+    
     // ✅ NUEVO: Métodos auxiliares
     static cambiarPestana(tabName) {
         document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
@@ -494,4 +715,5 @@ export class ResultsDisplay {
 
 }
 window.ResultsDisplay = ResultsDisplay;
+
 
