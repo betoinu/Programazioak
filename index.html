@@ -67,13 +67,14 @@
                         <button class="tab-button" data-tab="matrices">📈 Matrizeak</button>
                     </div>
                 </div>
-
-                <!-- Contenido de Pestañas -->
+                
+                <!-- Contenido de Pestañas - SOLO 4 PESTAÑAS -->
                 <div id="tab-content">
                     <!-- Pestaña Resumen -->
                     <div id="tab-resumen" class="tab-panel active">
-                        <div id="analysis-summary" class="result-section">
-                            <h3 class="text-xl font-semibold mb-4">📊 Laburpen Exekutiboa</h3>
+                        <div id="results-container" class="result-section">
+                            <!-- ELIMINAR analysis-summary, usar solo results-container -->
+                            <h3 class="text-xl font-semibold mb-4">📊 ANECA Emaitzak - Laburpen Exekutiboa</h3>
                             <div id="summary-content" class="text-gray-700">
                                 <p>Analisia abiarazi ezazu planaren diagnostiko osoa ikusteko.</p>
                             </div>
@@ -108,16 +109,6 @@
                                 <p>Matrize analisiak hemen bistaratuko dira.</p>
                             </div>
                         </div>
-                    </div>
-
-
-                    <div id="tab-results" class="tab-panel active">
-                        <div id="results-container" class="result-section">
-                            <h3 class="text-xl font-semibold mb-4">📈 ANECA Emaitzak</h3>
-                            <div id="results-content">
-                                <p>Emaitza txostenak hemen bistaratuko dira.</p>
-                            </div>
-                        </div>                        
                     </div>
                 </div>
             </div>
@@ -547,6 +538,7 @@ window.mostrarResultadosAnalisisGlobal = function(resultados) {
     </script>
 </body>
 </html>
+
 
 
 
