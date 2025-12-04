@@ -223,7 +223,7 @@
         console.log('- AnecaAPI:', typeof AnecaAPI);
         console.log('- CompetenceMapper:', typeof CompetenceMapper);
         console.log('- GapAnalyzer:', typeof GapAnalyzer);
-        console.log('- DataService:', typeof DataService);
+        console.log("- CurriculumDataService:", CurriculumDataService);
         
         // Configurar pestañas (código anterior...)
         const tabButtons = document.querySelectorAll('.tab-button');
@@ -304,7 +304,7 @@
         try {
             // 1. Cargar datos del curriculum
             console.log('📥 Curriculum datuak kargatzen...');
-            const curriculumData = await DataService.getCurriculumData();
+            const curriculumData = await CurriculumDataService.getCurriculumData();
             console.log('✅ Curriculum datuak kargatuta:', curriculumData);
             
             // 2. Verificar módulos disponibles
@@ -537,6 +537,7 @@ window.mostrarResultadosAnalisisGlobal = function(resultados) {
     </script>
 </body>
 </html>
+
 
 
 
