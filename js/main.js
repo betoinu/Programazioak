@@ -106,10 +106,22 @@ async function initializeGlobalAnalysis() {
         console.log('✅ Análisis ANECA completado');
         
         // 5. MOSTRAR DASHBOARD COMPLETO
-const resultados = 
+        const resultados = {
+            curriculumData,
+            ambitosProfesionales,
+            progresionCompetencial,
+            matrizCompetenciasRA,
+            matrizRAsignaturas,
+            matrizCompetenciasAsignaturas,
+            matrizContenidosRA,
+            indicadoresAcreditacion,
+            validacionANECA,
+            analisisHuecos
+        };
         
-        // ✅ USAR LA FUNCIÓN CORRECTA
+        // Mostrar dashboard
         ResultsDisplay.displayAnecaResults(resultados);
+        
         console.log("✅ Dashboard mostrado en interfaz");
         initializeMatrixVisualization(resultados);
     } catch (error) {  // ← MANTENER el catch
@@ -179,6 +191,7 @@ window.initializeGlobalAnalysis = initializeGlobalAnalysis;
 window.setupBidirectionalSystem = setupBidirectionalSystem;
 
 console.log('✅ Todos los módulos ANECA exportados al objeto global');
+
 
 
 
