@@ -105,30 +105,46 @@ async function initializeGlobalAnalysis() {
         
         console.log('✅ Análisis ANECA completado');
         
-        // 5. MOSTRAR DASHBOARD COMPLETO
-        const resultados = {
-            curriculumData,
-            ambitosProfesionales,
-            progresionCompetencial,
-            matrizCompetenciasRA,
-            matrizRAsignaturas,
-            matrizCompetenciasAsignaturas,
-            matrizContenidosRA,
-            indicadoresAcreditacion,
-            validacionANECA,
-            analisisHuecos
-        };
+        const resultadosCompletos = {
+                    matrices: {
+                        competenciasRA: matrizCompetenciasRA,
+                        RAsignaturas: matrizRAsignaturas,
+                        competenciasAsignaturas: matrizCompetenciasAsignaturas,
+                        contenidosRA: matrizContenidosRA
+                    },
+                    indicadoresAcreditacion: indicadoresAcreditacion,
+                    huecos: analisisHuecos, // Incluir huecos
+                    validacionANECA: validacionANECA,
+                    metadata: {
+                        totalCompetencias: matrizCompetenciasRA.competencias?.length || 0,
+                        totalAsignaturas: matrizRAsignaturas.matriz?.[0]?.asignaturas?.length || 0,
+                        totalRA: matrizCompetenciasRA.metricas?.totalRAs || 0,
+                        totalHuecos: analisisHuecos?.huecos?.length || 0,
+                        cumplimientoGlobal: indicadoresAcreditacion?.cumplimientoGlobal?.puntuacion || 0
+                    },
+                    // Mantener compatibilidad con código existente si es necesario
+                    curriculumData: curriculumData,
+                    ambitosProfesionales: ambitosProfesionales,
+                    progresionCompetencial: progresionCompetencial
+                };
         
-        // Mostrar dashboard
-        ResultsDisplay.displayAnecaResults(resultados);
-        
-        console.log("✅ Dashboard mostrado en interfaz");
-        initializeMatrixVisualization(resultados);
-    } catch (error) {  // ← MANTENER el catch
-        console.error('❌ Error en Análisis Global ANECA:', error);
-        showError(`Error en análisis ANECA: ${error.message}`);
-    }
-}
+                console.log("✅ ResultadosCompletos creados:", {
+                    matrices: Object.keys(resultadosCompletos.matrices),
+                    tieneIndicadores: !!resultadosCompletos.indicadoresAcreditacion,
+                    metadata: resultadosCompletos.metadata
+                });
+                
+                // 6. MOSTRAR DASHBOARD COMPLETO
+                ResultsDisplay.displayAnecaResults(resultadosCompletos);
+                
+                console.log("✅ Dashboard mostrado en interfaz");
+                initializeMatrixVisualization(resultadosCompletos);
+                
+            } catch (error) {
+                console.error('❌ Error en Análisis Global ANECA:', error);
+                showError(`Error en análisis ANECA: ${error.message}`);
+            }
+        }
 
 // ===== SISTEMA BIDIRECCIONAL =====
 function setupBidirectionalSystem() {
@@ -142,7 +158,7 @@ function setupBidirectionalSystem() {
         const { asignatura, cambios } = event.detail;
         this.actualizarAnalisisGlobal(asignatura, cambios);
     });
-} // ✅ LLAVE CERRADA
+} // ← ESTE } CIERRA setupBidirectionalSystem
 
 // ===== ✅ NUEVA FUNCIÓN: VISUALIZACIÓN DE MATRICES ANECA =====
 function initializeMatrixVisualization(resultados) {
@@ -191,6 +207,7 @@ window.initializeGlobalAnalysis = initializeGlobalAnalysis;
 window.setupBidirectionalSystem = setupBidirectionalSystem;
 
 console.log('✅ Todos los módulos ANECA exportados al objeto global');
+
 
 
 
