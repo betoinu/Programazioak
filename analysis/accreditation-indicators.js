@@ -4,43 +4,38 @@ export class AccreditationIndicators {
         console.log("📊 Generando reporte de acreditación ANECA/AUDIT...");
         
         try {
+            const indicadores = {
+                claridadCoherencia: this.evaluarClaridadCoherencia(curriculumData, matrices),
+                coberturaCurricular: this.evaluarCoberturaCurricular(matrices),
+                evaluacionAprendizaje: this.evaluarSistemaEvaluacion(curriculumData, matrices),
+                mejoraContinua: this.evaluarSistemaMejoraContinua(curriculumData)
+            };
+    
             const reporte = {
-                // ✅ INFORMACIÓN BÁSICA
                 metadata: {
                     fechaGeneracion: new Date().toISOString(),
                     version: '1.0',
                     estandar: 'ANECA/AUDIT',
                     titulacion: curriculumData.titulacion || 'No especificado'
                 },
-                
-                // ✅ INDICADORES CLAVE ORGANIZADOS POR CRITERIOS ANECA
-                indicadores: {
-                    // CRITERIO A: Claridad y coherencia del perfil de egreso
-                    claridadCoherencia: this.evaluarClaridadCoherencia(curriculumData, matrices),
-                    
-                    // CRITERIO B: Cobertura curricular  
-                    coberturaCurricular: this.evaluarCoberturaCurricular(matrices),
-                    
-                    // CRITERIO C: Evaluación del aprendizaje
-                    evaluacionAprendizaje: this.evaluarSistemaEvaluacion(curriculumData, matrices),
-                    
-                    // CRITERIO D: Mejora continua
-                    mejoraContinua: this.evaluarSistemaMejoraContinua(curriculumData)
-                },
-                
-                // ✅ PUNTUACIÓN GLOBAL Y RECOMENDACIONES
-                resumenEjecutivo: this.generarResumenEjecutivo(curriculumData, matrices),
+    
+                indicadores,
+    
+                resumenEjecutivo: this.generarResumenEjecutivo(indicadores),
+    
                 cumplimientoGlobal: this.calcularCumplimientoGlobal(),
+    
                 recomendacionesPrioritarias: this.generarRecomendacionesPrioritarias()
             };
-            
+    
             return reporte;
-            
+    
         } catch (error) {
             console.error('❌ Error al generar reporte de acreditación:', error);
             throw error;
         }
     }
+
 
     // === CRITERIO A: CLARIDAD Y COHERENCIA DEL PERFIL DE EGRESO ===
     static evaluarClaridadCoherencia(curriculumData, matrices) {
@@ -310,17 +305,17 @@ export class AccreditationIndicators {
     }
 
     // === RESÚMENES Y PUNTUACIONES GLOBALES ===
-    static generarResumenEjecutivo(curriculumData, matrices) {
-        const indicadores = this.generarReporteAcreditacionCompleto(curriculumData, matrices).indicadores;
-        
+    static generarResumenEjecutivo(indicadores) {
         return {
             puntuacionGlobal: this.calcularPuntuacionGlobal(indicadores),
             estadoGeneral: this.determinarEstadoGeneral(indicadores),
             fortalezasPrincipales: this.identificarFortalezasPrincipales(indicadores),
             debilidadesCriticas: this.identificarDebilidadesCriticas(indicadores),
-            prioridadesAccion: this.establecerPrioridadesAccion(indicadores)
+            prioridadesAccion: this.establecerPrioridadesAccion(indicadores),
+            fechaGeneracion: new Date().toISOString()
         };
     }
+
 
     static calcularCumplimientoGlobal() {
         // Lógica para calcular cumplimiento global basado en todos los indicadores
@@ -1216,102 +1211,7 @@ static generarRecomendacionesSeguimiento(curriculumData) {
     
     return recomendaciones;
 }
-// === MÉTODOS DE RESUMEN EJECUTIVO ===
-
-static generarResumenEjecutivo(curriculumData, matrices) {
-    const indicadores = this.generarReporteAcreditacionCompleto(curriculumData, matrices).indicadores;
-    
-    return {
-        puntuacionGlobal: this.calcularPuntuacionGlobal(indicadores),
-        estadoGeneral: this.determinarEstadoGeneral(indicadores),
-        fortalezasPrincipales: this.identificarFortalezasPrincipales(indicadores),
-        debilidadesCriticas: this.identificarDebilidadesCriticas(indicadores),
-        prioridadesAccion: this.establecerPrioridadesAccion(indicadores),
-        fechaGeneracion: new Date().toISOString()
-    };
-}
-
-static calcularCumplimientoGlobal() {
-    return {
-        puntuacionTotal: 0, // Se calculará dinámicamente
-        nivelCumplimiento: 'EN_PROCESO',
-        criteriosCumplidos: 0,
-        criteriosPendientes: 0,
-        fechaProximaEvaluacion: this.calcularFechaProximaEvaluacion()
-    };
-}
-
-static determinarEstadoGeneral(indicadores) {
-    const puntuacionGlobal = this.calcularPuntuacionGlobal(indicadores);
-    
-    if (puntuacionGlobal >= 80) return 'EXCELENTE';
-    if (puntuacionGlobal >= 60) return 'SATISFACTORIO';
-    if (puntuacionGlobal >= 40) return 'MEJORABLE';
-    return 'CRÍTICO';
-}
-
-static identificarFortalezasPrincipales(indicadores) {
-    const fortalezas = [];
-    
-    Object.entries(indicadores).forEach(([criterio, subindicadores]) => {
-        Object.entries(subindicadores).forEach(([codigo, indicador]) => {
-            if (indicador.puntuacion >= 80) {
-                fortalezas.push({
-                    criterio: codigo,
-                    indicador: indicador.indicador,
-                    puntuacion: indicador.puntuacion
-                });
-            }
-        });
-    });
-    
-    return fortalezas;
-}
-
-static identificarDebilidadesCriticas(indicadores) {
-    const debilidades = [];
-    
-    Object.entries(indicadores).forEach(([criterio, subindicadores]) => {
-        Object.entries(subindicadores).forEach(([codigo, indicador]) => {
-            if (indicador.puntuacion < 60) {
-                debilidades.push({
-                    criterio: codigo,
-                    indicador: indicador.indicador,
-                    puntuacion: indicador.puntuacion,
-                    estado: indicador.estado
-                });
-            }
-        });
-    });
-    
-    return debilidades;
-}
-
-static establecerPrioridadesAccion(indicadores) {
-    const debilidades = this.identificarDebilidadesCriticas(indicadores);
-    
-    return debilidades.map(debilidad => ({
-        prioridad: debilidad.puntuacion < 40 ? 'ALTA' : 'MEDIA',
-        area: debilidad.criterio,
-        accion: `Mejorar ${debilidad.indicador.toLowerCase()}`,
-        plazo: debilidad.puntuacion < 40 ? '3 meses' : '6 meses',
-        responsable: 'Coordinación de titulación'
-    }));
-}
-
-static calcularPuntuacionGlobal(indicadores) {
-    let puntuacionTotal = 0;
-    let totalIndicadores = 0;
-    
-    Object.values(indicadores).forEach(criterio => {
-        Object.values(criterio).forEach(indicador => {
-            puntuacionTotal += indicador.puntuacion || 0;
-            totalIndicadores++;
-        });
-    });
-    
-    return totalIndicadores > 0 ? puntuacionTotal / totalIndicadores : 0;
-}   
+ 
 // Continúa con los demás métodos faltantes...  
     
     // === MÉTODOS DE FECHA Y TEMPORALIDAD ===
@@ -1322,6 +1222,7 @@ static calcularPuntuacionGlobal(indicadores) {
     }
 
 }
+
 
 
 
