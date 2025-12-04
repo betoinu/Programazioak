@@ -165,11 +165,88 @@ export class ResultsDisplay {
                 </div>
             </div>
         `;
-
+        this.actualizarPestanasInferiores(resultados);
         // Guardar datos para acceso rápido
         window.anecaResults = resultados;
     }
 
+    static actualizarPestanasInferiores(resultados) {
+        // 1. Pestaña Competencias
+        const competenceContent = document.getElementById('competence-content');
+        if (competenceContent && resultados.matrices?.competenciasRA) {
+            competenceContent.innerHTML = this.generarTablaCompetencias(resultados.matrices.competenciasRA);
+        }
+        
+        // 2. Pestaña Huecos
+        const gapContent = document.getElementById('gap-content');
+        if (gapContent && resultados.huecos) {
+            gapContent.innerHTML = this.generarTablaHuecos(resultados.huecos);
+        }
+        
+        // 3. Pestaña Matrices
+        const matrixContent = document.getElementById('matrix-content');
+        if (matrixContent) {
+            matrixContent.innerHTML = `
+                <div class="matrix-links">
+                    <h4>Matrices ANECA Disponibles</h4>
+                    <div class="matrix-link" onclick="ResultsDisplay.mostrarMatriz1()">
+                        🔗 Matriz Competencias-RA
+                    </div>
+                    <div class="matrix-link" onclick="ResultsDisplay.mostrarMatriz2()">
+                        📚 Matriz RA-Asignaturas
+                    </div>
+                    <div class="matrix-link" onclick="ResultsDisplay.mostrarMatriz3()">
+                        🔄 Matriz Competencias-Asignaturas
+                    </div>
+                    <div class="matrix-link" onclick="ResultsDisplay.mostrarMatriz4()">
+                        🎯 Matriz Contenidos-RA
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    static generarTablaCompetencias(competenciasRA) {
+    if (!competenciasRA?.competencias) return '<p>No hay datos de competencias</p>';
+    
+    let html = '<table class="competence-table"><thead><tr><th>Competencia</th><th>RAs</th><th>Ámbito</th></tr></thead><tbody>';
+    
+    competenciasRA.competencias.forEach(comp => {
+        html += `
+            <tr>
+                <td><strong>${comp.nombre}</strong></td>
+                <td>${comp.RAs?.length || 0}</td>
+                <td>${comp.ambito || 'No especificado'}</td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table>';
+    return html;
+}
+
+    static generarTablaHuecos(huecos) {
+        if (!huecos?.huecos?.length) return '<p>✅ No se detectaron huecos críticos</p>';
+        
+        let html = '<div class="gap-list">';
+        
+        huecos.huecos.forEach(hueco => {
+            html += `
+                <div class="gap-item ${hueco.prioridad}">
+                    <div class="gap-header">
+                        <strong>${hueco.tipo}</strong>
+                        <span class="gap-priority">${hueco.prioridad}</span>
+                    </div>
+                    <div class="gap-description">${hueco.descripcion}</div>
+                    ${hueco.recomendacion ? `<div class="gap-recommendation">📝 ${hueco.recomendacion}</div>` : ''}
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        return html;
+    }
+    
     // ✅ NUEVO: Preparar secciones para matrices individuales
     static prepararSeccionesMatrices(resultados) {
         // Las matrices se cargarán bajo demanda cuando el usuario haga clic
@@ -180,9 +257,41 @@ export class ResultsDisplay {
     static mostrarMatriz1() {
         this.cambiarPestana('matriz1');
         const container = document.getElementById('aneca-matriz1');
-        if (window.anecaResults && window.MatrixDisplay) {
-            MatrixDisplay.mostrarMatrizCompetenciasRA(window.anecaResults.matrices.competenciasRA, 'aneca-matriz1');
+        
+        if (window.anecaResults?.matrices?.competenciasRA && window.MatrixDisplay) {
+            // Asegúrate de que MatrixDisplay tenga el método correcto
+            if (MatrixDisplay.mostrarMatrizCompetenciasRA) {
+                MatrixDisplay.mostrarMatrizCompetenciasRA(
+                    window.anecaResults.matrices.competenciasRA, 
+                    'aneca-matriz1'
+                );
+            } else {
+                container.innerHTML = this.generarMatrizSimple(
+                    window.anecaResults.matrices.competenciasRA,
+                    'Matriz 1: Competencias - RA'
+                );
+            }
+        } else {
+            container.innerHTML = '<p>❌ No hay datos de matriz disponibles</p>';
         }
+    }
+
+    static generarMatrizSimple(datosMatriz, titulo) {
+        if (!datosMatriz?.competencias) return '<p>No hay datos de matriz</p>';
+        
+        let html = `<h3>${titulo}</h3><div class="matrix-container">`;
+        
+        datosMatriz.competencias.forEach(competencia => {
+            html += `
+                <div class="matrix-row">
+                    <div class="competence-cell"><strong>${competencia.nombre}</strong></div>
+                    <div class="ra-cell">${competencia.RAs?.length || 0} RAs</div>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        return html;
     }
 
     static mostrarMatriz2() {
@@ -385,3 +494,4 @@ export class ResultsDisplay {
 
 }
 window.ResultsDisplay = ResultsDisplay;
+
