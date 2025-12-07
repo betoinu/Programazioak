@@ -20,6 +20,8 @@ import { showError, hideError, setLoadingState } from '/Programazioak/utils/ui-h
 import { AccreditationIndicators } from '/Programazioak/analysis/accreditation-indicators.js';
 import { DiagnosticSystem } from '/Programazioak/utils/diagnostic-system.js';
 import BloomAnalyzer from '/Programazioak/analysis/BloomAnalyzer.js';
+import CurriculumCoverage_v2 from '/Programazioak/analysis/CurriculumCoverage_v2.js';
+import ContentAlignment_v2 from '/Programazioak/analysis/ContentAlignment_v2.js';
 
 
 // ===== INICIALIZACIÓN PRINCIPAL =====
@@ -193,9 +195,9 @@ window.ResultsDisplay = ResultsDisplay;
 // Sistema ANECA completo
 window.GlobalAnalyzer = GlobalAnalyzer;
 window.CompetenceMapper = CompetenceMapper;
-window.CurriculumCoverage = CurriculumCoverage;
+window.CurriculumCoverage = CurriculumCoverage_v2;
 window.HorizontalCoherence = HorizontalCoherence;
-window.ContentAlignment = ContentAlignment;
+window.ContentAlignment = ContentAlignment_v2;
 window.AnecaValidator = AnecaValidator;
 window.MatrixDisplay = MatrixDisplay;
 window.GapAnalyzer = GapAnalyzer;
@@ -209,6 +211,7 @@ window.initializeGlobalAnalysis = initializeGlobalAnalysis;
 window.setupBidirectionalSystem = setupBidirectionalSystem;
 
 console.log('✅ Todos los módulos ANECA exportados al objeto global');
+
 
 
 
