@@ -1,3 +1,4 @@
+import BloomAnalyzer from '/Programazioak/analysis/BloomAnalyzer.js';
 export class ContentAlignment {
     static generarMatrizContenidosRA(curriculumData) {
         const matriz = [];
@@ -76,7 +77,7 @@ export class ContentAlignment {
                 RAs.push({
                     ra: ra.descripcion || ra,
                     codigoRA: ra.codigo || `RA${ra.id}`,
-                    fuerzaRelacion: this.calcularFuerzaRelacion(textoContenido, textoRA),
+                    fuerzaRelacion: BloomAnalyzer.calculateBloomAlignment(textoContenido, textoRA).score
                     // ✅ MEJORA: Añadir información ANECA
                     nivelContribucion: this.determinarNivelContribucionRA(textoContenido, textoRA),
                     verbosAccion: this.extraerVerbosAccion(textoRA),
@@ -90,23 +91,10 @@ export class ContentAlignment {
     }
     
     static hayCoincidenciaSemantica(textoContenido, textoRA) {
-        const palabrasClaveContenido = this.extraerPalabrasClave(textoContenido);
-        const palabrasClaveRA = this.extraerPalabrasClave(textoRA);
-        
-        // ✅ MEJORA: Coincidencia más inteligente con verbos de acción
-        const verbosComunes = this.extraerVerbosComunes(textoContenido, textoRA);
-        if (verbosComunes.length > 0) {
-            return true;
-        }
-        
-        // Coincidencia por palabras clave significativas
-        const coincidencias = palabrasClaveContenido.filter(palabra => 
-            palabrasClaveRA.includes(palabra)
-        );
-        
-        return coincidencias.length >= 2; // Mínimo 2 coincidencias
-    }
-    
+        const bloom = BloomAnalyzer.inferBloomLevel(contenido);
+        return bloom?.category || 'COMPRENDER';
+    }  
+   
     static extraerPalabrasClave(texto) {
         const stopWords = ['de', 'la', 'el', 'y', 'en', 'a', 'los', 'las', 'del', 'se', 'con', 'por', 'para', 'su'];
         const palabras = texto.split(/\s+/)
@@ -117,18 +105,8 @@ export class ContentAlignment {
     }
     
     static calcularFuerzaRelacion(textoContenido, textoRA) {
-        const palabrasContenido = this.extraerPalabrasClave(textoContenido);
-        const palabrasRA = this.extraerPalabrasClave(textoRA);
-        
-        const coincidencias = palabrasContenido.filter(palabra => 
-            palabrasRA.includes(palabra)
-        );
-        
-        // ✅ MEJORA: Considerar verbos de acción en el cálculo
-        const verbosComunes = this.extraerVerbosComunes(textoContenido, textoRA);
-        const bonusVerbos = verbosComunes.length * 0.2;
-        
-        return Math.min(1, (coincidencias.length / Math.max(palabrasContenido.length, palabrasRA.length)) + bonusVerbos);
+        const bloom = BloomAnalyzer.inferBloomLevel(contenido);
+        return bloom?.category || 'COMPRENDER';
     }
     
     static determinarNivelContenido(contenido, RAsRelacionados) {
@@ -284,25 +262,8 @@ export class ContentAlignment {
 
     // ✅ NUEVO: Determinar nivel Bloom del contenido
     static determinarNivelBloomContenido(contenido) {
-        const texto = contenido.toLowerCase();
-        const verbos = this.extraerVerbosAccion(texto);
-        
-        const nivelesBloom = {
-            'RECORDAR': ['definir', 'identificar', 'listar', 'nombrar', 'recordar'],
-            'COMPRENDER': ['describir', 'explicar', 'interpretar', 'parafrasear', 'resumir'],
-            'APLICAR': ['aplicar', 'calcular', 'demostrar', 'emplear', 'usar'],
-            'ANALIZAR': ['analizar', 'comparar', 'contrastar', 'diferenciar', 'organizar'],
-            'EVALUAR': ['evaluar', 'criticar', 'justificar', 'valorar', 'verificar'],
-            'CREAR': ['crear', 'diseñar', 'desarrollar', 'formular', 'planificar']
-        };
-        
-        for (const [nivel, verbosNivel] of Object.entries(nivelesBloom)) {
-            if (verbos.some(verbo => verbosNivel.includes(verbo))) {
-                return nivel;
-            }
-        }
-        
-        return 'COMPRENDER'; // Por defecto
+        const bloom = BloomAnalyzer.inferBloomLevel(contenido);
+        return bloom?.category || 'COMPRENDER';
     }
 
     // ✅ NUEVO: Generar evidencias ANECA
@@ -346,20 +307,13 @@ export class ContentAlignment {
     }
 
     static extraerVerbosAccion(texto) {
-        const verbos = ['analizar', 'aplicar', 'calcular', 'clasificar', 'comparar', 'crear',
-                       'demostrar', 'diseñar', 'evaluar', 'explicar', 'identificar', 'implementar',
-                       'justificar', 'proponer', 'resolver', 'sintetizar', 'validar'];
-        
-        return texto.toLowerCase().split(' ')
-            .filter(palabra => verbos.includes(palabra))
-            .filter((v, i, a) => a.indexOf(v) === i);
+        const bloom = BloomAnalyzer.inferBloomLevel(contenido);
+        return bloom?.category || 'COMPRENDER';
     }
 
     static extraerVerbosComunes(textoContenido, textoRA) {
-        const verbosContenido = this.extraerVerbosAccion(textoContenido);
-        const verbosRA = this.extraerVerbosAccion(textoRA);
-        
-        return verbosContenido.filter(verbo => verbosRA.includes(verbo));
+        const bloom = BloomAnalyzer.inferBloomLevel(contenido);
+        return bloom?.category || 'COMPRENDER';
     }
 
     static extraerCriteriosEvaluacion(ra) {
