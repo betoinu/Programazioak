@@ -73,13 +73,13 @@ async function initializeGlobalAnalysis() {
         const matrizCompetenciasRA = await CompetenceMapper.generarMatrizCompetenciasRA(curriculumData);
         
         console.log("📊 Generando Matriz 2: RA - Asignaturas...");
-        const matrizRAsignaturas = await CurriculumCoverage.generarMatrizRAsignaturas(curriculumData);
+        const matrizRAsignaturas = await CurriculumCoverage_v2.generarMatrizRAsignaturas(curriculumData);
         
         console.log("📊 Generando Matriz 3: Competencias - Asignaturas...");
         const matrizCompetenciasAsignaturas = await HorizontalCoherence.generarMatrizCompetenciasAsignaturas(curriculumData);
         
         console.log("📊 Generando Matriz 4: Contenidos - RA...");
-        const matrizContenidosRA = await ContentAlignment.generarMatrizContenidosRA(curriculumData);
+        const matrizContenidosRA = await ContentAlignment_v2.generarMatrizContenidosRA(curriculumData);
         
         // ✅ NUEVO: INDICADORES DE ACREDITACIÓN ANECA
         console.log("📊 Generando Indicadores de Acreditación ANECA...");
@@ -211,6 +211,7 @@ window.initializeGlobalAnalysis = initializeGlobalAnalysis;
 window.setupBidirectionalSystem = setupBidirectionalSystem;
 
 console.log('✅ Todos los módulos ANECA exportados al objeto global');
+
 
 
 
