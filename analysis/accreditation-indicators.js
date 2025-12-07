@@ -11,6 +11,9 @@ export class AccreditationIndicators {
                 mejoraContinua: this.evaluarSistemaMejoraContinua(curriculumData)
             };
     
+            const bloomIndicators = BloomAnalyzer.getIndicators({ curriculumData, matrices });
+                reporte.indicadoresBloom = bloomIndicators;
+            
             const reporte = {
                 metadata: {
                     fechaGeneracion: new Date().toISOString(),
@@ -29,7 +32,7 @@ export class AccreditationIndicators {
             };
     
             return reporte;
-    
+            
         } catch (error) {
             console.error('❌ Error al generar reporte de acreditación:', error);
             throw error;
@@ -244,20 +247,10 @@ export class AccreditationIndicators {
     static evaluarRAMedibles(matrizCompetenciaRA) {
         if (!matrizCompetenciaRA?.competencias) return 'NO_EVALUADO';
         
-        const rasMedibles = matrizCompetenciaRA.competencias.reduce((count, competencia) => {
-            if (competencia.resultadosAprendizaje) {
-                return count + competencia.resultadosAprendizaje.filter(ra =>
-                    this.esRAMedible(ra.descripcion)
-                ).length;
-            }
-            return count;
-        }, 0);
-        
-        const totalRAs = matrizCompetenciaRA.competencias.reduce((count, competencia) => {
-            return count + (competencia.resultadosAprendizaje?.length || 0);
-        }, 0);
-        
-        const porcentaje = totalRAs > 0 ? (rasMedibles / totalRAs) * 100 : 0;
+        const allRAs = []; // extraer todos los RAs tal como haces ahora
+        matrices.competenciaRA.competencias.forEach(c => allRAs.push(...(c.resultadosAprendizaje || [])));
+        const coverage = BloomAnalyzer.calculateBloomCoverage(allRAs);
+        const porcentaje = 100 - (coverage.percentages.no_identificado || 0); // o define medible como niveles >= X
         
         if (porcentaje >= 80) return 'CUMPLE_TOTALMENTE';
         if (porcentaje >= 60) return 'CUMPLE_PARCIALMENTE';
@@ -288,20 +281,17 @@ export class AccreditationIndicators {
     }
 
     // === MÉTODOS AUXILIARES GENERALES ===
+    import BloomAnalyzer from '/Programazioak/analysis/BloomAnalyzer.js';
+
     static contieneVerboAccion(texto) {
-        const verbosAccion = ['analizar', 'aplicar', 'calcular', 'clasificar', 'comparar', 'crear',
-                            'demostrar', 'diseñar', 'evaluar', 'explicar', 'identificar', 'implementar'];
-        return verbosAccion.some(verbo => texto.toLowerCase().includes(verbo));
+      const inferred = BloomAnalyzer.inferBloomLevel(texto);
+      return !!inferred;
     }
 
     static esRAMedible(descripcionRA) {
-        if (!descripcionRA) return false;
-        
-        const verbosObservables = ['analizar', 'aplicar', 'calcular', 'clasificar', 'comparar', 'crear',
-                                 'demostrar', 'diseñar', 'evaluar', 'explicar', 'identificar', 'implementar'];
-        
-        const primerVerbo = descripcionRA.toLowerCase().split(' ')[0];
-        return verbosObservables.includes(primerVerbo);
+      const inferred = BloomAnalyzer.inferBloomLevel(descripcionRA);
+      // Considerar 'medible' si inferido y nivel >= 1
+      return !!inferred;
     }
 
     // === RESÚMENES Y PUNTUACIONES GLOBALES ===
@@ -1222,6 +1212,7 @@ static generarRecomendacionesSeguimiento(curriculumData) {
     }
 
 }
+
 
 
 
