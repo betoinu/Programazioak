@@ -1,3 +1,4 @@
+import BloomAnalyzer from '/Programazioak/analysis/BloomAnalyzer.js';
 export class CurriculumCoverage {
     static generarMatrizRAsignaturas(curriculumData) {
         const matriz = [];
@@ -464,3 +465,4 @@ export class CurriculumCoverage {
         return [...new Set(niveles)]; // Eliminar duplicados
     }
 } // ✅ ÚNICA LLAVE DE CIERRE AL FINAL
+
