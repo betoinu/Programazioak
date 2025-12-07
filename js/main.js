@@ -22,6 +22,7 @@ import { DiagnosticSystem } from '/Programazioak/utils/diagnostic-system.js';
 import BloomAnalyzer from '/Programazioak/analysis/BloomAnalyzer.js';
 import CurriculumCoverage_v2 from '/Programazioak/analysis/CurriculumCoverage_v2.js';
 import ContentAlignment_v2 from '/Programazioak/analysis/ContentAlignment_v2.js';
+import AccreditationIndicators_v2 from '/Programazioak/analysis/AccreditationIndicators_v2.js';
 
 
 // ===== INICIALIZACIÓN PRINCIPAL =====
@@ -62,6 +63,27 @@ async function initializeGlobalAnalysis() {
             }
         }
         const curriculumData = await CurriculumDataService.loadData();
+
+        // === NUEVO: Procesamiento ANECA v2 ===
+
+        const indicadoresANECA_v2 = AccreditationIndicators_v2.generarIndicadoresANECACurriculum(
+            curriculumData.competencias || [],
+            curriculumData.resultadosAprendizaje || [],
+            curriculumData.contenidos || []
+        );
+        
+        // === NUEVO: Matrices v2 ===
+        const matrizCobertura_v2 = CurriculumCoverage_v2.generarMatrizRAsignaturas(curriculumData);
+        const matrizContenidos_v2 = ContentAlignment_v2.generarMatrizContenidosRA(curriculumData);
+        
+        // === Logging de verificación ===
+        console.group("ANECA v2 - Verificación inicial");
+        console.log("Indicadores v2:", indicadoresANECA_v2);
+        console.log("Cobertura v2:", matrizCobertura_v2);
+        console.log("Alineación Contenidos v2:", matrizContenidos_v2);
+        console.log("Bloom Indicators:", BloomAnalyzer.getIndicators(curriculumData));
+        console.groupEnd();
+
         
         // 1. ANÁLISIS MACRO
         const globalAnalyzer = new GlobalAnalyzer(curriculumData);
@@ -211,6 +233,7 @@ window.initializeGlobalAnalysis = initializeGlobalAnalysis;
 window.setupBidirectionalSystem = setupBidirectionalSystem;
 
 console.log('✅ Todos los módulos ANECA exportados al objeto global');
+
 
 
 
