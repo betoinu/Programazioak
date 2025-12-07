@@ -1,4 +1,5 @@
 // 📁 analysis/accreditation-indicators.js - NUEVO ARCHIVO
+import BloomAnalyzer from '/Programazioak/analysis/BloomAnalyzer.js';
 export class AccreditationIndicators {
     static generarReporteAcreditacionCompleto(curriculumData, matrices) {
         console.log("📊 Generando reporte de acreditación ANECA/AUDIT...");
@@ -281,8 +282,6 @@ export class AccreditationIndicators {
     }
 
     // === MÉTODOS AUXILIARES GENERALES ===
-    import BloomAnalyzer from '/Programazioak/analysis/BloomAnalyzer.js';
-
     static contieneVerboAccion(texto) {
       const inferred = BloomAnalyzer.inferBloomLevel(texto);
       return !!inferred;
@@ -1212,6 +1211,7 @@ static generarRecomendacionesSeguimiento(curriculumData) {
     }
 
 }
+
 
 
 
