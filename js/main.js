@@ -19,6 +19,8 @@ import { GapAnalyzer } from '/Programazioak/visualization/gap-analyzer.js';
 import { showError, hideError, setLoadingState } from '/Programazioak/utils/ui-helpers.js';
 import { AccreditationIndicators } from '/Programazioak/analysis/accreditation-indicators.js';
 import { DiagnosticSystem } from '/Programazioak/utils/diagnostic-system.js';
+import BloomAnalyzer from '/Programazioak/analysis/BloomAnalyzer.js';
+
 
 // ===== INICIALIZACIÓN PRINCIPAL =====
 document.addEventListener('DOMContentLoaded', async function() {
@@ -207,6 +209,7 @@ window.initializeGlobalAnalysis = initializeGlobalAnalysis;
 window.setupBidirectionalSystem = setupBidirectionalSystem;
 
 console.log('✅ Todos los módulos ANECA exportados al objeto global');
+
 
 
 
