@@ -22,7 +22,7 @@ import { DiagnosticSystem } from '/Programazioak/utils/diagnostic-system.js';
 import BloomAnalyzer from '/Programazioak/analysis/BloomAnalyzer.js';
 import CurriculumCoverage_v2 from '/Programazioak/analysis/CurriculumCoverage_v2.js';
 import ContentAlignment_v2 from '/Programazioak/analysis/ContentAlignment_v2.js';
-import AcreditationIndicators_v2 from '/Programazioak/analysis/AccreditationIndicators_v2.js';
+import AccreditationIndicators_v2 from '/Programazioak/analysis/AccreditationIndicators_v2.js';
 
 
 // ===== INICIALIZACIÓN PRINCIPAL =====
@@ -233,6 +233,7 @@ window.initializeGlobalAnalysis = initializeGlobalAnalysis;
 window.setupBidirectionalSystem = setupBidirectionalSystem;
 
 console.log('✅ Todos los módulos ANECA exportados al objeto global');
+
 
 
 
